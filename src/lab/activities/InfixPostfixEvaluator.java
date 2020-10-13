@@ -12,7 +12,10 @@ public class InfixPostfixEvaluator {
         StringBuilder output = new StringBuilder();
         Stack<String> stack = new MyLinkedList<>();
 
-        System.out.printf("%n%-20s%-50s%-50s", "Token", "Postfix", "Stack");
+        System.out.println("\n|-------------------------------------------------------------------------------------|");
+        System.out.printf("| %-19s %-64s|", "Infix expression ->", infix);
+        System.out.printf("\n| %-9s| %-40s| %-30s |\n", "Symbol", "Postfix", "Stack");
+        System.out.print("|-------------------------------------------------------------------------------------|");
         for (String token : infix.split("(?<=[-+*/^()])|(?=[-+*/^()])")) {
             // operator
             if (isValidOperator(token)) {
@@ -34,20 +37,28 @@ public class InfixPostfixEvaluator {
             } else {
                 output.append(token).append(' ');
             }
-            System.out.printf("%n%-20s%-50s%-50s", token, output.toString(), stack.toString());
+            System.out.printf("\n| %-9s| %-40s| %-30s |", token, output.toString(), stack.toString());
         }
 
         while (!stack.isEmpty()) {
             output.append(stack.pop()).append(' ');
-            System.out.printf("%n%-20s%-50s%-50s", "", output.toString(), stack.toString());
+            System.out.printf("\n| %-9s| %-40s| %-30s |", "", output.toString(), stack.toString());
         }
+        System.out.println("\n|-------------------------------------------------------------------------------------|");
+
         return output.toString();
     }
 
     public static double computePostFix(String postfix) {
         Stack<Double> stack = new MyLinkedList<>();
+        String op1 = "";
+        String op2 = "";
+        String ans = "";
 
-        System.out.printf("%n%-20s%-50s", "Token", "Stack");
+        System.out.println("\n|-------------------------------------------------------------------------------|");
+        System.out.printf("| %-19s %-56s|", "Postfix expression ->", postfix);
+        System.out.printf("\n| %-10s| %-10s| %-10s| %-10s| %-30s|\n", "Symbol", "operand1", "operand2", "value", "Stack");
+        System.out.println("|-------------------------------------------------------------------------------|");
         for (String token : postfix.split("\\s")) {
             try {
                 stack.push((Double.parseDouble(token)));
@@ -55,13 +66,18 @@ public class InfixPostfixEvaluator {
                 try {
                     double a = stack.pop();
                     double b = stack.pop();
-                    stack.push(compute(b, a, token));
+                    double answer = compute(b, a, token);
+                    stack.push(answer);
+                    op1 = Double.toString(b);
+                    op2 = Double.toString(a);
+                    ans = Double.toString(answer);
                 } catch (Exception ex) {
                     System.out.println("Syntax Error");
                 }
             }
-            System.out.printf("%n%-20s%-50s", token, stack.toString());
+            System.out.printf("| %-10s| %-10s| %-10s| %-10s| %-30s|\n", token, op1, op2, ans, stack.toString());
         }
+        System.out.println("|-------------------------------------------------------------------------------|");
 
         return stack.peek();
     }

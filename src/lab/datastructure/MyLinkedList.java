@@ -101,15 +101,25 @@ public class MyLinkedList<T> implements Stack<T> {
      * This toString method returns top, top.next, ... , last item
      * basically, 10,9,8,...,0 not 0,1,2,..,10
      *
-     * @return string form
+     * @return string for
      */
+    @SuppressWarnings("unchecked")
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        if (this.numElements == 0) return "";
+        if (this.numElements == 1) return top.info.toString();
 
-        for (Node<T> s = top; s != null; s = s.link) {
-            sb.append(s.info).append(" ");
-        }
+        T[] symbolsArray = (T[])new Object[numElements];
+        StringBuilder toReturn = new StringBuilder();
 
-        return sb.toString();
+        // input values in array
+        int i = 0;
+        for (Node<T> s = top; s != null; s = s.link, i++)
+            symbolsArray[i] = s.info;
+        // append to string in reverse order of array
+        for (int j = symbolsArray.length-1; j > 0; j--)
+            toReturn.append(symbolsArray[j].toString()).append(", ");
+        toReturn.append(symbolsArray[0]); // to prevent tailing comma
+
+        return toReturn.toString();
     }
 }
