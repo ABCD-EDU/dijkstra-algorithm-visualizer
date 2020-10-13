@@ -67,14 +67,14 @@ public class InfixPostfixEvaluator {
     }
 
     private static double compute(double x, double y, String op) {
-        return switch (op) {
-            case "+" -> x + y;
-            case "-" -> x - y;
-            case "*" -> x * y;
-            case "/" -> x / y;
-            case "^" -> Math.pow(x, y);
-            default -> 0;
-        };
+        switch (op) {
+            case "+": return x + y;
+            case "-": return x - y;
+            case "*": return x * y;
+            case "/": return x / y;
+            case "^": return Math.pow(x, y);
+            default: return 0;
+        }
     }
 
     private static boolean isValidOperator(String token) {
