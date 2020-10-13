@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class InfixPostfixEvaluatorTest {
     @Test
     void testPostfix() {
-        String infix = "2 + 4 / 5 * ( 5 - 3 ) ^ 5 ^ 4";
-        String infix1 = "A * B + C / D";
-        String infix2 = "A * ( B + C ) / D";
-        String infix3 = "A * ( B + C / D )";
-        String infix4 = "A + B + C + D";
+        String infix = "2+4/5*(5-3)^5^4";
+        String infix1 = "A*B+C/D";
+        String infix2 = "A*(B+C)/D";
+        String infix3 = "A*(B+C/D)";
+        String infix4 = "A+B+C+D";
 
         assertEquals("2 4 5 / 5 3 - 5 4 ^ ^ * + ", toPostfix(infix));
         assertEquals("A B * C D / + ", toPostfix(infix1));

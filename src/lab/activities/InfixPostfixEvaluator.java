@@ -13,7 +13,7 @@ public class InfixPostfixEvaluator {
         Stack<String> stack = new MyLinkedList<>();
 
         System.out.printf("%n%-20s%-50s%-50s", "Token", "Postfix", "Stack");
-        for (String token : infix.split("\\s")) {
+        for (String token : infix.split("(?<=[-+*/^()])|(?=[-+*/^()])")) {
             // operator
             if (isValidOperator(token)) {
                 while (!stack.isEmpty() && isHigherPrecedence(token, stack.peek()))
