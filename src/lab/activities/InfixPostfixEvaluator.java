@@ -46,7 +46,7 @@ public class InfixPostfixEvaluator {
         }
         System.out.println("\n|-------------------------------------------------------------------------------------|");
 
-        return output.toString();
+        return output.substring(0, output.length() - 1);
     }
 
     public static double computePostFix(String postfix) {
