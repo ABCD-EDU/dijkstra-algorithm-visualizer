@@ -75,30 +75,15 @@ public class EvaluatorWindow {
         gridBagLayout = new GridBagLayout();
         infixToPostPanel.setLayout(gridBagLayout);
         gridBagLayout.rowHeights = new int[]{30,400,30};
-
-//        infixToPostPanel.setBorder(new EmptyBorder(10,10,10,10));
+        infixToPostPanel.setBorder(new EmptyBorder(10,10,10,10));
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill= GridBagConstraints.BOTH;
         gbc.weightx =1;
         gbc.weighty=1;
 
-//        initializeInfixToPostPanelContents();
-        infixToPostfixLabel = new JLabel("Input Infix Expression:");
-        infixToPostfixInputTextField = new JTextField(20);
-        infixToPostfixButton = new JButton("Convert");
-        infixToPostfixButton.addActionListener(new ButtonHandler());
+        initializeInfixToPostPanelContents();
 
-        String[] COLUMN_NAMES = {"Symbol","Postfix Expression","Operator Stack"};
-        int[] columnWidths = {80,150,150};
-        infixToPostfixTable = new JTable();
-        infixToPostfixTableModel = new DefaultTableModel();
-        infixToPostfixScrollPane = new JScrollPane();
-        initializeTable(infixToPostfixTable, infixToPostfixTableModel, COLUMN_NAMES, columnWidths, infixToPostfixScrollPane);
-
-        outputPostfixLabel = new JLabel("Postfix Expression: ");
-        outputPostfixTextField = new JTextField(20);
-        outputPostfixTextField.setEditable(false);
         gbc.gridx = 0;
         gbc.gridy =0;
         infixToPostPanel.add(infixToPostfixLabel, gbc);
@@ -122,7 +107,21 @@ public class EvaluatorWindow {
     }
 
     public void initializeInfixToPostPanelContents(){
+        infixToPostfixLabel = new JLabel("Input Infix Expression:");
+        infixToPostfixInputTextField = new JTextField(20);
+        infixToPostfixButton = new JButton("Convert");
+        infixToPostfixButton.addActionListener(new ButtonHandler());
 
+        String[] COLUMN_NAMES = {"Symbol","Postfix Expression","Operator Stack"};
+        int[] columnWidths = {80,150,150};
+        infixToPostfixTable = new JTable();
+        infixToPostfixTableModel = new DefaultTableModel();
+        infixToPostfixScrollPane = new JScrollPane();
+        initializeTable(infixToPostfixTable, infixToPostfixTableModel, COLUMN_NAMES, columnWidths, infixToPostfixScrollPane);
+
+        outputPostfixLabel = new JLabel("Postfix Expression: ");
+        outputPostfixTextField = new JTextField(20);
+        outputPostfixTextField.setEditable(false);
     }
 
     public void setPostfixEvaluationPanel(){
@@ -130,29 +129,13 @@ public class EvaluatorWindow {
         gridBagLayout = new GridBagLayout();
         gridBagLayout.rowHeights = new int[]{30,400,30};
         postfixEvaluationPanel.setLayout(gridBagLayout);
-
 //        postfixEvaluationPanel.setBorder(new EmptyBorder(10,10,10,10));
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx =1;
         gbc.weighty=1;
-//        initializePostfixEvaluationPanelContents();
-        postfixEvaluationLabel = new JLabel("Post Fix Expression: ");
-        postfixEvaluationTextField = new JTextField(20);
-        postfixEvaluationTextField.setEditable(false);
-
-        String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
-        int[] columnsWidths = {70,70,70,70,150};
-        postfixEvaluationTable = new JTable();
-        postfixEvaluationTableModel = new DefaultTableModel();
-        evaluatedScrollPane = new JScrollPane();
-        initializeTable(postfixEvaluationTable, postfixEvaluationTableModel, COLUMN_NAMES, columnsWidths, evaluatedScrollPane);
-
-        outputEvaluatedLabel = new JLabel("Evaluated Expression: ");
-        outputEvaluatedTexField = new JTextField(20);
-        outputEvaluatedTexField.setEditable(false);
-
+        initializePostfixEvaluationPanelContents();
         gbc.gridx=0;
         gbc.gridy=0;
         postfixEvaluationPanel.add(postfixEvaluationLabel,gbc);
@@ -172,7 +155,20 @@ public class EvaluatorWindow {
     }
 
     public void initializePostfixEvaluationPanelContents(){
+        postfixEvaluationLabel = new JLabel("Post Fix Expression: ");
+        postfixEvaluationTextField = new JTextField(20);
+        postfixEvaluationTextField.setEditable(false);
 
+        String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
+        int[] columnsWidths = {70,70,70,70,150};
+        postfixEvaluationTable = new JTable();
+        postfixEvaluationTableModel = new DefaultTableModel();
+        evaluatedScrollPane = new JScrollPane();
+        initializeTable(postfixEvaluationTable, postfixEvaluationTableModel, COLUMN_NAMES, columnsWidths, evaluatedScrollPane);
+
+        outputEvaluatedLabel = new JLabel("Evaluated Expression: ");
+        outputEvaluatedTexField = new JTextField(20);
+        outputEvaluatedTexField.setEditable(false);
 
     }
 
