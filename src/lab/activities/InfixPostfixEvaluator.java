@@ -75,11 +75,34 @@ public class InfixPostfixEvaluator {
                     System.out.println("Syntax Error");
                 }
             }
-            System.out.printf("| %-10s| %-10s| %-10s| %-10s| %-30s|\n", token, op1, op2, ans, stack.toString());
+            String s = formatVariablesToPrint(stack);
+            System.out.printf("| %-10s| %-10s| %-10s| %-10s| %-30s|\n", token, formatDouble(op1),
+                    formatDouble(op2), formatDouble(ans), s);
         }
         System.out.println("|-------------------------------------------------------------------------------|");
 
         return stack.peek();
+    }
+
+    private static String formatVariablesToPrint(Stack<Double> stack) {
+        if (stack.size() == 0) return "";
+        if (stack.size() == 1) return formatDouble(String.valueOf(stack.peek()));
+
+        StringBuilder sb = new StringBuilder();
+        String[] numbers = stack.toString().split(",");
+
+        for (int i = 0; i < numbers.length-1; i++ )
+            sb.append(formatDouble(numbers[i]));
+        sb.append(formatDouble(numbers[numbers.length - 1]));
+
+        return sb.toString();
+    }
+
+    public static String formatDouble(String value) {
+        if (value.equals("")) return "";
+        String[] parts = value.split("\\.");
+        if (parts[1].length() < 3) return value;
+        return parts[0] + "." + parts[1].substring(0,3);
     }
 
     private static double compute(double x, double y, String op) {
