@@ -32,59 +32,59 @@ class InfixPostfixEvaluatorTest {
     InfixPostfixEvaluatorTest() {
     }
 
-    @Test
-    void testCase1() {
-        System.out.print("|==================================== Test Case 1 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix1);
-        Assertions.assertEquals(this.postfix1, postfixAnswer);
-        Assertions.assertEquals(this.answer1, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
-
-    @Test
-    void testCase2() {
-        System.out.print("|==================================== Test Case 2 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix2);
-        Assertions.assertEquals(this.postfix2, postfixAnswer);
-        Assertions.assertEquals(this.answer2, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
-
-    @Test
-    void testCase3() {
-        System.out.print("|==================================== Test Case 3 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix3);
-        Assertions.assertEquals(this.postfix3, postfixAnswer);
-        Assertions.assertEquals(this.answer3, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
-
-    @Test
-    void testCase4() {
-        System.out.print("|==================================== Test Case 4 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix4);
-        Assertions.assertEquals(this.postfix4, postfixAnswer);
-        Assertions.assertEquals(this.answer4, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
-
-    @Test
-    void testCase5() {
-        System.out.print("|==================================== Test Case 5 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix5);
-        Assertions.assertEquals(this.postfix5, postfixAnswer);
-        Assertions.assertEquals(this.answer5, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
-
-    @Test
-    void testCase6() {
-        System.out.print("|==================================== Test Case 6 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix6);
-        Assertions.assertEquals(this.postfix6, postfixAnswer);
-        Assertions.assertEquals(this.answer6, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
-
-    @Test
-    void testCase7() {
-        System.out.print("|==================================== Test Case 7 ====================================|");
-        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix7);
-        Assertions.assertEquals(this.postfix7, postfixAnswer);
-        Assertions.assertEquals(this.answer7, InfixPostfixEvaluator.computePostFix(postfixAnswer));
-    }
+//    @Test
+//    void testCase1() {
+//        System.out.print("|==================================== Test Case 1 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix1);
+//        Assertions.assertEquals(this.postfix1, postfixAnswer);
+//        Assertions.assertEquals(this.answer1, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
+//
+//    @Test
+//    void testCase2() {
+//        System.out.print("|==================================== Test Case 2 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix2);
+//        Assertions.assertEquals(this.postfix2, postfixAnswer);
+//        Assertions.assertEquals(this.answer2, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
+//
+//    @Test
+//    void testCase3() {
+//        System.out.print("|==================================== Test Case 3 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix3);
+//        Assertions.assertEquals(this.postfix3, postfixAnswer);
+//        Assertions.assertEquals(this.answer3, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
+//
+//    @Test
+//    void testCase4() {
+//        System.out.print("|==================================== Test Case 4 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix4);
+//        Assertions.assertEquals(this.postfix4, postfixAnswer);
+//        Assertions.assertEquals(this.answer4, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
+//
+//    @Test
+//    void testCase5() {
+//        System.out.print("|==================================== Test Case 5 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix5);
+//        Assertions.assertEquals(this.postfix5, postfixAnswer);
+//        Assertions.assertEquals(this.answer5, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
+//
+//    @Test
+//    void testCase6() {
+//        System.out.print("|==================================== Test Case 6 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix6);
+//        Assertions.assertEquals(this.postfix6, postfixAnswer);
+//        Assertions.assertEquals(this.answer6, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
+//
+//    @Test
+//    void testCase7() {
+//        System.out.print("|==================================== Test Case 7 ====================================|");
+//        String postfixAnswer = InfixPostfixEvaluator.toPostfix(this.infix7);
+//        Assertions.assertEquals(this.postfix7, postfixAnswer);
+//        Assertions.assertEquals(this.answer7, InfixPostfixEvaluator.computePostFix(postfixAnswer));
+//    }
 }

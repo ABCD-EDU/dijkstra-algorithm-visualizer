@@ -8,9 +8,11 @@ public class InfixPostfixEvaluator {
 
     private static final Object[][] ops = {{"+", "-", "/", "*", "^"}, {2, 2 ,3 ,3 ,4}};
 
-    public static String toPostfix(String infix) {
+    public static String[][] toPostfix(String infix) {
         StringBuilder output = new StringBuilder();
         Stack<String> stack = new MyLinkedList<>();
+        String[][] rows = new String[infix.split("(?<=[-+*/^()])|(?=[-+*/^()])").length*2][];
+        int currentIdx = 0;
 
         System.out.println("\n|-------------------------------------------------------------------------------------|");
         System.out.printf("| %-19s %-64s|", "Infix expression ->", infix);
@@ -38,19 +40,23 @@ public class InfixPostfixEvaluator {
                 output.append(token).append(' ');
             }
             System.out.printf("\n| %-9s| %-40s| %-30s |", token, output.toString(), stack.toString());
+            rows[currentIdx++] = new String[]{token, output.toString(), stack.toString()};
         }
 
         while (!stack.isEmpty()) {
             output.append(stack.pop()).append(' ');
             System.out.printf("\n| %-9s| %-40s| %-30s |", "", output.toString(), stack.toString());
+            rows[currentIdx++] = new String[]{"", output.toString(), stack.toString()};
         }
         System.out.println("\n|-------------------------------------------------------------------------------------|");
 
-        return output.substring(0, output.length() - 1);
+        return rows = trimToSize(rows, currentIdx);
     }
 
-    public static double computePostFix(String postfix) {
+    public static String[][] computePostFix(String postfix) {
         Stack<Double> stack = new MyLinkedList<>();
+        String[][] rows = new String[postfix.split("\\s").length*2][];
+        int currentIdx = 0;
         String op1 = "";
         String op2 = "";
         String ans = "";
@@ -78,10 +84,21 @@ public class InfixPostfixEvaluator {
             String s = formatVariablesToPrint(stack);
             System.out.printf("| %-10s| %-10s| %-10s| %-10s| %-30s|\n", token, formatDouble(op1),
                     formatDouble(op2), formatDouble(ans), s);
+            rows[currentIdx++] = new String[]{token, formatDouble(op1), formatDouble(op2), formatDouble(ans), s};
         }
         System.out.println("|-------------------------------------------------------------------------------|");
 
-        return stack.peek();
+        return rows = trimToSize(rows, currentIdx);
+    }
+
+    /**
+     * Helper method used to set an array's size lower than its original size.
+     */
+    private static String[][] trimToSize(String[][] origArr, int size) {
+        String[][] trimmed = new String[size][origArr[0].length];
+        for (int i = 0; i < size; i++)
+            trimmed[i] = origArr[i];
+        return trimmed;
     }
 
     private static String formatVariablesToPrint(Stack<Double> stack) {
