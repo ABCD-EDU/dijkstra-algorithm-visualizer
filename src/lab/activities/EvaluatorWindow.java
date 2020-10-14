@@ -1,7 +1,9 @@
 package lab.activities;
 
+import javax.sound.sampled.Line;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -127,7 +129,7 @@ public class EvaluatorWindow {
         infixToPostfixButton.addActionListener(new ButtonHandler());
 
         String[] COLUMN_NAMES = {"Symbol","Postfix Expression","Operator Stack"};
-        int[] columnWidths = {60,300,100};
+        int[] columnWidths = {60,250,150};
         infixToPostfixTable = new JTable();
         infixToPostfixTableModel = new DefaultTableModel();
         infixToPostfixScrollPane = new JScrollPane();
@@ -204,7 +206,7 @@ public class EvaluatorWindow {
         defaultTableModel.setColumnIdentifiers(columnNames);
         defaultTableModel.setRowCount(0);
         table.setEnabled(false);
-        table.setDefaultRenderer(Object.class,new TableCellRender());
+        table.setDefaultRenderer(Object.class, new TableCellRender());
         table.getTableHeader().setReorderingAllowed(false);
         table.setCellSelectionEnabled(false);
         table.setRowHeight(10);
@@ -213,6 +215,9 @@ public class EvaluatorWindow {
         table.getTableHeader().setForeground(Color.white);
         table.getTableHeader().setFont(new Font("Arial", Font.ITALIC, 12));
         table.setRowHeight(50);
+        table.setBackground(Color.WHITE);
+        table.setOpaque(true);
+        table.setFillsViewportHeight(true);
 
         int i = 0;
         for (int width : columnsWidth) {
@@ -221,6 +226,7 @@ public class EvaluatorWindow {
             column.setPreferredWidth(width);
         }
         scrollPane.setViewportView(table);
+        scrollPane.setBorder(new LineBorder(new Color(0,0,0,0)));
         scrollPane.setVisible(true);
     }
 
@@ -262,7 +268,7 @@ public class EvaluatorWindow {
         }
     }
 
-    class TableCellRender implements TableCellRenderer{
+    static class TableCellRender implements TableCellRenderer{
 
         DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
         @Override
