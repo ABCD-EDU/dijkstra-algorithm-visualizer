@@ -231,7 +231,7 @@ public class EvaluatorWindow {
     public void populateTables(){
         infixToPostfixTableModel.setRowCount(0);
         postfixEvaluationTableModel.setRowCount(0);
-        String infix= infixToPostfixInputTextField.getText();
+        String infix = infixToPostfixInputTextField.getText();
         String[][] table1Values = InfixPostfixEvaluator.toPostfix(infix);
         String postfix = table1Values[table1Values.length-1][1];
         String[][] table2Values = InfixPostfixEvaluator.computePostFix(postfix);
@@ -261,7 +261,23 @@ public class EvaluatorWindow {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource()==infixToPostfixButton){
-                populateTables();
+
+                if (infixToPostfixInputTextField.getText().length() == 0){
+                    JOptionPane.showMessageDialog(frame, "Input Field is Empty.",
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                try{
+                    populateTables();
+                } catch (NullPointerException NE) {
+                    JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+                } catch (InvalidInfixException IE) {
+                    JOptionPane.showMessageDialog(frame, IE.getMessage(),
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+                }
+
             }
         }
     }

@@ -3,8 +3,6 @@ package lab.activities;
 import lab.datastructure.MyLinkedList;
 import lab.datastructure.Stack;
 
-import java.util.Arrays;
-
 // TODO: TABLE and TESTS and toPREFIX
 public class InfixPostfixEvaluator {
 
@@ -13,14 +11,17 @@ public class InfixPostfixEvaluator {
     public static String[][] toPostfix(String infix) {
         StringBuilder output = new StringBuilder();
         Stack<String> stack = new MyLinkedList<>();
-        String[][] rows = new String[infix.split("(?<=[-+*/^()])|(?=[-+*/^()])").length*2][];
+        String[] symbolsArr = infix.split("(?<=[-+*/^()])|(?=[-+*/^()])");
+        symbolsArr = formatSymbolsArr(symbolsArr);
+        validateInfix(symbolsArr);
+        String[][] rows = new String[symbolsArr.length*2][];
         int currentIdx = 0;
 
         System.out.println("\n|-------------------------------------------------------------------------------------|");
         System.out.printf("| %-19s %-64s|", "Infix expression ->", infix);
         System.out.printf("\n| %-9s| %-40s| %-30s |\n", "Symbol", "Postfix", "Stack");
         System.out.print("|-------------------------------------------------------------------------------------|");
-        for (String token : infix.split("(?<=[-+*/^()])|(?=[-+*/^()])")) {
+        for (String token : symbolsArr) {
             // operator
             if (isValidOperator(token)) {
                 while (!stack.isEmpty() && isHigherPrecedence(token, stack.peek()))
@@ -93,10 +94,20 @@ public class InfixPostfixEvaluator {
     }
 
     /**
-     * Helper method used to set an array's size lower than its original size.
+     * Helper method used to set a multi-dimensional array's size lower than its original size.
      */
     private static String[][] trimToSize(String[][] origArr, int size) {
         String[][] trimmed = new String[size][origArr[0].length];
+        for (int i = 0; i < size; i++)
+            trimmed[i] = origArr[i];
+        return trimmed;
+    }
+
+    /**
+     * Helper method used to set an array's size lower than its original size.
+     */
+    private static String[] trimToSize(String[] origArr, int size) {
+        String[] trimmed = new String[size];
         for (int i = 0; i < size; i++)
             trimmed[i] = origArr[i];
         return trimmed;
@@ -135,10 +146,7 @@ public class InfixPostfixEvaluator {
     }
 
     private static boolean isValidOperator(String token) {
-        for (var arr : ops)
-            for (var item : arr)
-                if (item.equals(token))
-                    return true;
+        for (var op : ops[0]) if (op.equals(token)) return true;
         return false;
     }
 
@@ -154,4 +162,76 @@ public class InfixPostfixEvaluator {
 
         return 0;
     }
+
+    /**
+     * Infix is invalid if:
+     * 1. Two operators are next to each other || two numerical values are next to each other
+     * 2. A non numerical value and a non operator symbol exists within the symbolsArray
+     * @param symbolsArr arr containing all symbols within the infix expression to be checked
+     */
+    private static void validateInfix(String[] symbolsArr) {
+        boolean prevIsOperator = true;
+        for (int i = 0; i < symbolsArr.length; i++) {
+            if (symbolsArr[i].contains(" "))
+                throw new InvalidInfixException("Infix Expression Contains Whitespace(s).");
+            boolean currentIsOperator = isValidOperator(symbolsArr[i]);
+            if (!currentIsOperator && !symbolsArr[i].equals("(") && !symbolsArr[i].equals(")")) {
+                try {
+                    Double.parseDouble(symbolsArr[i]);
+                }catch (NumberFormatException e) {
+                    throw new InvalidInfixException("Invalid symbol: " + symbolsArr[i]);
+                }
+            }
+            if (symbolsArr[i].equals("(") && (!symbolsArr[i+1].equals("-") && isValidOperator(symbolsArr[i+1])))
+                throw new InvalidInfixException("Misplaced Symbol: " + symbolsArr[i+1]);
+            if (currentIsOperator && prevIsOperator) throw new InvalidInfixException("Misplaced Symbol: " + symbolsArr[i]);
+            prevIsOperator = currentIsOperator;
+        }
+    }
+
+    private static void printArr(String[] arr) {
+        if (arr.length == 0) System.out.println("[ empty ]");
+        System.out.print("[ ");
+        for(int i = 0; i < arr.length-1; i++) {
+            System.out.print(arr[i] + ", ");
+        }
+        System.out.println(arr[arr.length-1] + " ]");
+    }
+
+    /**
+     * Conditions:
+     * If arr[0] == '-' then concatenate
+     * If '(' precedes '-' then concatenate
+     * If '-' is preceded by an operator then concatenate
+     * Else let '-' be its own symbol
+     */
+    private static String[] formatSymbolsArr(String[] symbols) {
+        String[] toReturn = new String[symbols.length];
+        int ctr = 0;
+
+        if (symbols[symbols.length-1].equals("(") || isValidOperator(symbols[symbols.length-1]))
+            throw new InvalidInfixException("Misplaced Symbol: " + symbols[symbols.length-1]);
+
+        for (int i = 0; i < symbols.length; i++) {
+            if ( (symbols[i].equals("(") && symbols[i+1].equals("-")) ||
+                    (isValidOperator(symbols[i]) && symbols[i+1].equals("-")) ) {
+                toReturn[ctr++] = symbols[i];
+                toReturn[ctr++] = symbols[i+1] + symbols[i+2];
+                i+=2;
+            }
+//            else if(symbols[i].equals("-") && symbols[i+1].equals("(")) {
+//                  TODO: Implement if negative parenthesis should be taken into consideration
+//            }
+            else if(i == 0 && symbols[i].equals("-") && !symbols[i+1].equals("(")){
+                toReturn[ctr++] = symbols[i] + symbols[i+1];
+                i++;
+            }
+            else {
+                toReturn[ctr++] = symbols[i];
+            }
+        }
+
+        return trimToSize(toReturn, ctr);
+    }
+
 }
