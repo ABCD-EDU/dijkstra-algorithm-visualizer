@@ -10,8 +10,11 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 
 public class EvaluatorWindow {
-
+    Color backgroundColor = new Color(0xF4D35E);
+    Color accentColor = new Color(0x0D3B66);
+    Color accentColor2 = new Color(0xFAF0CA);
     JFrame frame;
+    JPanel mainPanel;
     JPanel panelsContainerPanel;
 
     JPanel infixToPostPanel;
@@ -31,7 +34,7 @@ public class EvaluatorWindow {
     DefaultTableModel postfixEvaluationTableModel;
     JTable postfixEvaluationTable;
     JLabel outputEvaluatedLabel;
-    JTextField outputEvaluatedTexField;
+    JTextField outputEvaluatedTextField;
     JScrollPane evaluatedScrollPane;
 
     GridBagLayout gridBagLayout;
@@ -39,15 +42,17 @@ public class EvaluatorWindow {
 
     EvaluatorWindow(){
         frame = new JFrame("Converter");
-        gridBagLayout = new GridBagLayout();
+        mainPanel = new JPanel();
+        mainPanel.setBackground(backgroundColor);
+        mainPanel.setLayout(new GridBagLayout());
         frame.setMinimumSize(new Dimension(800,500));
-        frame.setLayout(gridBagLayout);
         gbc = new GridBagConstraints();
         gbc.weightx = gbc.weighty =1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = gbc.gridwidth =1;
         setPanelsContainerPanel();
-        frame.add(panelsContainerPanel,gbc);
+        mainPanel.add(panelsContainerPanel, gbc);
+        frame.add(mainPanel);
 
         frame.setResizable(false);
         frame.pack();
@@ -58,6 +63,7 @@ public class EvaluatorWindow {
 
     public void setPanelsContainerPanel(){
         panelsContainerPanel = new JPanel();
+        panelsContainerPanel.setBackground(backgroundColor);
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(1,1,1,1);
         gbc.fill = GridBagConstraints.BOTH;
@@ -74,63 +80,72 @@ public class EvaluatorWindow {
 
     void setInfixToPostPanel(){
         infixToPostPanel = new JPanel();
+        infixToPostPanel.setBackground(backgroundColor);
         gridBagLayout = new GridBagLayout();
         infixToPostPanel.setLayout(gridBagLayout);
-        gridBagLayout.rowHeights = new int[]{30,400,30};
+        gridBagLayout.rowHeights = new int[]{30,400,35};
         infixToPostPanel.setBorder(new EmptyBorder(10,10,10,10));
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill= GridBagConstraints.BOTH;
         gbc.weightx =1;
         gbc.weighty=1;
-
         initializeInfixToPostPanelContents();
-
         gbc.gridx = 0;
-        gbc.gridy =0;
+        gbc.gridy = 0;
         infixToPostPanel.add(infixToPostfixLabel, gbc);
-        gbc.gridx=1;
+        gbc.gridx = 1;
         gbc.gridwidth = 2;
         infixToPostPanel.add(infixToPostfixInputTextField,gbc);
-        gbc.gridwidth=1;
-        gbc.gridx=3;
+        gbc.gridwidth = 1;
+        gbc.gridx = 3;
         infixToPostPanel.add(infixToPostfixButton,gbc);
-        gbc.gridx=0;
-        gbc.gridy=1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 4;
         infixToPostPanel.add(infixToPostfixScrollPane, gbc);
-        gbc.gridwidth=1;
-        gbc.gridx=0;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
         gbc.gridy++;
         infixToPostPanel.add(outputPostfixLabel,gbc);
-        gbc.gridx=1;
-        gbc.gridwidth = 2;
+        gbc.gridx = 1;
+        gbc.gridwidth = 3;
         infixToPostPanel.add(outputPostfixTextField, gbc);
     }
 
     public void initializeInfixToPostPanelContents(){
         infixToPostfixLabel = new JLabel("Input Infix Expression:");
+        infixToPostfixLabel.setForeground(Color.black);
         infixToPostfixInputTextField = new JTextField(20);
+        infixToPostfixInputTextField.setBorder(null);
         infixToPostfixButton = new JButton("Convert");
+        infixToPostfixButton.setBackground(accentColor);
+        infixToPostfixButton.setForeground(Color.white);
+        infixToPostfixButton.setFocusPainted(false);
         infixToPostfixButton.addActionListener(new ButtonHandler());
 
         String[] COLUMN_NAMES = {"Symbol","Postfix Expression","Operator Stack"};
-        int[] columnWidths = {50,260,150};
+        int[] columnWidths = {60,300,100};
         infixToPostfixTable = new JTable();
         infixToPostfixTableModel = new DefaultTableModel();
         infixToPostfixScrollPane = new JScrollPane();
         initializeTable(infixToPostfixTable, infixToPostfixTableModel, COLUMN_NAMES, columnWidths, infixToPostfixScrollPane);
 
         outputPostfixLabel = new JLabel("Postfix Expression: ");
+        outputPostfixLabel.setForeground(Color.black);
         outputPostfixTextField = new JTextField(20);
+        outputPostfixTextField.setFont(new Font("Arial", Font.BOLD, 12));
+        outputPostfixTextField.setBackground(accentColor2);
+        outputPostfixTextField.setBorder(null);
         outputPostfixTextField.setEditable(false);
     }
 
     public void setPostfixEvaluationPanel(){
         postfixEvaluationPanel = new JPanel();
+        postfixEvaluationPanel.setBackground(backgroundColor);
         gridBagLayout = new GridBagLayout();
-        gridBagLayout.rowHeights = new int[]{30,400,30};
         postfixEvaluationPanel.setLayout(gridBagLayout);
+        gridBagLayout.rowHeights = new int[]{35,400,35};
 //        postfixEvaluationPanel.setBorder(new EmptyBorder(10,10,10,10));
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
@@ -153,25 +168,31 @@ public class EvaluatorWindow {
         postfixEvaluationPanel.add(outputEvaluatedLabel,gbc);
         gbc.gridx=1;
         gbc.gridwidth=2;
-        postfixEvaluationPanel.add(outputEvaluatedTexField,gbc);
+        postfixEvaluationPanel.add(outputEvaluatedTextField,gbc);
     }
 
     public void initializePostfixEvaluationPanelContents(){
-        postfixEvaluationLabel = new JLabel("Post Fix Expression: ");
-        postfixEvaluationTextField = new JTextField(20);
+        postfixEvaluationLabel = new JLabel("Postfix Expression: ");
+        postfixEvaluationLabel.setForeground(Color.black);
+        postfixEvaluationTextField = new JTextField(30);
+        postfixEvaluationTextField.setBackground(accentColor2);
+        postfixEvaluationTextField.setBorder(null);
         postfixEvaluationTextField.setEditable(false);
 
         String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
-        int[] columnsWidths = {70,70,70,70,150};
+        int[] columnsWidths = {50,70,70,70,170};
         postfixEvaluationTable = new JTable();
         postfixEvaluationTableModel = new DefaultTableModel();
         evaluatedScrollPane = new JScrollPane();
         initializeTable(postfixEvaluationTable, postfixEvaluationTableModel, COLUMN_NAMES, columnsWidths, evaluatedScrollPane);
 
         outputEvaluatedLabel = new JLabel("Evaluated Expression: ");
-        outputEvaluatedTexField = new JTextField(20);
-        outputEvaluatedTexField.setEditable(false);
-
+        outputEvaluatedLabel.setForeground(Color.black);
+        outputEvaluatedTextField = new JTextField(30);
+        outputEvaluatedTextField.setFont(new Font("Arial", Font.BOLD, 12));
+        outputEvaluatedTextField.setBackground(accentColor2);
+        outputEvaluatedTextField.setBorder(null);
+        outputEvaluatedTextField.setEditable(false);
     }
 
 
@@ -185,7 +206,8 @@ public class EvaluatorWindow {
         table.setCellSelectionEnabled(false);
         table.setRowHeight(10);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.getTableHeader().setBackground(new Color(85,203,211));
+        table.getTableHeader().setBackground(accentColor);
+        table.getTableHeader().setForeground(Color.white);
         table.getTableHeader().setFont(new Font("Arial", Font.ITALIC, 12));
         table.setRowHeight(50);
 
@@ -224,7 +246,7 @@ public class EvaluatorWindow {
             });
         }
         postfixEvaluationTextField.setText(postfix);
-        outputEvaluatedTexField.setText(table2Values[table2Values.length-1][3]);
+        outputEvaluatedTextField.setText(table2Values[table2Values.length-1][3]);
     }
 
     class ButtonHandler implements ActionListener{
