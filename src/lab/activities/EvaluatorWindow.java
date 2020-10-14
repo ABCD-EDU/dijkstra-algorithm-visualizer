@@ -49,6 +49,7 @@ public class EvaluatorWindow {
         setPanelsContainerPanel();
         frame.add(panelsContainerPanel,gbc);
 
+        frame.setResizable(false);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -114,7 +115,7 @@ public class EvaluatorWindow {
         infixToPostfixButton.addActionListener(new ButtonHandler());
 
         String[] COLUMN_NAMES = {"Symbol","Postfix Expression","Operator Stack"};
-        int[] columnWidths = {80,150,150};
+        int[] columnWidths = {50,260,150};
         infixToPostfixTable = new JTable();
         infixToPostfixTableModel = new DefaultTableModel();
         infixToPostfixScrollPane = new JScrollPane();
@@ -179,13 +180,13 @@ public class EvaluatorWindow {
         table.setModel(defaultTableModel);
         defaultTableModel.setColumnIdentifiers(columnNames);
         defaultTableModel.setRowCount(0);
-        table.setEnabled(true);
+        table.setEnabled(false);
         table.getTableHeader().setReorderingAllowed(false);
         table.setCellSelectionEnabled(false);
-        table.setRowHeight(20);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        table.setRowHeight(10);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.getTableHeader().setBackground(new Color(85,203,211));
-        table.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 12));
+        table.getTableHeader().setFont(new Font("Arial", Font.ITALIC, 12));
         table.setRowHeight(50);
 
         int i = 0;
