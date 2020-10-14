@@ -5,8 +5,6 @@ public interface Stack<T> {
 
     boolean isEmpty(); /* checks if empty */
 
-    T top() throws StackException;
-
     T pop() throws StackException;
 
     void push(T item) throws StackException;
@@ -15,5 +13,5 @@ public interface Stack<T> {
 
     void clear();
 
-    int search(T item); /* return the location of T*/
+//    int search(T item); /* return the location of T*/
 }
