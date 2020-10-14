@@ -2,7 +2,9 @@ package lab.activities;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -202,6 +204,7 @@ public class EvaluatorWindow {
         defaultTableModel.setColumnIdentifiers(columnNames);
         defaultTableModel.setRowCount(0);
         table.setEnabled(false);
+        table.setDefaultRenderer(Object.class,new TableCellRender());
         table.getTableHeader().setReorderingAllowed(false);
         table.setCellSelectionEnabled(false);
         table.setRowHeight(10);
@@ -256,6 +259,21 @@ public class EvaluatorWindow {
             if (e.getSource()==infixToPostfixButton){
                 populateTables();
             }
+        }
+    }
+
+    class TableCellRender implements TableCellRenderer{
+
+        DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (row % 2 == 0) {
+                c.setBackground(Color.WHITE);
+            } else {
+                c.setBackground(new Color(0xF4D35E));
+            }
+            return c;
         }
     }
 }

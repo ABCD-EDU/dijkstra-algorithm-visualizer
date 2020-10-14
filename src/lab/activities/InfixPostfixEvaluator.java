@@ -3,6 +3,8 @@ package lab.activities;
 import lab.datastructure.MyLinkedList;
 import lab.datastructure.Stack;
 
+import java.util.Arrays;
+
 // TODO: TABLE and TESTS and toPREFIX
 public class InfixPostfixEvaluator {
 
@@ -49,7 +51,6 @@ public class InfixPostfixEvaluator {
             rows[currentIdx++] = new String[]{"", output.toString(), stack.toString()};
         }
         System.out.println("\n|-------------------------------------------------------------------------------------|");
-
         return rows = trimToSize(rows, currentIdx);
     }
 
@@ -138,7 +139,6 @@ public class InfixPostfixEvaluator {
             for (var item : arr)
                 if (item.equals(token))
                     return true;
-
         return false;
     }
 
