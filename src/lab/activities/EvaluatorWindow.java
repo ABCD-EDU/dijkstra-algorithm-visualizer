@@ -46,14 +46,15 @@ public class EvaluatorWindow {
 
     EvaluatorWindow(){
         frame = new JFrame("Converter");
+        frame.setIconImage(new ImageIcon("src/DINO.png").getImage());
         mainPanel = new JPanel();
         mainPanel.setBackground(backgroundColor);
         mainPanel.setLayout(new GridBagLayout());
         frame.setMinimumSize(new Dimension(800,500));
         gbc = new GridBagConstraints();
-        gbc.weightx = gbc.weighty =1;
+        gbc.weightx = gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = gbc.gridwidth =1;
+        gbc.gridheight = gbc.gridwidth = 1;
         setPanelsContainerPanel();
         mainPanel.add(panelsContainerPanel, gbc);
         frame.add(mainPanel);
@@ -124,7 +125,7 @@ public class EvaluatorWindow {
         infixToPostfixInputTextField.setBorder(null);
         infixToPostfixButton = new JButton("Convert");
         infixToPostfixButton.setBackground(accentColor);
-        infixToPostfixButton.setForeground(Color.white);
+        infixToPostfixButton.setForeground(Color.WHITE);
         infixToPostfixButton.setFocusPainted(false);
         infixToPostfixButton.addActionListener(new ButtonHandler());
 
@@ -207,17 +208,14 @@ public class EvaluatorWindow {
         defaultTableModel.setRowCount(0);
         table.setEnabled(false);
         table.setDefaultRenderer(Object.class, new TableCellRender());
-        table.getTableHeader().setReorderingAllowed(false);
         table.setCellSelectionEnabled(false);
-        table.setRowHeight(10);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.getTableHeader().setBackground(accentColor);
-        table.getTableHeader().setForeground(Color.white);
-        table.getTableHeader().setFont(new Font("Arial", Font.ITALIC, 12));
         table.setRowHeight(50);
-        table.setBackground(Color.WHITE);
         table.setOpaque(true);
         table.setFillsViewportHeight(true);
+        table.getTableHeader().setDefaultRenderer(new TableHeaderRenderer());
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setFont(new Font("Arial", Font.ITALIC, 12));
 
         int i = 0;
         for (int width : columnsWidth) {
@@ -268,18 +266,24 @@ public class EvaluatorWindow {
         }
     }
 
-    static class TableCellRender implements TableCellRenderer{
-
+    static class TableHeaderRenderer extends JLabel implements TableCellRenderer {
         DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component c = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (row % 2 == 0) {
-                c.setBackground(Color.WHITE);
-            } else {
-                c.setBackground(new Color(0xF4D35E));
-            }
-            return c;
+            Component component = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            component.setBackground(new Color(0x0D3B66));
+            component.setForeground(Color.WHITE);
+            return component;
+        }
+    }
+
+    static class TableCellRender implements TableCellRenderer{
+        DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            component.setBackground(Color.WHITE);
+            return component;
         }
     }
 }
