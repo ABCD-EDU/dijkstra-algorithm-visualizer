@@ -317,33 +317,59 @@ public class EvaluatorWindow {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource()==infixToPostfixButton){
-                populateTables();
-            } else if (e.getSource() == lightTheme) {
-                backgroundColor = new Color(0xFFFFFF);
-                headerColor = new Color(0x111111);
-                uneditableFieldColor = new Color(0xE5E5E5);
-                mainForeground = Color.BLACK;
-                secondaryForeground = Color.WHITE;
-                infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
-                initializeTheme();
-            } else if (e.getSource() == darkTheme) {
-                backgroundColor = new Color(0x333333);
-                headerColor = new Color(0x000000);
-                uneditableFieldColor = new Color(0x4A4A4A);
-                mainForeground = Color.WHITE;
-                secondaryForeground = Color.WHITE;
-                infixToPostfixInputTextField.setBorder(null);
-                initializeTheme();
-            } else if (e.getSource() == sluTheme) {
-                backgroundColor = new Color(0xF4D35E);
-                headerColor = new Color(0x0D3B66);
-                uneditableFieldColor = new Color(0xFAF0CA);
-                mainForeground = Color.BLACK;
-                secondaryForeground = Color.WHITE;
-                infixToPostfixInputTextField.setBorder(null);
-                initializeTheme();
+                if (infixToPostfixInputTextField.getText().length() == 0){
+                    JOptionPane.showMessageDialog(frame, "Input Field is Empty.",
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                try{
+                    populateTables();
+                } catch (NullPointerException NE) {
+                    JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+                } catch (InvalidInfixException IE) {
+                    JOptionPane.showMessageDialog(frame, IE.getMessage(),
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+                }
             }
+            else if (e.getSource() == lightTheme)
+                setWindowLightTheme();
+            else if (e.getSource() == darkTheme)
+                setWindowDarkTheme();
+            else if (e.getSource() == sluTheme)
+                setWindowSluTheme();
         }
+
+    }
+
+    private void setWindowLightTheme() {
+        backgroundColor = new Color(0xFFFFFF);
+        headerColor = new Color(0x111111);
+        uneditableFieldColor = new Color(0xE5E5E5);
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.WHITE;
+        infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
+        initializeTheme();
+    }
+
+    private void setWindowDarkTheme() {
+        backgroundColor = new Color(0x333333);
+        headerColor = new Color(0x000000);
+        uneditableFieldColor = new Color(0x4A4A4A);
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        infixToPostfixInputTextField.setBorder(null);
+        initializeTheme();
+    }
+
+    private void setWindowSluTheme() {
+        backgroundColor = new Color(0xF4D35E);
+        headerColor = new Color(0x0D3B66);
+        uneditableFieldColor = new Color(0xFAF0CA);
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.WHITE;
+        infixToPostfixInputTextField.setBorder(null);
+        initializeTheme();
     }
 
     static class TableCellRender implements TableCellRenderer{
