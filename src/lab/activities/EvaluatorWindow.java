@@ -7,6 +7,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 public class EvaluatorWindow {
 
@@ -182,7 +183,7 @@ public class EvaluatorWindow {
         table.getTableHeader().setReorderingAllowed(false);
         table.setCellSelectionEnabled(false);
         table.setRowHeight(20);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         table.getTableHeader().setBackground(new Color(85,203,211));
         table.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 12));
         table.setRowHeight(50);
@@ -197,12 +198,40 @@ public class EvaluatorWindow {
         scrollPane.setVisible(true);
     }
 
+    public void populateTables(){
+        infixToPostfixTableModel.setRowCount(0);
+        postfixEvaluationTableModel.setRowCount(0);
+        String infix= infixToPostfixInputTextField.getText();
+        String[][] table1Values = InfixPostfixEvaluator.toPostfix(infix);
+        String postfix = table1Values[table1Values.length-1][1];
+        String[][] table2Values = InfixPostfixEvaluator.computePostFix(postfix);
+        for (String[] values: table1Values){
+            infixToPostfixTableModel.addRow(new Object[]{
+                    values[0],
+                    values[1],
+                    values[2],
+            });
+        }
+        outputPostfixTextField.setText(postfix);
+        for (String[] values: table2Values){
+            postfixEvaluationTableModel.addRow(new Object[]{
+                    values[0],
+                    values[1],
+                    values[2],
+                    values[3],
+                    values[4],
+            });
+        }
+        postfixEvaluationTextField.setText(postfix);
+        outputEvaluatedTexField.setText(table2Values[table2Values.length-1][3]);
+    }
+
     class ButtonHandler implements ActionListener{
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource()==infixToPostfixButton){
-
+                populateTables();
             }
         }
     }
