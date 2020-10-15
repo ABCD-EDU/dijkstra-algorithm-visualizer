@@ -46,6 +46,7 @@ public class EvaluatorWindow {
     JPanel postfixEvaluationPanel;
     JLabel postfixEvaluationLabel;
     JTextField postfixEvaluationTextField;
+    JButton postfixEvaluationButton;
     DefaultTableModel postfixEvaluationTableModel;
     JTable postfixEvaluationTable;
     JLabel outputEvaluatedLabel;
@@ -288,6 +289,9 @@ public class EvaluatorWindow {
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         postfixEvaluationPanel.add(postfixEvaluationTextField,gbc);
+        gbc.gridwidth = 1;
+        gbc.gridx = 3;
+        postfixEvaluationPanel.add(postfixEvaluationButton,gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 4;
@@ -296,13 +300,16 @@ public class EvaluatorWindow {
         gbc.gridy = 2;
         postfixEvaluationPanel.add(outputEvaluatedLabel,gbc);
         gbc.gridx = 1;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         postfixEvaluationPanel.add(outputEvaluatedTextField,gbc);
     }
 
     public void initializePostfixEvaluationPanelContents(){
         postfixEvaluationLabel = new JLabel("Postfix Expression: ");
         postfixEvaluationTextField = new JTextField(30);
+        postfixEvaluationButton = new JButton("Evaluate");
+        postfixEvaluationButton.setFocusPainted(false);
+        postfixEvaluationButton.addActionListener(new ButtonHandler());
 
         String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
         int[] columnsWidths = {50,70,70,70,170};
@@ -324,7 +331,6 @@ public class EvaluatorWindow {
         defaultTableModel.setColumnIdentifiers(columnNames);
         defaultTableModel.setRowCount(0);
         table.setEnabled(false);
-//        table.setDefaultRenderer(Object.class, new TableCellRender());
         table.setCellSelectionEnabled(false);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setRowHeight(50);
@@ -372,6 +378,22 @@ public class EvaluatorWindow {
         outputEvaluatedTextField.setText(table2Values[table2Values.length-1][3]);
     }
 
+    public void populatePostfixEvaluationTable(){
+        postfixEvaluationTableModel.setRowCount(0);
+        String postfix = postfixEvaluationTextField.getText();
+        String[][] values =  InfixPostfixEvaluator.computePostFix(postfix);
+        for (String[] value: values){
+            postfixEvaluationTableModel.addRow(new Object[]{
+                    value[0],
+                    value[1],
+                    value[2],
+                    value[3],
+                    value[4],
+            });
+        }
+        outputEvaluatedTextField.setText(values[values.length-1][3]);
+    }
+
     class ButtonHandler implements ActionListener {
 
         @Override
@@ -391,7 +413,11 @@ public class EvaluatorWindow {
                     JOptionPane.showMessageDialog(frame, IE.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } else if (e.getSource() == groupMembers)
+            }else if (e.getSource()==postfixEvaluationButton){
+                    populatePostfixEvaluationTable();
+            }
+
+            else if (e.getSource() == groupMembers)
                 displayGroupMembers();
             else if (e.getSource() == courseSpecifications)
                 displayCourseSpecifications();
@@ -446,14 +472,4 @@ public class EvaluatorWindow {
         secondaryForeground = Color.WHITE;
         initializeTheme();
     }
-
-//    static class TableCellRender implements TableCellRenderer{
-//        DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
-//        @Override
-//        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//            Component component = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//            component.setBackground(Color.WHITE);
-//            return component;
-//        }
-//    }
 }
