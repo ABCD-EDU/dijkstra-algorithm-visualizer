@@ -3,9 +3,7 @@ package lab.activities;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -30,6 +28,10 @@ public class EvaluatorWindow {
     JMenuItem lightTheme;
     JMenuItem darkTheme;
     JMenuItem sluTheme;
+    JMenu mode;
+    JMenuItem infixToPostfixMode;
+    JMenuItem postfixEvaluationMode;
+    boolean isInfixToPostfixMode = true;
 
     JPanel infixToPostPanel;
     JLabel infixToPostfixLabel;
@@ -40,7 +42,6 @@ public class EvaluatorWindow {
     JLabel outputPostfixLabel;
     JTextField outputPostfixTextField;
     JScrollPane infixToPostfixScrollPane;
-
 
     JPanel postfixEvaluationPanel;
     JLabel postfixEvaluationLabel;
@@ -66,6 +67,7 @@ public class EvaluatorWindow {
         gbc.gridheight = gbc.gridwidth = 1;
         initializeMenuBar();
         setPanelsContainerPanel();
+        setMode(true);
         initializeTheme();
         mainPanel.add(panelsContainerPanel, gbc);
         frame.add(mainPanel);
@@ -83,7 +85,6 @@ public class EvaluatorWindow {
         menuBar.setPreferredSize(new Dimension(10, 25));
 
         about = new JMenu("About");
-        about.setForeground(secondaryForeground);
         groupMembers = new JMenuItem("Group Members");
         groupMembers.addActionListener(new ButtonHandler());
         about.add(groupMembers);
@@ -93,7 +94,6 @@ public class EvaluatorWindow {
         menuBar.add(about);
 
         themes = new JMenu("Themes");
-        themes.setForeground(secondaryForeground);
         lightTheme = new JMenuItem("Light");
         lightTheme.addActionListener(new ButtonHandler());
         themes.add(lightTheme);
@@ -105,7 +105,51 @@ public class EvaluatorWindow {
         themes.add(sluTheme);
         menuBar.add(themes);
 
+        mode = new JMenu("Mode");
+        infixToPostfixMode = new JMenuItem("Convert Infix to Postfix Expression");
+        infixToPostfixMode.addActionListener(new ButtonHandler());
+        mode.add(infixToPostfixMode);
+        postfixEvaluationMode = new JMenuItem("Evaluate Postfix Expression");
+        postfixEvaluationMode.addActionListener(new ButtonHandler());
+        mode.add(postfixEvaluationMode);
+        menuBar.add(mode);
+
         frame.setJMenuBar(menuBar);
+    }
+
+    public void setMode(boolean isInfixToPostfixMode) {
+        if (isInfixToPostfixMode) {
+            this.isInfixToPostfixMode = true;
+            infixToPostfixInputTextField.setBackground(Color.WHITE);
+            infixToPostfixInputTextField.setEditable(true);
+            infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
+            postfixEvaluationTextField.setBackground(uneditableFieldColor);
+            postfixEvaluationTextField.setText(null);
+            postfixEvaluationTextField.setEditable(false);
+            postfixEvaluationTextField.setBorder(null);
+        } else {
+            this.isInfixToPostfixMode = false;
+            postfixEvaluationTextField.setBackground(Color.WHITE);
+            postfixEvaluationTextField.setText(null);
+            postfixEvaluationTextField.setEditable(true);
+            postfixEvaluationTextField.setBorder(new LineBorder(headerColor, 2));
+            infixToPostfixInputTextField.setBackground(uneditableFieldColor);
+            infixToPostfixInputTextField.setText(null);
+            infixToPostfixInputTextField.setEditable(false);
+            infixToPostfixInputTextField.setBorder(null);
+        }
+        clearTableContent();
+        outputPostfixTextField.setText(null);
+        outputEvaluatedTextField.setText(null);
+    }
+
+    public void clearTableContent() {
+        for( int i = infixToPostfixTableModel.getRowCount() - 1; i >= 0; i-- ) {
+            infixToPostfixTableModel.setRowCount(0);
+        }
+        for( int i = postfixEvaluationTableModel.getRowCount() - 1; i >= 0; i-- ) {
+            postfixEvaluationTableModel.setRowCount(0);
+        }
     }
 
     public void initializeTheme() {
@@ -114,6 +158,8 @@ public class EvaluatorWindow {
         UIManager.put("OptionPane.messageForeground", secondaryForeground);
         UIManager.put("Button.background", backgroundColor);
         UIManager.put("Button.foreground", mainForeground);
+        UIManager.put("Button.select", headerColor);
+        UIManager.put("Button.focus", backgroundColor);
 
         mainPanel.setBackground(backgroundColor);
         menuBar.setBackground(headerColor);
@@ -122,10 +168,18 @@ public class EvaluatorWindow {
         infixToPostfixButton.setBackground(headerColor);
         outputPostfixTextField.setBackground(uneditableFieldColor);
         postfixEvaluationPanel.setBackground(backgroundColor);
-        postfixEvaluationTextField.setBackground(uneditableFieldColor);
         outputEvaluatedTextField.setBackground(uneditableFieldColor);
-        infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
+        if (isInfixToPostfixMode) {
+            postfixEvaluationTextField.setBackground(uneditableFieldColor);
+            infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
+        } else{
+            infixToPostfixInputTextField.setBackground(uneditableFieldColor);
+            postfixEvaluationTextField.setBorder(new LineBorder(headerColor, 2));
+        }
 
+        about.setForeground(secondaryForeground);
+        themes.setForeground(secondaryForeground);
+        mode.setForeground(secondaryForeground);
         infixToPostfixLabel.setForeground(mainForeground);
         infixToPostfixButton.setForeground(secondaryForeground);
         outputPostfixLabel.setForeground(mainForeground);
@@ -138,15 +192,12 @@ public class EvaluatorWindow {
         infixToPostfixTable.getTableHeader().setBackground(headerColor);
         infixToPostfixTable.getTableHeader().setForeground(secondaryForeground);
         infixToPostfixTable.getTableHeader().setBorder(new LineBorder(headerColor));
-
         postfixEvaluationTable.getTableHeader().setBackground(headerColor);
         postfixEvaluationTable.getTableHeader().setForeground(secondaryForeground);
         postfixEvaluationTable.getTableHeader().setBorder(new LineBorder(headerColor));
 
-        infixToPostfixTable.setBorder(new LineBorder(headerColor, 2));
-        postfixEvaluationTable.setBorder(new LineBorder(headerColor, 2));
-        infixToPostfixScrollPane.setBorder(new LineBorder(backgroundColor));
-        evaluatedScrollPane.setBorder(new LineBorder(backgroundColor));
+        infixToPostfixScrollPane.setBorder(new LineBorder(headerColor, 2));
+        evaluatedScrollPane.setBorder(new LineBorder(headerColor, 2));
     }
 
     public void setPanelsContainerPanel(){
@@ -173,9 +224,9 @@ public class EvaluatorWindow {
         infixToPostPanel.setBorder(new EmptyBorder(10,10,10,10));
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
-        gbc.fill= GridBagConstraints.BOTH;
-        gbc.weightx =1;
-        gbc.weighty=1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         initializeInfixToPostPanelContents();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -202,7 +253,6 @@ public class EvaluatorWindow {
     public void initializeInfixToPostPanelContents(){
         infixToPostfixLabel = new JLabel("Input Infix Expression:");
         infixToPostfixInputTextField = new JTextField(20);
-        infixToPostfixInputTextField.setBorder(null);
         infixToPostfixButton = new JButton("Convert");
         infixToPostfixButton.setFocusPainted(false);
         infixToPostfixButton.addActionListener(new ButtonHandler());
@@ -216,9 +266,9 @@ public class EvaluatorWindow {
 
         outputPostfixLabel = new JLabel("Postfix Expression: ");
         outputPostfixTextField = new JTextField(20);
+        outputPostfixTextField.setEditable(false);
         outputPostfixTextField.setFont(new Font("Arial", Font.BOLD, 12));
         outputPostfixTextField.setBorder(null);
-        outputPostfixTextField.setEditable(false);
     }
 
     public void setPostfixEvaluationPanel(){
@@ -229,32 +279,30 @@ public class EvaluatorWindow {
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx =1;
-        gbc.weighty=1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         initializePostfixEvaluationPanelContents();
-        gbc.gridx=0;
-        gbc.gridy=0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         postfixEvaluationPanel.add(postfixEvaluationLabel,gbc);
-        gbc.gridx=1;
-        gbc.gridwidth =2;
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
         postfixEvaluationPanel.add(postfixEvaluationTextField,gbc);
-        gbc.gridx=0;
-        gbc.gridy=1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 4;
         postfixEvaluationPanel.add(evaluatedScrollPane,gbc);
-        gbc.gridwidth=1;
-        gbc.gridy=2;
+        gbc.gridwidth = 1;
+        gbc.gridy = 2;
         postfixEvaluationPanel.add(outputEvaluatedLabel,gbc);
-        gbc.gridx=1;
-        gbc.gridwidth=2;
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
         postfixEvaluationPanel.add(outputEvaluatedTextField,gbc);
     }
 
     public void initializePostfixEvaluationPanelContents(){
         postfixEvaluationLabel = new JLabel("Postfix Expression: ");
         postfixEvaluationTextField = new JTextField(30);
-        postfixEvaluationTextField.setBorder(null);
-        postfixEvaluationTextField.setEditable(false);
 
         String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
         int[] columnsWidths = {50,70,70,70,170};
@@ -265,11 +313,10 @@ public class EvaluatorWindow {
 
         outputEvaluatedLabel = new JLabel("Evaluated Expression: ");
         outputEvaluatedTextField = new JTextField(30);
+        outputEvaluatedTextField.setEditable(false);
         outputEvaluatedTextField.setFont(new Font("Arial", Font.BOLD, 12));
         outputEvaluatedTextField.setBorder(null);
-        outputEvaluatedTextField.setEditable(false);
     }
-
 
     void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames, int[] columnsWidth,
                          JScrollPane scrollPane ){
@@ -277,7 +324,7 @@ public class EvaluatorWindow {
         defaultTableModel.setColumnIdentifiers(columnNames);
         defaultTableModel.setRowCount(0);
         table.setEnabled(false);
-        table.setDefaultRenderer(Object.class, new TableCellRender());
+//        table.setDefaultRenderer(Object.class, new TableCellRender());
         table.setCellSelectionEnabled(false);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setRowHeight(50);
@@ -325,17 +372,17 @@ public class EvaluatorWindow {
         outputEvaluatedTextField.setText(table2Values[table2Values.length-1][3]);
     }
 
-    class ButtonHandler implements ActionListener{
+    class ButtonHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource()==infixToPostfixButton){
-                if (infixToPostfixInputTextField.getText().length() == 0){
+            if (e.getSource() == infixToPostfixButton) {
+                if (infixToPostfixInputTextField.getText().length() == 0) {
                     JOptionPane.showMessageDialog(frame, "Input Field is Empty.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                try{
+                try {
                     populateTables();
                 } catch (NullPointerException NE) {
                     JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
@@ -344,8 +391,7 @@ public class EvaluatorWindow {
                     JOptionPane.showMessageDialog(frame, IE.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            }
-            else if (e.getSource() == groupMembers)
+            } else if (e.getSource() == groupMembers)
                 displayGroupMembers();
             else if (e.getSource() == courseSpecifications)
                 displayCourseSpecifications();
@@ -355,6 +401,10 @@ public class EvaluatorWindow {
                 setWindowDarkTheme();
             else if (e.getSource() == sluTheme)
                 setWindowSluTheme();
+            else if (e.getSource() == infixToPostfixMode)
+                setMode(true);
+            else if (e.getSource() == postfixEvaluationMode)
+                setMode(false);
         }
     }
 
@@ -370,23 +420,22 @@ public class EvaluatorWindow {
     }
 
     private void setWindowLightTheme() {
-        backgroundColor = new Color(0xFFFFFF);
+        backgroundColor = Color.WHITE;
         headerColor = new Color(0x222222);
         uneditableFieldColor = new Color(0xE5E5E5);
         mainForeground = Color.BLACK;
         secondaryForeground = Color.WHITE;
-        infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
         initializeTheme();
     }
 
     private void setWindowDarkTheme() {
         backgroundColor = new Color(0x333333);
-        headerColor = new Color(0x000000);
+        headerColor = Color.BLACK;
         uneditableFieldColor = new Color(0x4A4A4A);
         mainForeground = Color.WHITE;
         secondaryForeground = Color.WHITE;
-        infixToPostfixInputTextField.setBorder(null);
         initializeTheme();
+        postfixEvaluationTextField.setForeground(Color.BLACK);
     }
 
     private void setWindowSluTheme() {
@@ -395,17 +444,16 @@ public class EvaluatorWindow {
         uneditableFieldColor = new Color(0xFAF0CA);
         mainForeground = Color.BLACK;
         secondaryForeground = Color.WHITE;
-        infixToPostfixInputTextField.setBorder(null);
         initializeTheme();
     }
 
-    static class TableCellRender implements TableCellRenderer{
-        DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component component = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            component.setBackground(Color.WHITE);
-            return component;
-        }
-    }
+//    static class TableCellRender implements TableCellRenderer{
+//        DefaultTableCellRenderer DEFAULT_RENDER = new DefaultTableCellRenderer();
+//        @Override
+//        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//            Component component = DEFAULT_RENDER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//            component.setBackground(Color.WHITE);
+//            return component;
+//        }
+//    }
 }
