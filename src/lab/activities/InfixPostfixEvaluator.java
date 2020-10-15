@@ -67,7 +67,7 @@ public class InfixPostfixEvaluator {
 
         System.out.println("\n|-------------------------------------------------------------------------------|");
         System.out.printf("| %-19s %-56s|", "Postfix expression ->", postfix);
-        System.out.printf("\n| %-10s| %-10s| %-10s| %-10s| %-30s|\n", "Symbol", "operand1", "operand2", "value", "Stack");
+        System.out.printf("\n| %-10s| %-10s| %-10s| %-10s| %-30s|\n", "Symbol", "31", "operand2", "value", "Stack");
         System.out.println("|-------------------------------------------------------------------------------|");
         for (String token : postfix.split("\\s")) {
             try {
