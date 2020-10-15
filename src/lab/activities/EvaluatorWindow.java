@@ -12,19 +12,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class EvaluatorWindow {
-    Color backgroundColor = new Color(0xF4D35E);
-    Color headerColor = new Color(0x0D3B66);
-    Color uneditableFieldColor = new Color(0xFAF0CA);
+    Color backgroundColor = new Color(0xFFFFFF);
+    Color headerColor = new Color(0x222222);
+    Color uneditableFieldColor = new Color(0xE5E5E5);
     Color mainForeground = Color.BLACK;
     Color secondaryForeground = Color.WHITE;
 
     JFrame frame;
+    JMenuBar menuBar;
     JPanel mainPanel;
     JPanel panelsContainerPanel;
 
-    JMenuBar menuBar;
-    JMenu themes;
     JMenu about;
+    JMenuItem groupMembers;
+    JMenuItem courseSpecifications;
+    JMenu themes;
     JMenuItem lightTheme;
     JMenuItem darkTheme;
     JMenuItem sluTheme;
@@ -62,8 +64,8 @@ public class EvaluatorWindow {
         gbc.weightx = gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = gbc.gridwidth = 1;
-        setPanelsContainerPanel();
         initializeMenuBar();
+        setPanelsContainerPanel();
         initializeTheme();
         mainPanel.add(panelsContainerPanel, gbc);
         frame.add(mainPanel);
@@ -78,31 +80,41 @@ public class EvaluatorWindow {
     public void initializeMenuBar() {
         menuBar = new JMenuBar();
         menuBar.setBorderPainted(false);
-
-        themes = new JMenu("Themes");
-        themes.setForeground(secondaryForeground);
-
-        lightTheme = new JMenuItem("Light");
-        lightTheme.addActionListener(new ButtonHandler());
-        themes.add(lightTheme);
-
-        darkTheme = new JMenuItem("Dark");
-        darkTheme.addActionListener(new ButtonHandler());
-        themes.add(darkTheme);
-
-        sluTheme = new JMenuItem("SLU");
-        sluTheme.addActionListener(new ButtonHandler());
-        themes.add(sluTheme);
+        menuBar.setPreferredSize(new Dimension(10, 25));
 
         about = new JMenu("About");
         about.setForeground(secondaryForeground);
-
-        menuBar.add(themes);
+        groupMembers = new JMenuItem("Group Members");
+        groupMembers.addActionListener(new ButtonHandler());
+        about.add(groupMembers);
+        courseSpecifications = new JMenuItem("Course Specification");
+        courseSpecifications.addActionListener(new ButtonHandler());
+        about.add(courseSpecifications);
         menuBar.add(about);
+
+        themes = new JMenu("Themes");
+        themes.setForeground(secondaryForeground);
+        lightTheme = new JMenuItem("Light");
+        lightTheme.addActionListener(new ButtonHandler());
+        themes.add(lightTheme);
+        darkTheme = new JMenuItem("Dark");
+        darkTheme.addActionListener(new ButtonHandler());
+        themes.add(darkTheme);
+        sluTheme = new JMenuItem("SLU");
+        sluTheme.addActionListener(new ButtonHandler());
+        themes.add(sluTheme);
+        menuBar.add(themes);
+
         frame.setJMenuBar(menuBar);
     }
 
     public void initializeTheme() {
+        UIManager.put("OptionPane.background", headerColor);
+        UIManager.put("Panel.background", headerColor);
+        UIManager.put("OptionPane.messageForeground", secondaryForeground);
+        UIManager.put("Button.background", backgroundColor);
+        UIManager.put("Button.foreground", mainForeground);
+
         mainPanel.setBackground(backgroundColor);
         menuBar.setBackground(headerColor);
         panelsContainerPanel.setBackground(backgroundColor);
@@ -112,6 +124,7 @@ public class EvaluatorWindow {
         postfixEvaluationPanel.setBackground(backgroundColor);
         postfixEvaluationTextField.setBackground(uneditableFieldColor);
         outputEvaluatedTextField.setBackground(uneditableFieldColor);
+        infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
 
         infixToPostfixLabel.setForeground(mainForeground);
         infixToPostfixButton.setForeground(secondaryForeground);
@@ -319,19 +332,23 @@ public class EvaluatorWindow {
             if (e.getSource()==infixToPostfixButton){
                 if (infixToPostfixInputTextField.getText().length() == 0){
                     JOptionPane.showMessageDialog(frame, "Input Field is Empty.",
-                            "Alert", JOptionPane.WARNING_MESSAGE);
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 try{
                     populateTables();
                 } catch (NullPointerException NE) {
                     JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
-                            "Alert", JOptionPane.WARNING_MESSAGE);
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 } catch (InvalidInfixException IE) {
                     JOptionPane.showMessageDialog(frame, IE.getMessage(),
-                            "Alert", JOptionPane.WARNING_MESSAGE);
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+            else if (e.getSource() == groupMembers)
+                displayGroupMembers();
+            else if (e.getSource() == courseSpecifications)
+                displayCourseSpecifications();
             else if (e.getSource() == lightTheme)
                 setWindowLightTheme();
             else if (e.getSource() == darkTheme)
@@ -339,12 +356,22 @@ public class EvaluatorWindow {
             else if (e.getSource() == sluTheme)
                 setWindowSluTheme();
         }
+    }
 
+    private void displayGroupMembers() {
+        JOptionPane.showMessageDialog(frame,"     Arevalo Lance\n     Barana Lance Matthew\n     Bayquen Christian" +
+                "\n     Cayton Arian Carl\n     De los Trinos Jp","Group 4", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void displayCourseSpecifications() {
+        JOptionPane.showMessageDialog(null, "   Description:    Data Structures\n   Instructor:" +
+                "       Roderick Makil\n   Class Code:     9413\n   Class #:           CS 211",
+                "Course Specifications", JOptionPane.PLAIN_MESSAGE, null);
     }
 
     private void setWindowLightTheme() {
         backgroundColor = new Color(0xFFFFFF);
-        headerColor = new Color(0x111111);
+        headerColor = new Color(0x222222);
         uneditableFieldColor = new Color(0xE5E5E5);
         mainForeground = Color.BLACK;
         secondaryForeground = Color.WHITE;
