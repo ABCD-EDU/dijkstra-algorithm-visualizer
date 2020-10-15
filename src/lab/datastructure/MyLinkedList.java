@@ -19,31 +19,6 @@ public class MyLinkedList<E>
             this.next = next;
             this.prev = prev;
         }
-
-        public void setData(E data) {
-            this.data = data;
-        }
-
-        public void setPrev(Node<E> prev) {
-            this.prev = prev;
-        }
-
-        public void setNext(Node<E> next) {
-            this.next = next;
-        }
-
-        public Node<E> getNext() {
-            return next;
-        }
-
-        public Node<E> getPrev() {
-            return prev;
-        }
-
-        public E getData() {
-            return data;
-        }
-
     }
 
     public MyLinkedList() {}
@@ -132,13 +107,13 @@ public class MyLinkedList<E>
     }
 
     public void deleteFirst() {
-        if (size != 0) {
+        if (!isEmpty()) {
             deleteFirstNode();
         }
     }
 
     public void deleteLast() {
-        if (size != 0) {
+        if (!isEmpty()) {
             deleteEndNode();
         }
     }
@@ -146,7 +121,7 @@ public class MyLinkedList<E>
     void insertHead(E data) {
         final Node<E> prevHead = head;
         final Node<E> newNode = new Node<>(null , data, prevHead);
-        if (size != 0) {
+        if (!isEmpty()) {
             head = prevHead.prev = newNode;
         }else {
             head = tail = newNode;
@@ -157,7 +132,7 @@ public class MyLinkedList<E>
     void insertTail(E data) {
         final Node<E> prevTail = tail;
         final Node<E> newNode = new Node<>(prevTail, data, null);
-        if (size != 0) {
+        if (!isEmpty()) {
             tail = prevTail.next = newNode;
         }else {
             head = tail = newNode;
@@ -205,7 +180,7 @@ public class MyLinkedList<E>
 
     void deleteFirstNode() {
         final Node<E> newHead = head.next;
-        if (size != 0) {
+        if (!isEmpty()) {
             if (head == tail) {
                 head = tail = null;
             }else {
@@ -219,7 +194,7 @@ public class MyLinkedList<E>
 
     void deleteEndNode(){
         final Node<E> newTail = tail.prev;
-        if (size != 0) {
+        if (!isEmpty()) {
             if (head == tail) {
                 head = tail = null;
             }else {
