@@ -43,6 +43,7 @@ public class EvaluatorWindow {
     JPanel postfixEvaluationPanel;
     JLabel postfixEvaluationLabel;
     JTextField postfixEvaluationTextField;
+    JButton postfixEvaluationButton;
     DefaultTableModel postfixEvaluationTableModel;
     JTable postfixEvaluationTable;
     JLabel outputEvaluatedLabel;
@@ -134,6 +135,9 @@ public class EvaluatorWindow {
         postfixEvaluationTable.setBorder(new LineBorder(headerColor, 2));
         infixToPostfixScrollPane.setBorder(new LineBorder(backgroundColor));
         evaluatedScrollPane.setBorder(new LineBorder(backgroundColor));
+
+        infixToPostfixScrollPane.setBackground(headerColor);
+        evaluatedScrollPane.setBackground(headerColor);
     }
 
     public void setPanelsContainerPanel(){
@@ -241,7 +245,9 @@ public class EvaluatorWindow {
         postfixEvaluationLabel = new JLabel("Postfix Expression: ");
         postfixEvaluationTextField = new JTextField(30);
         postfixEvaluationTextField.setBorder(null);
-        postfixEvaluationTextField.setEditable(false);
+        postfixEvaluationButton = new JButton("Evaluate");
+        postfixEvaluationButton.setFocusPainted(false);
+        postfixEvaluationButton.addActionListener(new ButtonHandler());
 
         String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
         int[] columnsWidths = {50,70,70,70,170};

@@ -3,6 +3,8 @@ package lab.activities;
 import lab.datastructure.MyLinkedList;
 import lab.datastructure.Stack;
 
+import java.util.Arrays;
+
 // TODO: TABLE and TESTS and toPREFIX
 public class InfixPostfixEvaluator {
 
@@ -12,6 +14,7 @@ public class InfixPostfixEvaluator {
         StringBuilder output = new StringBuilder();
         Stack<String> stack = new MyLinkedList<>();
         String[] symbolsArr = infix.split("(?<=[-+*/^()])|(?=[-+*/^()])");
+        System.out.println(Arrays.toString(symbolsArr));
         symbolsArr = formatSymbolsArr(symbolsArr);
         validateInfix(symbolsArr);
         String[][] rows = new String[symbolsArr.length*2][];
@@ -28,7 +31,6 @@ public class InfixPostfixEvaluator {
                     output.append(stack.pop()).append(' ');
                 stack.push(token);
             }
-
             // left parenthesis
             else if (token.equals("(")) {
                 stack.push(token);
