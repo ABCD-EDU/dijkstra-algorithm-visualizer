@@ -3,7 +3,7 @@ package lab.datastructure;
 import java.util.NoSuchElementException;
 
 public class MyLinkedList<E>
-        implements Stack<E>, MyList<E> {
+        implements Stack<E>, MyList<E>, Queue<E> {
 
     Node<E> head;
     Node<E> tail;
@@ -87,6 +87,22 @@ public class MyLinkedList<E>
     @Override
     public boolean isEmpty() {
         return size == 0;
+    }
+
+    @Override
+    public boolean enqueue(E data) {
+        insertHead(data);
+        return true;
+    }
+
+    @Override
+    public E dequeue() {
+        return attainFirst();
+    }
+
+    @Override
+    public E firstElement() {
+        return head.data;
     }
 
     @Override
