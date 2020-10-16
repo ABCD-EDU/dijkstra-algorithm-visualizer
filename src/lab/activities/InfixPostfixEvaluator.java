@@ -54,7 +54,7 @@ public class InfixPostfixEvaluator {
             rows[currentIdx++] = new String[]{"", output.toString(), stack.toString()};
         }
         System.out.println("\n|-------------------------------------------------------------------------------------|");
-        return rows = trimToSize(rows, currentIdx);
+        return trimToSize(rows, currentIdx);
     }
 
     public static String[][] computePostFix(String postfix) {
@@ -87,17 +87,20 @@ public class InfixPostfixEvaluator {
                 } catch (InvalidPostfixException IPE) {
                     throw new InvalidPostfixException("Math Error: Cannot divide by 0");
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     throw new InvalidPostfixException("Postfix Syntax Error!");
                 }
             }
             String s = formatVariablesToPrint(stack);
             System.out.printf("| %-10s| %-10s| %-10s| %-10s| %-30s|\n", token, formatDouble(op1),
                     formatDouble(op2), formatDouble(ans), s);
+            if (token.equals(symbolsArr[symbolsArr.length-1]))
+                s = formatFinalAnswer(stack.peek());
             rows[currentIdx++] = new String[]{token, formatDouble(op1), formatDouble(op2), formatDouble(ans), s};
         }
         System.out.println("|-------------------------------------------------------------------------------|");
 
-        return rows = trimToSize(rows, currentIdx);
+        return trimToSize(rows, currentIdx);
     }
 
     /**
@@ -137,15 +140,47 @@ public class InfixPostfixEvaluator {
         String[] numbers = stack.toString().split(",");
 
         for (int i = 0; i < numbers.length-1; i++ )
-            sb.append(formatDouble(numbers[i]));
+            sb.append(formatDouble(numbers[i])).append(",");
         sb.append(formatDouble(numbers[numbers.length - 1]));
 
         return sb.toString();
     }
 
+    private static String formatFinalAnswer(Double num) {
+        String[] parts = Double.toString(num).split("\\.");
+        if (parts[0].contains("-")) parts[0] = "-" + addCommas(parts[0].substring(1));
+            else parts[0] = addCommas(parts[0]);
+        if (parts[1].equals("0")) return parts[0];
+        return parts[0] + "." + parts[1];
+    }
+
+    private static String addCommas(String wholeNum){
+        String[] digits;
+        String formattedString = "";
+        digits = wholeNum.split("");
+        for(int i = digits.length-1, j = 0; i > -1; i--, j++ ){
+            formattedString += digits[i];
+            if( j == 2 && i != 0){
+                formattedString += ",";
+                j = -1;
+            }
+        }
+        return reverseString(formattedString);
+    }
+
+    private static String reverseString(String string){
+        String reversedString = "";
+        String[] digitArray = string.split("");
+        for(int i = digitArray.length-1; i > -1; i--){
+            reversedString += digitArray[i];
+        }
+        return reversedString;
+    }
+
     public static String formatDouble(String value) {
         if (value.equals("")) return "";
         String[] parts = value.split("\\.");
+        if (parts[1].equals("0")) return parts[0];
         if (parts[1].length() < 3) return value;
         return parts[0] + "." + parts[1].substring(0,3);
     }

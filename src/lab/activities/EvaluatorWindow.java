@@ -412,7 +412,8 @@ public class EvaluatorWindow {
             });
         }
         outputPostfixTextField.setText(postfix);
-        for (String[] values: table2Values){
+        for (int i = 0; i < table2Values.length-1; i++){
+            String[] values = table2Values[i];
             postfixEvaluationTableModel.addRow(new Object[]{
                     values[0],
                     values[1],
@@ -421,24 +422,46 @@ public class EvaluatorWindow {
                     values[4],
             });
         }
+        String[] values = table2Values[table2Values.length-1];
+        postfixEvaluationTableModel.addRow(new Object[]{values[0], values[1],
+                values[2], values[3], removeCommas(values[4]),
+        });
         postfixEvaluationTextField.setText(postfix);
-        outputEvaluatedTextField.setText(table2Values[table2Values.length-1][3]);
+        outputEvaluatedTextField.setText(table2Values[table2Values.length-1][4]);
     }
 
     public void populatePostfixEvaluationTable(){
         postfixEvaluationTableModel.setRowCount(0);
         String postfix = postfixEvaluationTextField.getText();
-        String[][] values =  InfixPostfixEvaluator.computePostFix(postfix);
-        for (String[] value: values){
+        String[][] rowValues =  InfixPostfixEvaluator.computePostFix(postfix);
+        for (int i = 0; i < rowValues.length-1; i++){
+            String[] values = rowValues[i];
             postfixEvaluationTableModel.addRow(new Object[]{
-                    value[0],
-                    value[1],
-                    value[2],
-                    value[3],
-                    value[4],
+                    values[0],
+                    values[1],
+                    values[2],
+                    values[3],
+                    values[4],
             });
         }
-        outputEvaluatedTextField.setText(values[values.length-1][3]);
+        String[] values = rowValues[rowValues.length-1];
+        postfixEvaluationTableModel.addRow(new Object[]{ values[0], values[1],
+                values[2], values[3], removeCommas(values[4]),
+        });
+        outputEvaluatedTextField.setText(rowValues[rowValues.length-1][4]);
+    }
+
+    /**
+     * Helper method that removes the commas within the digits of a given string of numbers.
+     */
+    private String removeCommas(String string){
+        String[] stringArray = string.split("");
+        String noCommas = "";
+        for (String s : stringArray) {
+            if (!s.equals(","))
+                noCommas += s;
+        }
+        return noCommas;
     }
 
     class ButtonHandler implements ActionListener {
