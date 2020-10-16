@@ -5,7 +5,6 @@ import lab.datastructure.Stack;
 
 import java.util.Arrays;
 
-// TODO: TABLE and TESTS and toPREFIX
 public class InfixPostfixEvaluator {
 
     private static final Object[][] ops = {{"+", "-", "/", "*", "^"}, {2, 2 ,3 ,3 ,4}};
@@ -14,7 +13,6 @@ public class InfixPostfixEvaluator {
         StringBuilder output = new StringBuilder();
         Stack<String> stack = new MyLinkedList<>();
         String[] symbolsArr = infix.split("(?<=[-+*/^()])|(?=[-+*/^()])");
-        System.out.println(Arrays.toString(symbolsArr));
         symbolsArr = formatSymbolsArr(symbolsArr);
         validateInfix(symbolsArr);
         String[][] rows = new String[symbolsArr.length*2][];
@@ -116,8 +114,7 @@ public class InfixPostfixEvaluator {
      */
     private static String[][] trimToSize(String[][] origArr, int size) {
         String[][] trimmed = new String[size][origArr[0].length];
-        for (int i = 0; i < size; i++)
-            trimmed[i] = origArr[i];
+        if (size >= 0) System.arraycopy(origArr, 0, trimmed, 0, size);
         return trimmed;
     }
 
@@ -126,8 +123,7 @@ public class InfixPostfixEvaluator {
      */
     private static String[] trimToSize(String[] origArr, int size) {
         String[] trimmed = new String[size];
-        for (int i = 0; i < size; i++)
-            trimmed[i] = origArr[i];
+        if (size >= 0) System.arraycopy(origArr, 0, trimmed, 0, size);
         return trimmed;
     }
 
@@ -155,25 +151,25 @@ public class InfixPostfixEvaluator {
 
     private static String addCommas(String wholeNum){
         String[] digits;
-        String formattedString = "";
+        StringBuilder formattedString = new StringBuilder();
         digits = wholeNum.split("");
         for(int i = digits.length-1, j = 0; i > -1; i--, j++ ){
-            formattedString += digits[i];
+            formattedString.append(digits[i]);
             if( j == 2 && i != 0){
-                formattedString += ",";
+                formattedString.append(",");
                 j = -1;
             }
         }
-        return reverseString(formattedString);
+        return reverseString(formattedString.toString());
     }
 
     private static String reverseString(String string){
-        String reversedString = "";
+        StringBuilder reversedString = new StringBuilder();
         String[] digitArray = string.split("");
         for(int i = digitArray.length-1; i > -1; i--){
-            reversedString += digitArray[i];
+            reversedString.append(digitArray[i]);
         }
-        return reversedString;
+        return reversedString.toString();
     }
 
     public static String formatDouble(String value) {
@@ -278,15 +274,6 @@ public class InfixPostfixEvaluator {
         if (opCtr != numCtr-1)
             throw new InvalidPostfixException("Imbalanced number of numbers and operations");
 
-    }
-
-    private static void printArr(String[] arr) {
-        if (arr.length == 0) System.out.println("[ empty ]");
-        System.out.print("[ ");
-        for(int i = 0; i < arr.length-1; i++) {
-            System.out.print(arr[i] + ", ");
-        }
-        System.out.println(arr[arr.length-1] + " ]");
     }
 
     /**
