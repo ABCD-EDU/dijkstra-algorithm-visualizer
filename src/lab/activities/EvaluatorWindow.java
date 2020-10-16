@@ -6,48 +6,49 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class EvaluatorWindow {
-    Color backgroundColor, headerColor, uneditableFieldColor;
-    Color mainForeground, secondaryForeground;
+    private final String INITIAL_THEME = "Light";
 
-    JFrame frame;
-    JPanel mainPanel;
-    JPanel panelsContainerPanel;
+    private Color backgroundColor, headerColor, uneditableFieldColor;
+    private Color mainForeground, secondaryForeground;
 
-    JMenuBar menuBar;
-    JMenu about, themes, mode, menuSpacing0, menuSpacing1, menuSpacing2;
-    JMenuItem groupMembers, courseSpecifications;
-    JMenuItem lightTheme, darkTheme, sluTheme;
-    JMenuItem infixToPostfixMode, postfixEvaluationMode;
-    boolean isInfixToPostfixMode = true;
+    private JFrame frame;
+    private JPanel mainPanel;
+    private JPanel panelsContainerPanel;
 
-    JPanel infixToPostPanel;
-    JLabel infixToPostfixLabel;
-    JTextField infixToPostfixInputTextField;
-    JButton infixToPostfixButton;
-    DefaultTableModel infixToPostfixTableModel;
-    JTable infixToPostfixTable;
-    JLabel outputPostfixLabel;
-    JTextField outputPostfixTextField;
-    JScrollPane infixToPostfixScrollPane;
+    private JMenuBar menuBar;
+    private JMenu about, themes, mode, menuSpacing0, menuSpacing1, menuSpacing2;
+    private JMenuItem groupMembers, courseSpecifications;
+    private JMenuItem lightTheme, darkTheme, sluTheme;
+    private JMenuItem infixToPostfixMode, postfixEvaluationMode;
+    private boolean isInfixToPostfixMode = true;
 
-    JPanel postfixEvaluationPanel;
-    JLabel postfixEvaluationLabel;
-    JTextField postfixEvaluationTextField;
-    JButton postfixEvaluationButton;
-    DefaultTableModel postfixEvaluationTableModel;
-    JTable postfixEvaluationTable;
-    JLabel outputEvaluatedLabel;
-    JTextField outputEvaluatedTextField;
-    JScrollPane evaluatedScrollPane;
+    private JPanel infixToPostPanel;
+    private JLabel infixToPostfixLabel;
+    private JTextField infixToPostfixInputTextField;
+    private JButton infixToPostfixButton;
+    private DefaultTableModel infixToPostfixTableModel;
+    private JTable infixToPostfixTable;
+    private JLabel outputPostfixLabel;
+    private JTextField outputPostfixTextField;
+    private JScrollPane infixToPostfixScrollPane;
 
-    GridBagLayout gridBagLayout;
-    GridBagConstraints gbc;
+    private JPanel postfixEvaluationPanel;
+    private JLabel postfixEvaluationLabel;
+    private JTextField postfixEvaluationTextField;
+    private JButton postfixEvaluationButton;
+    private DefaultTableModel postfixEvaluationTableModel;
+    private JTable postfixEvaluationTable;
+    private JLabel outputEvaluatedLabel;
+    private JTextField outputEvaluatedTextField;
+    private JScrollPane evaluatedScrollPane;
 
-    EvaluatorWindow(){
+    private String currentTheme = INITIAL_THEME;
+    private GridBagLayout gridBagLayout;
+    private GridBagConstraints gbc;
+
+    public EvaluatorWindow(){
         frame = new JFrame("Converter");
         frame.setIconImage(new ImageIcon("src/DINO.png").getImage());
         mainPanel = new JPanel();
@@ -71,7 +72,7 @@ public class EvaluatorWindow {
         frame.setVisible(true);
     }
 
-    public void setMenuBar() {
+    private void setMenuBar() {
         menuBar = new JMenuBar();
         menuBar.setBorderPainted(false);
         menuBar.setPreferredSize(new Dimension(10, 25));
@@ -130,7 +131,7 @@ public class EvaluatorWindow {
         mode.add(postfixEvaluationMode);
     }
 
-    public void setMode(boolean isInfixToPostfixMode) {
+    private  void setMode(boolean isInfixToPostfixMode) {
         if (isInfixToPostfixMode) {
             this.isInfixToPostfixMode = true;
             infixToPostfixButton.setEnabled(true);
@@ -166,7 +167,7 @@ public class EvaluatorWindow {
         clearTableContent();
     }
 
-    public void clearTableContent() {
+    private  void clearTableContent() {
         for( int i = infixToPostfixTableModel.getRowCount() - 1; i >= 0; i-- ) {
             infixToPostfixTableModel.setRowCount(0);
         }
@@ -175,30 +176,14 @@ public class EvaluatorWindow {
         }
     }
 
-    public void setTheme(String theme) {
-        String currentMode = "Light";
-        if (theme.equalsIgnoreCase("Light")) {
-            backgroundColor = Color.WHITE;
-            headerColor = new Color(0x222222);
-            uneditableFieldColor = new Color(0xE5E5E5);
-            mainForeground = Color.BLACK;
-            secondaryForeground = Color.WHITE;
-            currentMode = "Light";
-        } else if (theme.equalsIgnoreCase("Dark")) {
-            backgroundColor = new Color(0x333333);
-            headerColor = Color.BLACK;
-            uneditableFieldColor = new Color(0x4A4A4A);
-            mainForeground = Color.WHITE;
-            secondaryForeground = Color.WHITE;
-            currentMode = "Dark";
-        } else if (theme.equalsIgnoreCase("SLU")) {
-            backgroundColor = new Color(0xF4D35E);
-            headerColor = new Color(0x0D3B66);
-            uneditableFieldColor = new Color(0xFAF0CA);
-            mainForeground = Color.BLACK;
-            secondaryForeground = Color.WHITE;
-            currentMode = "SLU";
-        }
+    private  void setTheme(String theme) {
+        if (theme.equalsIgnoreCase("Light"))
+            setWhiteThemeProperties();
+        else if (theme.equalsIgnoreCase("Dark"))
+            setDarkThemeProperties();
+        else if (theme.equalsIgnoreCase("SLU"))
+            setSLUThemeProperties();
+
         UIManager.put("OptionPane.background", headerColor);
         UIManager.put("Panel.background", headerColor);
         UIManager.put("OptionPane.messageForeground", secondaryForeground);
@@ -208,11 +193,38 @@ public class EvaluatorWindow {
         UIManager.put("Button.focus", backgroundColor);
 
         setBackgrounds();
-        setComponentPropertiesAccordingToMode(currentMode);
-        setForeGrounds();
+        setComponentPropertiesAccordingToMode(currentTheme);
+        setForegrounds();
         setTableHeaders();
         setBorders();
 
+    }
+
+    private void setWhiteThemeProperties() {
+        backgroundColor = Color.WHITE;
+        headerColor = new Color(0x222222);
+        uneditableFieldColor = new Color(0xE5E5E5);
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.WHITE;
+        currentTheme = "Light";
+    }
+
+    private void setDarkThemeProperties() {
+        backgroundColor = new Color(0x333333);
+        headerColor = Color.BLACK;
+        uneditableFieldColor = new Color(0x4A4A4A);
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        currentTheme = "Dark";
+    }
+
+    private void setSLUThemeProperties() {
+        backgroundColor = new Color(0xF4D35E);
+        headerColor = new Color(0x0D3B66);
+        uneditableFieldColor = new Color(0xFAF0CA);
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.WHITE;
+        currentTheme = "SLU";
     }
 
     private void setComponentPropertiesAccordingToMode(String currentMode) {
@@ -247,9 +259,11 @@ public class EvaluatorWindow {
         outputPostfixTextField.setBackground(uneditableFieldColor);
         postfixEvaluationPanel.setBackground(backgroundColor);
         outputEvaluatedTextField.setBackground(uneditableFieldColor);
+        infixToPostfixScrollPane.setBackground(headerColor);
+        evaluatedScrollPane.setBackground(headerColor);
     }
 
-    private void setForeGrounds() {
+    private void setForegrounds() {
         about.setForeground(secondaryForeground);
         themes.setForeground(secondaryForeground);
         mode.setForeground(secondaryForeground);
@@ -291,7 +305,7 @@ public class EvaluatorWindow {
         panelsContainerPanel.add(postfixEvaluationPanel,gbc);
     }
 
-    void setInfixToPostPanel(){
+    private void setInfixToPostPanel(){
         infixToPostPanel = new JPanel();
         gridBagLayout = new GridBagLayout();
         infixToPostPanel.setLayout(gridBagLayout);
@@ -325,7 +339,7 @@ public class EvaluatorWindow {
         infixToPostPanel.add(outputPostfixTextField, gbc);
     }
 
-    public void initializeInfixToPostPanelContents(){
+    private void initializeInfixToPostPanelContents(){
         infixToPostfixLabel = new JLabel("Input Infix Expression:");
         infixToPostfixInputTextField = new JTextField(20);
         infixToPostfixInputTextField.addActionListener(e -> evaluateInfix());
@@ -348,7 +362,7 @@ public class EvaluatorWindow {
         outputPostfixTextField.setBorder(null);
     }
 
-    public void setPostfixEvaluationPanel(){
+    private void setPostfixEvaluationPanel(){
         postfixEvaluationPanel = new JPanel();
         gridBagLayout = new GridBagLayout();
         postfixEvaluationPanel.setLayout(gridBagLayout);
@@ -380,7 +394,7 @@ public class EvaluatorWindow {
         postfixEvaluationPanel.add(outputEvaluatedTextField,gbc);
     }
 
-    public void initializePostfixEvaluationPanelContents(){
+    private void initializePostfixEvaluationPanelContents(){
         postfixEvaluationLabel = new JLabel("Postfix Expression: ");
         postfixEvaluationTextField = new JTextField(30);
         postfixEvaluationButton = new JButton("Evaluate");
@@ -401,7 +415,7 @@ public class EvaluatorWindow {
         outputEvaluatedTextField.setBorder(null);
     }
 
-    void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames, int[] columnsWidth,
+    private void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames, int[] columnsWidth,
                          JScrollPane scrollPane ){
         table.setModel(defaultTableModel);
         defaultTableModel.setColumnIdentifiers(columnNames);
@@ -426,7 +440,7 @@ public class EvaluatorWindow {
         scrollPane.setVisible(true);
     }
 
-    public void populateTables(){
+    private void populateTables(){
         infixToPostfixTableModel.setRowCount(0);
         postfixEvaluationTableModel.setRowCount(0);
         String infix= infixToPostfixInputTextField.getText();
@@ -459,7 +473,7 @@ public class EvaluatorWindow {
         outputEvaluatedTextField.setText(table2Values[table2Values.length-1][4]);
     }
 
-    public void populatePostfixEvaluationTable(){
+    private void populatePostfixEvaluationTable(){
         postfixEvaluationTableModel.setRowCount(0);
         String postfix = postfixEvaluationTextField.getText();
         String[][] rowValues =  InfixPostfixEvaluator.computePostFix(postfix);
