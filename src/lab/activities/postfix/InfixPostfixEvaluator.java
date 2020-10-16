@@ -1,9 +1,7 @@
-package lab.activities;
+package lab.activities.postfix;
 
 import lab.datastructure.MyLinkedList;
 import lab.datastructure.Stack;
-
-import java.util.Arrays;
 
 public class InfixPostfixEvaluator {
 

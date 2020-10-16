@@ -1,4 +1,4 @@
-package lab.activities;
+package lab.activities.postfix;
 
 public class InfixToPostfixExecutable {
     public static void main(String[] args) {

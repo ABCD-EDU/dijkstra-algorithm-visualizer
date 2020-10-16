@@ -1,4 +1,4 @@
-package lab.activities;
+package lab.activities.postfix;
 
 public class InvalidPostfixException extends RuntimeException{
 

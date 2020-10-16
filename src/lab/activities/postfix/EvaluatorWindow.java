@@ -1,4 +1,4 @@
-package lab.activities;
+package lab.activities.postfix;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
