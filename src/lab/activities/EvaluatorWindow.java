@@ -77,40 +77,16 @@ public class EvaluatorWindow {
         menuBar.setPreferredSize(new Dimension(10, 25));
 
         menuSpacing0 = new JMenu();
-        menuSpacing0.setEnabled(false);
-
-        about = new JMenu("About");
-        groupMembers = new JMenuItem("Group Members");
-        groupMembers.addActionListener(new ButtonHandler());
-        about.add(groupMembers);
-        courseSpecifications = new JMenuItem("Course Specification");
-        courseSpecifications.addActionListener(new ButtonHandler());
-        about.add(courseSpecifications);
-
         menuSpacing1 = new JMenu();
-        menuSpacing1.setEnabled(false);
-
-        themes = new JMenu("Themes");
-        lightTheme = new JMenuItem("Light");
-        lightTheme.addActionListener(new ButtonHandler());
-        themes.add(lightTheme);
-        darkTheme = new JMenuItem("Dark");
-        darkTheme.addActionListener(new ButtonHandler());
-        themes.add(darkTheme);
-        sluTheme = new JMenuItem("SLU");
-        sluTheme.addActionListener(new ButtonHandler());
-        themes.add(sluTheme);
-
         menuSpacing2 = new JMenu();
+
+        menuSpacing0.setEnabled(false);
+        menuSpacing1.setEnabled(false);
         menuSpacing2.setEnabled(false);
 
-        mode = new JMenu("Mode");
-        infixToPostfixMode = new JMenuItem("Convert Infix to Postfix Expression");
-        infixToPostfixMode.addActionListener(new ButtonHandler());
-        mode.add(infixToPostfixMode);
-        postfixEvaluationMode = new JMenuItem("Evaluate Postfix Expression");
-        postfixEvaluationMode.addActionListener(new ButtonHandler());
-        mode.add(postfixEvaluationMode);
+        initializeAboutSubMenu();
+        initializeThemesSubMenu();
+        initializeModesSubMenu();
 
         menuBar.add(menuSpacing0);
         menuBar.add(about);
@@ -119,6 +95,39 @@ public class EvaluatorWindow {
         menuBar.add(menuSpacing2);
         menuBar.add(mode);
         frame.setJMenuBar(menuBar);
+    }
+
+    private void initializeAboutSubMenu() {
+        about = new JMenu("About");
+        groupMembers = new JMenuItem("Group Members");
+        groupMembers.addActionListener(e -> displayGroupMembers());
+        about.add(groupMembers);
+        courseSpecifications = new JMenuItem("Course Specification");
+        courseSpecifications.addActionListener(e -> displayCourseSpecifications());
+        about.add(courseSpecifications);
+    }
+
+    private void initializeThemesSubMenu() {
+        themes = new JMenu("Themes");
+        lightTheme = new JMenuItem("Light");
+        lightTheme.addActionListener(e -> setTheme("Light"));
+        themes.add(lightTheme);
+        darkTheme = new JMenuItem("Dark");
+        darkTheme.addActionListener(e -> setTheme("Dark"));
+        themes.add(darkTheme);
+        sluTheme = new JMenuItem("SLU");
+        sluTheme.addActionListener(e -> setTheme("SLU"));
+        themes.add(sluTheme);
+    }
+
+    private void initializeModesSubMenu() {
+        mode = new JMenu("Mode");
+        infixToPostfixMode = new JMenuItem("Convert Infix to Postfix Expression");
+        infixToPostfixMode.addActionListener(e -> setMode(true));
+        mode.add(infixToPostfixMode);
+        postfixEvaluationMode = new JMenuItem("Evaluate Postfix Expression");
+        postfixEvaluationMode.addActionListener(e -> setMode(false));
+        mode.add(postfixEvaluationMode);
     }
 
     public void setMode(boolean isInfixToPostfixMode) {
@@ -198,13 +207,15 @@ public class EvaluatorWindow {
         UIManager.put("Button.select", headerColor);
         UIManager.put("Button.focus", backgroundColor);
 
-        mainPanel.setBackground(backgroundColor);
-        menuBar.setBackground(headerColor);
-        panelsContainerPanel.setBackground(backgroundColor);
-        infixToPostPanel.setBackground(backgroundColor);
-        outputPostfixTextField.setBackground(uneditableFieldColor);
-        postfixEvaluationPanel.setBackground(backgroundColor);
-        outputEvaluatedTextField.setBackground(uneditableFieldColor);
+        setBackgrounds();
+        setComponentPropertiesAccordingToMode(currentMode);
+        setForeGrounds();
+        setTableHeaders();
+        setBorders();
+
+    }
+
+    private void setComponentPropertiesAccordingToMode(String currentMode) {
         if (isInfixToPostfixMode) {
             if (currentMode.equals("Dark")) infixToPostfixInputTextField.setBorder(null);
             else infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
@@ -226,7 +237,19 @@ public class EvaluatorWindow {
             infixToPostfixButton.setBackground(uneditableFieldColor);
             infixToPostfixInputTextField.setBackground(uneditableFieldColor);
         }
+    }
 
+    private void setBackgrounds() {
+        mainPanel.setBackground(backgroundColor);
+        menuBar.setBackground(headerColor);
+        panelsContainerPanel.setBackground(backgroundColor);
+        infixToPostPanel.setBackground(backgroundColor);
+        outputPostfixTextField.setBackground(uneditableFieldColor);
+        postfixEvaluationPanel.setBackground(backgroundColor);
+        outputEvaluatedTextField.setBackground(uneditableFieldColor);
+    }
+
+    private void setForeGrounds() {
         about.setForeground(secondaryForeground);
         themes.setForeground(secondaryForeground);
         mode.setForeground(secondaryForeground);
@@ -236,14 +259,18 @@ public class EvaluatorWindow {
         outputEvaluatedLabel.setForeground(mainForeground);
         outputPostfixTextField.setForeground(mainForeground);
         outputEvaluatedTextField.setForeground(mainForeground);
+    }
 
+    private void setTableHeaders() {
         infixToPostfixTable.getTableHeader().setBackground(headerColor);
         infixToPostfixTable.getTableHeader().setForeground(secondaryForeground);
         infixToPostfixTable.getTableHeader().setBorder(new LineBorder(headerColor));
         postfixEvaluationTable.getTableHeader().setBackground(headerColor);
         postfixEvaluationTable.getTableHeader().setForeground(secondaryForeground);
         postfixEvaluationTable.getTableHeader().setBorder(new LineBorder(headerColor));
+    }
 
+    private void setBorders() {
         infixToPostfixScrollPane.setBorder(new LineBorder(headerColor, 3));
         evaluatedScrollPane.setBorder(new LineBorder(headerColor, 3));
     }
@@ -301,9 +328,10 @@ public class EvaluatorWindow {
     public void initializeInfixToPostPanelContents(){
         infixToPostfixLabel = new JLabel("Input Infix Expression:");
         infixToPostfixInputTextField = new JTextField(20);
+        infixToPostfixInputTextField.addActionListener(e -> evaluateInfix());
         infixToPostfixButton = new JButton("Convert");
         infixToPostfixButton.setFocusPainted(false);
-        infixToPostfixButton.addActionListener(new ButtonHandler());
+        infixToPostfixButton.addActionListener(e -> evaluateInfix());
 
         String[] COLUMN_NAMES = {"Symbol","Postfix Expression","Operator Stack"};
         int[] columnWidths = {60,250,150};
@@ -314,6 +342,7 @@ public class EvaluatorWindow {
 
         outputPostfixLabel = new JLabel("Postfix Expression: ");
         outputPostfixTextField = new JTextField(20);
+        outputPostfixTextField.addActionListener(e -> evaluatePostFix());
         outputPostfixTextField.setEditable(false);
         outputPostfixTextField.setFont(new Font("Arial", Font.BOLD, 12));
         outputPostfixTextField.setBorder(null);
@@ -356,7 +385,7 @@ public class EvaluatorWindow {
         postfixEvaluationTextField = new JTextField(30);
         postfixEvaluationButton = new JButton("Evaluate");
         postfixEvaluationButton.setFocusPainted(false);
-        postfixEvaluationButton.addActionListener(new ButtonHandler());
+        postfixEvaluationButton.addActionListener(e -> evaluatePostFix());
 
         String[] COLUMN_NAMES = {"Token", "Operand 1","Operand 2","Operand 3", "Stack"};
         int[] columnsWidths = {50,70,70,70,170};
@@ -464,52 +493,34 @@ public class EvaluatorWindow {
         return noCommas;
     }
 
-    class ButtonHandler implements ActionListener {
+    private void evaluateInfix() {
+        if (infixToPostfixInputTextField.getText().length() == 0) {
+            JOptionPane.showMessageDialog(frame, "Infix Input Field is Empty.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            populateTables();
+        } catch (NullPointerException NE) {
+            JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (InvalidInfixException IIE) {
+            JOptionPane.showMessageDialog(frame, IIE.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == infixToPostfixButton) {
-                if (infixToPostfixInputTextField.getText().length() == 0) {
-                    JOptionPane.showMessageDialog(frame, "Infix Input Field is Empty.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                try {
-                    populateTables();
-                } catch (NullPointerException NE) {
-                    JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                } catch (InvalidInfixException IIE) {
-                    JOptionPane.showMessageDialog(frame, IIE.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }else if (e.getSource()==postfixEvaluationButton){
-                if (postfixEvaluationTextField.getText().length() == 0){
-                    JOptionPane.showMessageDialog(frame, "Postfix Input Field is Empty.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                try{
-                    populatePostfixEvaluationTable();
-                }catch (InvalidPostfixException IPE) {
-                    JOptionPane.showMessageDialog(frame, IPE.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-            else if (e.getSource() == groupMembers)
-                displayGroupMembers();
-            else if (e.getSource() == courseSpecifications)
-                displayCourseSpecifications();
-            else if (e.getSource() == lightTheme)
-                setTheme("Light");
-            else if (e.getSource() == darkTheme)
-                setTheme("Dark");
-            else if (e.getSource() == sluTheme)
-                setTheme("SLU");
-            else if (e.getSource() == infixToPostfixMode)
-                setMode(true);
-            else if (e.getSource() == postfixEvaluationMode)
-                setMode(false);
+    private void evaluatePostFix() {
+        if (postfixEvaluationTextField.getText().length() == 0){
+            JOptionPane.showMessageDialog(frame, "Postfix Input Field is Empty.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try{
+            populatePostfixEvaluationTable();
+        }catch (InvalidPostfixException IPE) {
+            JOptionPane.showMessageDialog(frame, IPE.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

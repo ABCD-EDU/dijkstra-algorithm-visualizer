@@ -87,7 +87,6 @@ public class InfixPostfixEvaluator {
                 } catch (InvalidPostfixException IPE) {
                     throw new InvalidPostfixException("Math Error: Cannot divide by 0");
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     throw new InvalidPostfixException("Postfix Syntax Error!");
                 }
             }
@@ -311,9 +310,6 @@ public class InfixPostfixEvaluator {
                 toReturn[ctr++] = symbols[i+1] + symbols[i+2];
                 i+=2;
             }
-//            else if(symbols[i].equals("-") && symbols[i+1].equals("(")) {
-//                  TODO: Implement if negative parenthesis should be taken into consideration
-//            }
             else if(i == 0 && symbols[i].equals("-") && !symbols[i+1].equals("(")){
                 toReturn[ctr++] = symbols[i] + symbols[i+1];
                 i++;
