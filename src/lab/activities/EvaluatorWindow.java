@@ -10,27 +10,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class EvaluatorWindow {
-    Color backgroundColor = new Color(0xFFFFFF);
-    Color headerColor = new Color(0x222222);
-    Color uneditableFieldColor = new Color(0xE5E5E5);
-    Color mainForeground = Color.BLACK;
-    Color secondaryForeground = Color.WHITE;
+    Color backgroundColor, headerColor, uneditableFieldColor;
+    Color mainForeground, secondaryForeground;
 
     JFrame frame;
-    JMenuBar menuBar;
     JPanel mainPanel;
     JPanel panelsContainerPanel;
 
-    JMenu about;
-    JMenuItem groupMembers;
-    JMenuItem courseSpecifications;
-    JMenu themes;
-    JMenuItem lightTheme;
-    JMenuItem darkTheme;
-    JMenuItem sluTheme;
-    JMenu mode;
-    JMenuItem infixToPostfixMode;
-    JMenuItem postfixEvaluationMode;
+    JMenuBar menuBar;
+    JMenu about, themes, mode, menuSpacing0, menuSpacing1, menuSpacing2;
+    JMenuItem groupMembers, courseSpecifications;
+    JMenuItem lightTheme, darkTheme, sluTheme;
+    JMenuItem infixToPostfixMode, postfixEvaluationMode;
     boolean isInfixToPostfixMode = true;
 
     JPanel infixToPostPanel;
@@ -66,10 +57,10 @@ public class EvaluatorWindow {
         gbc.weightx = gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = gbc.gridwidth = 1;
-        initializeMenuBar();
+        setMenuBar();
         setPanelsContainerPanel();
         setMode(true);
-        initializeTheme();
+        setTheme("Light");
         mainPanel.add(panelsContainerPanel, gbc);
         frame.add(mainPanel);
 
@@ -80,10 +71,13 @@ public class EvaluatorWindow {
         frame.setVisible(true);
     }
 
-    public void initializeMenuBar() {
+    public void setMenuBar() {
         menuBar = new JMenuBar();
         menuBar.setBorderPainted(false);
         menuBar.setPreferredSize(new Dimension(10, 25));
+
+        menuSpacing0 = new JMenu();
+        menuSpacing0.setEnabled(false);
 
         about = new JMenu("About");
         groupMembers = new JMenuItem("Group Members");
@@ -92,7 +86,9 @@ public class EvaluatorWindow {
         courseSpecifications = new JMenuItem("Course Specification");
         courseSpecifications.addActionListener(new ButtonHandler());
         about.add(courseSpecifications);
-        menuBar.add(about);
+
+        menuSpacing1 = new JMenu();
+        menuSpacing1.setEnabled(false);
 
         themes = new JMenu("Themes");
         lightTheme = new JMenuItem("Light");
@@ -104,7 +100,9 @@ public class EvaluatorWindow {
         sluTheme = new JMenuItem("SLU");
         sluTheme.addActionListener(new ButtonHandler());
         themes.add(sluTheme);
-        menuBar.add(themes);
+
+        menuSpacing2 = new JMenu();
+        menuSpacing2.setEnabled(false);
 
         mode = new JMenu("Mode");
         infixToPostfixMode = new JMenuItem("Convert Infix to Postfix Expression");
@@ -113,35 +111,50 @@ public class EvaluatorWindow {
         postfixEvaluationMode = new JMenuItem("Evaluate Postfix Expression");
         postfixEvaluationMode.addActionListener(new ButtonHandler());
         mode.add(postfixEvaluationMode);
-        menuBar.add(mode);
 
+        menuBar.add(menuSpacing0);
+        menuBar.add(about);
+        menuBar.add(menuSpacing1);
+        menuBar.add(themes);
+        menuBar.add(menuSpacing2);
+        menuBar.add(mode);
         frame.setJMenuBar(menuBar);
     }
 
     public void setMode(boolean isInfixToPostfixMode) {
         if (isInfixToPostfixMode) {
             this.isInfixToPostfixMode = true;
+            infixToPostfixButton.setEnabled(true);
+            infixToPostfixButton.setBackground(headerColor);
+            infixToPostfixButton.setForeground(secondaryForeground);
             infixToPostfixInputTextField.setBackground(Color.WHITE);
             infixToPostfixInputTextField.setEditable(true);
             infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
+            postfixEvaluationButton.setEnabled(false);
+            postfixEvaluationButton.setBackground(uneditableFieldColor);
             postfixEvaluationTextField.setBackground(uneditableFieldColor);
             postfixEvaluationTextField.setText(null);
             postfixEvaluationTextField.setEditable(false);
             postfixEvaluationTextField.setBorder(null);
         } else {
             this.isInfixToPostfixMode = false;
+            postfixEvaluationButton.setEnabled(true);
+            postfixEvaluationButton.setBackground(headerColor);
+            postfixEvaluationButton.setForeground(secondaryForeground);
             postfixEvaluationTextField.setBackground(Color.WHITE);
             postfixEvaluationTextField.setText(null);
             postfixEvaluationTextField.setEditable(true);
             postfixEvaluationTextField.setBorder(new LineBorder(headerColor, 2));
+            infixToPostfixButton.setEnabled(false);
+            infixToPostfixButton.setBackground(uneditableFieldColor);
             infixToPostfixInputTextField.setBackground(uneditableFieldColor);
             infixToPostfixInputTextField.setText(null);
             infixToPostfixInputTextField.setEditable(false);
             infixToPostfixInputTextField.setBorder(null);
         }
-        clearTableContent();
         outputPostfixTextField.setText(null);
         outputEvaluatedTextField.setText(null);
+        clearTableContent();
     }
 
     public void clearTableContent() {
@@ -153,7 +166,30 @@ public class EvaluatorWindow {
         }
     }
 
-    public void initializeTheme() {
+    public void setTheme(String theme) {
+        String currentMode = "Light";
+        if (theme.equalsIgnoreCase("Light")) {
+            backgroundColor = Color.WHITE;
+            headerColor = new Color(0x222222);
+            uneditableFieldColor = new Color(0xE5E5E5);
+            mainForeground = Color.BLACK;
+            secondaryForeground = Color.WHITE;
+            currentMode = "Light";
+        } else if (theme.equalsIgnoreCase("Dark")) {
+            backgroundColor = new Color(0x333333);
+            headerColor = Color.BLACK;
+            uneditableFieldColor = new Color(0x4A4A4A);
+            mainForeground = Color.WHITE;
+            secondaryForeground = Color.WHITE;
+            currentMode = "Dark";
+        } else if (theme.equalsIgnoreCase("SLU")) {
+            backgroundColor = new Color(0xF4D35E);
+            headerColor = new Color(0x0D3B66);
+            uneditableFieldColor = new Color(0xFAF0CA);
+            mainForeground = Color.BLACK;
+            secondaryForeground = Color.WHITE;
+            currentMode = "SLU";
+        }
         UIManager.put("OptionPane.background", headerColor);
         UIManager.put("Panel.background", headerColor);
         UIManager.put("OptionPane.messageForeground", secondaryForeground);
@@ -166,28 +202,39 @@ public class EvaluatorWindow {
         menuBar.setBackground(headerColor);
         panelsContainerPanel.setBackground(backgroundColor);
         infixToPostPanel.setBackground(backgroundColor);
-        infixToPostfixButton.setBackground(headerColor);
         outputPostfixTextField.setBackground(uneditableFieldColor);
         postfixEvaluationPanel.setBackground(backgroundColor);
         outputEvaluatedTextField.setBackground(uneditableFieldColor);
         if (isInfixToPostfixMode) {
+            if (currentMode.equals("Dark")) infixToPostfixInputTextField.setBorder(null);
+            else infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
+            infixToPostfixButton.setBackground(headerColor);
+            infixToPostfixButton.setForeground(secondaryForeground);
+            postfixEvaluationTextField.setForeground(mainForeground);
+            postfixEvaluationButton.setBackground(uneditableFieldColor);
             postfixEvaluationTextField.setBackground(uneditableFieldColor);
-            infixToPostfixInputTextField.setBorder(new LineBorder(headerColor, 2));
-        } else{
+        } else {
+            if (currentMode.equals("Dark")) {
+                postfixEvaluationTextField.setBorder(null);
+                postfixEvaluationTextField.setForeground(Color.BLACK);
+            } else {
+                postfixEvaluationTextField.setBorder(new LineBorder(headerColor, 2));
+                postfixEvaluationTextField.setForeground(mainForeground);
+            }
+            postfixEvaluationButton.setBackground(headerColor);
+            postfixEvaluationButton.setForeground(secondaryForeground);
+            infixToPostfixButton.setBackground(uneditableFieldColor);
             infixToPostfixInputTextField.setBackground(uneditableFieldColor);
-            postfixEvaluationTextField.setBorder(new LineBorder(headerColor, 2));
         }
 
         about.setForeground(secondaryForeground);
         themes.setForeground(secondaryForeground);
         mode.setForeground(secondaryForeground);
         infixToPostfixLabel.setForeground(mainForeground);
-        infixToPostfixButton.setForeground(secondaryForeground);
         outputPostfixLabel.setForeground(mainForeground);
         postfixEvaluationLabel.setForeground(mainForeground);
         outputEvaluatedLabel.setForeground(mainForeground);
         outputPostfixTextField.setForeground(mainForeground);
-        postfixEvaluationTextField.setForeground(mainForeground);
         outputEvaluatedTextField.setForeground(mainForeground);
 
         infixToPostfixTable.getTableHeader().setBackground(headerColor);
@@ -197,8 +244,8 @@ public class EvaluatorWindow {
         postfixEvaluationTable.getTableHeader().setForeground(secondaryForeground);
         postfixEvaluationTable.getTableHeader().setBorder(new LineBorder(headerColor));
 
-        infixToPostfixScrollPane.setBorder(new LineBorder(headerColor, 2));
-        evaluatedScrollPane.setBorder(new LineBorder(headerColor, 2));
+        infixToPostfixScrollPane.setBorder(new LineBorder(headerColor, 3));
+        evaluatedScrollPane.setBorder(new LineBorder(headerColor, 3));
     }
 
     public void setPanelsContainerPanel(){
@@ -221,7 +268,7 @@ public class EvaluatorWindow {
         infixToPostPanel = new JPanel();
         gridBagLayout = new GridBagLayout();
         infixToPostPanel.setLayout(gridBagLayout);
-        gridBagLayout.rowHeights = new int[]{30,400,35};
+        gridBagLayout.rowHeights = new int[]{30,500,35};
         infixToPostPanel.setBorder(new EmptyBorder(10,10,10,10));
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
@@ -276,7 +323,7 @@ public class EvaluatorWindow {
         postfixEvaluationPanel = new JPanel();
         gridBagLayout = new GridBagLayout();
         postfixEvaluationPanel.setLayout(gridBagLayout);
-        gridBagLayout.rowHeights = new int[]{35,400,35};
+        gridBagLayout.rowHeights = new int[]{35,500,35};
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.BOTH;
@@ -426,17 +473,16 @@ public class EvaluatorWindow {
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-
             else if (e.getSource() == groupMembers)
                 displayGroupMembers();
             else if (e.getSource() == courseSpecifications)
                 displayCourseSpecifications();
             else if (e.getSource() == lightTheme)
-                setWindowLightTheme();
+                setTheme("Light");
             else if (e.getSource() == darkTheme)
-                setWindowDarkTheme();
+                setTheme("Dark");
             else if (e.getSource() == sluTheme)
-                setWindowSluTheme();
+                setTheme("SLU");
             else if (e.getSource() == infixToPostfixMode)
                 setMode(true);
             else if (e.getSource() == postfixEvaluationMode)
@@ -453,33 +499,5 @@ public class EvaluatorWindow {
         JOptionPane.showMessageDialog(null, "   Description:    Data Structures\n   Instructor:" +
                 "       Roderick Makil\n   Class Code:     9413\n   Class #:           CS 211",
                 "Course Specifications", JOptionPane.PLAIN_MESSAGE, null);
-    }
-
-    private void setWindowLightTheme() {
-        backgroundColor = Color.WHITE;
-        headerColor = new Color(0x222222);
-        uneditableFieldColor = new Color(0xE5E5E5);
-        mainForeground = Color.BLACK;
-        secondaryForeground = Color.WHITE;
-        initializeTheme();
-    }
-
-    private void setWindowDarkTheme() {
-        backgroundColor = new Color(0x333333);
-        headerColor = Color.BLACK;
-        uneditableFieldColor = new Color(0x4A4A4A);
-        mainForeground = Color.WHITE;
-        secondaryForeground = Color.WHITE;
-        initializeTheme();
-        postfixEvaluationTextField.setForeground(Color.BLACK);
-    }
-
-    private void setWindowSluTheme() {
-        backgroundColor = new Color(0xF4D35E);
-        headerColor = new Color(0x0D3B66);
-        uneditableFieldColor = new Color(0xFAF0CA);
-        mainForeground = Color.BLACK;
-        secondaryForeground = Color.WHITE;
-        initializeTheme();
     }
 }
