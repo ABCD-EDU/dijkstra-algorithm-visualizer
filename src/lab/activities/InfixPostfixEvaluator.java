@@ -59,7 +59,9 @@ public class InfixPostfixEvaluator {
 
     public static String[][] computePostFix(String postfix) {
         Stack<Double> stack = new MyLinkedList<>();
-        String[][] rows = new String[postfix.split("\\s").length*2][];
+        String[] symbolsArr = postfix.split("\\s");
+        validatePostfix(symbolsArr);
+        String[][] rows = new String[symbolsArr.length*2][];
         int currentIdx = 0;
         String op1 = "";
         String op2 = "";
@@ -69,7 +71,7 @@ public class InfixPostfixEvaluator {
         System.out.printf("| %-19s %-56s|", "Postfix expression ->", postfix);
         System.out.printf("\n| %-10s| %-10s| %-10s| %-10s| %-30s|\n", "Symbol", "31", "operand2", "value", "Stack");
         System.out.println("|-------------------------------------------------------------------------------|");
-        for (String token : postfix.split("\\s")) {
+        for (String token : symbolsArr) {
             try {
                 stack.push((Double.parseDouble(token)));
             } catch (Exception e) {
@@ -77,12 +79,15 @@ public class InfixPostfixEvaluator {
                     double a = stack.pop();
                     double b = stack.pop();
                     double answer = compute(b, a, token);
+                    if (token.equals("/")) validateQuotient(answer);
                     stack.push(answer);
                     op1 = Double.toString(b);
                     op2 = Double.toString(a);
                     ans = Double.toString(answer);
+                } catch (InvalidPostfixException IPE) {
+                    throw new InvalidPostfixException("Math Error: Cannot divide by 0");
                 } catch (Exception ex) {
-                    System.out.println("Syntax Error");
+                    throw new InvalidPostfixException("Postfix Syntax Error!");
                 }
             }
             String s = formatVariablesToPrint(stack);
@@ -93,6 +98,15 @@ public class InfixPostfixEvaluator {
         System.out.println("|-------------------------------------------------------------------------------|");
 
         return rows = trimToSize(rows, currentIdx);
+    }
+
+    /**
+     * Helper method used to check whether a quotient is valid (Not a product of dividing by 0)
+     */
+    private static void validateQuotient(double quotient) throws InvalidPostfixException {
+        String q = Double.toString(quotient);
+        if (q.equals("Infinity") || q.equals("-Infinity") || q.equals("NaN"))
+            throw new InvalidPostfixException();
     }
 
     /**
@@ -186,9 +200,50 @@ public class InfixPostfixEvaluator {
             }
             if (symbolsArr[i].equals("(") && (!symbolsArr[i+1].equals("-") && isValidOperator(symbolsArr[i+1])))
                 throw new InvalidInfixException("Misplaced Symbol: " + symbolsArr[i+1]);
+            if (symbolsArr[i].equals("/") && symbolsArr[i+1].equals("0"))
+                throw new InvalidInfixException("Math Error: Cannot divide by 0");
             if (currentIsOperator && prevIsOperator) throw new InvalidInfixException("Misplaced Symbol: " + symbolsArr[i]);
             prevIsOperator = currentIsOperator;
         }
+    }
+
+    /**
+     * Postfix is invalid if:
+     * 1. First two symbols are not numbers
+     * 2. Last element is not an operator
+     * 3. number of operators in postfix != number of numbers in postfix
+     * @param symbolsArr arr containing all symbols within the postfix expression to be checked
+     */
+    private static void validatePostfix(String[] symbolsArr) {
+        if (symbolsArr.length == 0) throw new InvalidPostfixException("Postfix Expression is empty");
+        if (symbolsArr.length == 1) return;
+
+        try {
+            Double.parseDouble(symbolsArr[0]);
+            Double.parseDouble(symbolsArr[1]);
+        }catch (NumberFormatException e) {
+            throw new InvalidPostfixException("First two symbols are not numbers");
+        }
+
+        if (!isValidOperator(symbolsArr[symbolsArr.length-1]))
+            throw new InvalidPostfixException("Last symbol is not an operation");
+
+        int numCtr = 0;
+        int opCtr = 0;
+        for (String s : symbolsArr) {
+            try {
+                Double.parseDouble(s);
+                numCtr++;
+            } catch (NumberFormatException e) {
+                if (!isValidOperator(s))
+                    throw new InvalidPostfixException("Invalid symbol: " + s);
+                opCtr++;
+            }
+        }
+
+        if (opCtr != numCtr-1)
+            throw new InvalidPostfixException("Imbalanced number of numbers and operations");
+
     }
 
     private static void printArr(String[] arr) {

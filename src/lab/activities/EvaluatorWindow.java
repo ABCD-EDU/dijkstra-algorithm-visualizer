@@ -400,7 +400,7 @@ public class EvaluatorWindow {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == infixToPostfixButton) {
                 if (infixToPostfixInputTextField.getText().length() == 0) {
-                    JOptionPane.showMessageDialog(frame, "Input Field is Empty.",
+                    JOptionPane.showMessageDialog(frame, "Infix Input Field is Empty.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -409,12 +409,22 @@ public class EvaluatorWindow {
                 } catch (NullPointerException NE) {
                     JOptionPane.showMessageDialog(frame, "Infix expression malformed.",
                             "Error", JOptionPane.ERROR_MESSAGE);
-                } catch (InvalidInfixException IE) {
-                    JOptionPane.showMessageDialog(frame, IE.getMessage(),
+                } catch (InvalidInfixException IIE) {
+                    JOptionPane.showMessageDialog(frame, IIE.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }else if (e.getSource()==postfixEvaluationButton){
+                if (postfixEvaluationTextField.getText().length() == 0){
+                    JOptionPane.showMessageDialog(frame, "Postfix Input Field is Empty.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try{
                     populatePostfixEvaluationTable();
+                }catch (InvalidPostfixException IPE) {
+                    JOptionPane.showMessageDialog(frame, IPE.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
 
             else if (e.getSource() == groupMembers)
