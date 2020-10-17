@@ -86,16 +86,17 @@ public class SinglyLinkedList<T> implements Stack<T> {
         numElements = 0;
     }
 
-    @Override
-    public int search(T item) {
-        int pos = 0;
-        for (Node<T> c = top; c != null; c = c.link) {
-            if (c.info.equals(item))
-                return pos;
-            pos++;
-        }
-        return -1;
-    }
+    // temporarily removed due to conflicts with the interfaces TODO: fix
+//    @Override
+//    public int search(T item) {
+//        int pos = 0;
+//        for (Node<T> c = top; c != null; c = c.link) {
+//            if (c.info.equals(item))
+//                return pos;
+//            pos++;
+//        }
+//        return -1;
+//    }
 
     /**
      * This toString method returns top, top.next, ... , last item
