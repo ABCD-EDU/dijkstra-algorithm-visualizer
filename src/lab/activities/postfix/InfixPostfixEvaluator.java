@@ -1,6 +1,6 @@
 package lab.activities.postfix;
 
-import lab.datastructure.MyLinkedList;
+import lab.datastructure.SinglyLinkedList;
 import lab.datastructure.Stack;
 
 public class InfixPostfixEvaluator {
@@ -9,7 +9,7 @@ public class InfixPostfixEvaluator {
 
     public static String[][] toPostfix(String infix) {
         StringBuilder output = new StringBuilder();
-        Stack<String> stack = new MyLinkedList<>();
+        Stack<String> stack = new SinglyLinkedList<>();
         String[] symbolsArr = infix.split("(?<=[-+*/^()])|(?=[-+*/^()])");
         symbolsArr = formatSymbolsArr(symbolsArr);
         validateInfix(symbolsArr);
@@ -54,7 +54,7 @@ public class InfixPostfixEvaluator {
     }
 
     public static String[][] computePostFix(String postfix) {
-        Stack<Double> stack = new MyLinkedList<>();
+        Stack<Double> stack = new SinglyLinkedList<>();
         String[] symbolsArr = postfix.split("\\s");
         validatePostfix(symbolsArr);
         String[][] rows = new String[symbolsArr.length*2][];

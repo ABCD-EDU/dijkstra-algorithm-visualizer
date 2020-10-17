@@ -49,7 +49,7 @@ public class EvaluatorWindow {
 
     public EvaluatorWindow() {
         frame = new JFrame("Converter");
-        frame.setIconImage(new ImageIcon("src/DINO.png").getImage());
+        frame.setIconImage(new ImageIcon("src/lab/activities/postfix/asset/DINO.png").getImage());
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         frame.setMinimumSize(new Dimension(800, 500));
@@ -431,6 +431,7 @@ public class EvaluatorWindow {
         infixToPostfixTableModel.setRowCount(0);
         postfixEvaluationTableModel.setRowCount(0);
         String infix = infixToPostfixInputTextField.getText();
+        System.out.println(infix);
         String[][] postfixValues = InfixPostfixEvaluator.toPostfix(infix);
         String postfix = postfixValues[postfixValues.length - 1][1];
         String[][] evaluateValues = InfixPostfixEvaluator.computePostFix(postfix);
@@ -465,10 +466,13 @@ public class EvaluatorWindow {
     }
 
     private void populatePostfixEvaluationTable() {
+        System.out.println("test postfix eval");
         postfixEvaluationTableModel.setRowCount(0);
         String postfix = postfixEvaluationTextField.getText();
         String[][] rowValues = InfixPostfixEvaluator.computePostFix(postfix);
+        System.out.println("test postfix");
         addTableValues(rowValues);
+        System.out.println("postfix sucess");
         outputEvaluatedTextField.setText(rowValues[rowValues.length - 1][4]);
     }
 
