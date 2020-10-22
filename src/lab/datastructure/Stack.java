@@ -13,5 +13,7 @@ public interface Stack<T> {
 
     void clear();
 
+//    void sort();
+
 //    int search(T item); /* return the location of T*/
 }

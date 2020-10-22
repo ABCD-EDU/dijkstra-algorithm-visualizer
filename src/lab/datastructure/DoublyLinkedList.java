@@ -44,7 +44,6 @@ public class DoublyLinkedList<E>
         return findData(data).data;
     }
 
-    @Override
     public E getElement(int pos) throws NoSuchElementException {
         Node<E> curr = head;
         for (int i = 0; i <= pos; i++) {

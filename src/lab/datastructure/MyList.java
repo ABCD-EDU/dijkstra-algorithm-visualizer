@@ -9,6 +9,8 @@ public interface MyList<E> {
 
     E getElement(E data) throws NoSuchElementException;
 
+    E getElement(int pos) throws NoSuchElementException;
+
     boolean delete(E data);
 
     boolean search(E data);
