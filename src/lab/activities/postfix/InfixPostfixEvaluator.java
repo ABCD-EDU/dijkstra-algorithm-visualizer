@@ -1,7 +1,7 @@
 package lab.activities.postfix;
 
-import lab.datastructure.SinglyLinkedList;
-import lab.datastructure.Stack;
+import lab.util.SinglyLinkedList;
+import lab.util.Stack;
 
 public class InfixPostfixEvaluator {
 

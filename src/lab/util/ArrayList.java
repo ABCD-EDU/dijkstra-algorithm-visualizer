@@ -1,22 +1,22 @@
-package lab.datastructure;
+package lab.util;
 
 import java.util.NoSuchElementException;
 
-public class MyArrayList<E>
-        implements MyList<E> {
+public class ArrayList<E>
+        implements List<E> {
 
     private static final int DEFAULT_CAPACITY = 5;
     private int capacity;
     private transient int trueSize;
     private Object[] elementData;
 
-    public MyArrayList() {
+    public ArrayList() {
         capacity = DEFAULT_CAPACITY;
         this.elementData = new Object[capacity];
         this.trueSize = 0;
     }
 
-    public MyArrayList(int size) {
+    public ArrayList(int size) {
         capacity = size;
         this.elementData = new Object[capacity];
         this.trueSize = 0;

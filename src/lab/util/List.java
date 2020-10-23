@@ -1,8 +1,8 @@
-package lab.datastructure;
+package lab.util;
 
 import java.util.NoSuchElementException;
 
-public interface MyList<E> {
+public interface List<E> {
     int getSize();
 
     void insert(E data) throws ListOverflowException;

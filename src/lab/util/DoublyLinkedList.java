@@ -1,9 +1,9 @@
-package lab.datastructure;
+package lab.util;
 
 import java.util.NoSuchElementException;
 
 public class DoublyLinkedList<E>
-        implements Stack<E>, MyList<E>, Queue<E> {
+        implements Stack<E>, List<E>, Queue<E> {
 
     Node<E> head;
     Node<E> tail;
@@ -73,19 +73,13 @@ public class DoublyLinkedList<E>
     }
 
     @Override
-    public boolean enqueue(E data) {
+    public void enqueue(E data) {
         insertHead(data);
-        return true;
     }
 
     @Override
     public E dequeue() {
         return attainFirst();
-    }
-
-    @Override
-    public E firstElement() {
-        return head.data;
     }
 
     @Override

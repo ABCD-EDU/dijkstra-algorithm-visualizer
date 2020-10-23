@@ -1,4 +1,4 @@
-package lab.datastructure;
+package lab.util;
 
 /**
  * Only the enqueue, dequeue, firstElement functions were coded in the MyLinkedList.java class due to conflict
@@ -12,9 +12,7 @@ public interface Queue<E> {
 
     boolean isEmpty();
 
-    boolean enqueue(E data);
+    void enqueue(E data);
 
     E dequeue();
-
-    E firstElement();
 }

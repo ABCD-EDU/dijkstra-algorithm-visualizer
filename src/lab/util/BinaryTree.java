@@ -1,8 +1,8 @@
-package lab.datastructure;
+package lab.util;
 
 import java.util.NoSuchElementException;
 
-public class MyBinaryTree<E extends Comparable<E>> {
+public class BinaryTree<E extends Comparable<E>> {
 
     Node<E> root;
 
@@ -18,7 +18,7 @@ public class MyBinaryTree<E extends Comparable<E>> {
         }
     }
 
-    public MyBinaryTree() {
+    public BinaryTree() {
         root = null;
     }
 
