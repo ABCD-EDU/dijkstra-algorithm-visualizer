@@ -1,4 +1,4 @@
-package lab.datastructure;
+package lab.util;
 
 public class SinglyLinkedList<T> implements Stack<T> {
     private Node<T> top;

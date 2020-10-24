@@ -1,4 +1,4 @@
-package lab.datastructure;
+package lab.util;
 
 public interface Stack<T> {
     int size(); /* returns the size of the stack */

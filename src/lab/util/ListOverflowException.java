@@ -1,4 +1,4 @@
-package lab.datastructure;
+package lab.util;
 
 public class ListOverflowException extends RuntimeException {
     public ListOverflowException() {
