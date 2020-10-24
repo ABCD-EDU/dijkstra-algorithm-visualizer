@@ -430,7 +430,7 @@ public class EvaluatorWindow {
     private void populateTables() {
         infixToPostfixTableModel.setRowCount(0);
         postfixEvaluationTableModel.setRowCount(0);
-        String infix = infixToPostfixInputTextField.getText();
+        String infix = infixToPostfixInputTextField.getText().trim();
         System.out.println(infix);
         String[][] postfixValues = InfixPostfixEvaluator.toPostfix(infix);
         String postfix = postfixValues[postfixValues.length - 1][1];
@@ -442,10 +442,10 @@ public class EvaluatorWindow {
                     values[2],
             });
         }
-        outputPostfixTextField.setText(postfix);
+        outputPostfixTextField.setText("  "+postfix);
         addTableValues(evaluateValues);
-        postfixEvaluationTextField.setText(postfix);
-        outputEvaluatedTextField.setText(evaluateValues[evaluateValues.length - 1][4]);
+        postfixEvaluationTextField.setText("  "+postfix);
+        outputEvaluatedTextField.setText("  "+evaluateValues[evaluateValues.length - 1][4]);
     }
 
     private void addTableValues(String[][] tableValues) {
@@ -468,12 +468,12 @@ public class EvaluatorWindow {
     private void populatePostfixEvaluationTable() {
         System.out.println("test postfix eval");
         postfixEvaluationTableModel.setRowCount(0);
-        String postfix = postfixEvaluationTextField.getText();
+        String postfix = postfixEvaluationTextField.getText().trim();
         String[][] rowValues = InfixPostfixEvaluator.computePostFix(postfix);
         System.out.println("test postfix");
         addTableValues(rowValues);
         System.out.println("postfix sucess");
-        outputEvaluatedTextField.setText(rowValues[rowValues.length - 1][4]);
+        outputEvaluatedTextField.setText("  "+rowValues[rowValues.length - 1][4]);
     }
 
     /**
