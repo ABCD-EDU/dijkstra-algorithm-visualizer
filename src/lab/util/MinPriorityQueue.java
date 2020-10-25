@@ -1,21 +1,19 @@
-package lab.datastructure;
-
-import java.util.ArrayList;
+package lab.util;
 
 public class MinPriorityQueue<T extends Comparable<T>> {
 
-    MyGrowingArrayList<T> heap;
+    ArrayList<T> heap;
 
-    MinPriorityQueue(){
-        heap = new MyGrowingArrayList<>();
+    public MinPriorityQueue(){
+        heap = new ArrayList<>();
     }
 
     public boolean isEmpty(){
-        return heap.size()==0;
+        return heap.getSize()==0;
     }
 
     public int getSize() {
-        return heap.size();
+        return heap.getSize();
     }
 
     public void insert(T data) {
@@ -23,11 +21,11 @@ public class MinPriorityQueue<T extends Comparable<T>> {
         moveUp();
     }
     public void moveUp(){
-        int i = heap.size()-1;
+        int i = heap.getSize()-1;
         while (i>0){
             int parentIndex = parent(i);
-            T data = heap.get(i);
-            T parent = heap.get(parentIndex);
+            T data = heap.getElement(i);
+            T parent = heap.getElement(parentIndex);
             int key = data.compareTo(parent);
             if (key<0){
                 //swap
@@ -43,16 +41,16 @@ public class MinPriorityQueue<T extends Comparable<T>> {
     public void moveDown(){
         int i= 0;
         int leftIndex = getLeftIndex(i); //leftChild index
-        while (leftIndex<heap.size()){
+        while (leftIndex<heap.getSize()){
             int max = leftIndex;
             int rightIndex =getRightIndex(i);
-            if (rightIndex<heap.size()){
-                int key = heap.get(rightIndex).compareTo(heap.get(max));
+            if (rightIndex<heap.getSize()){
+                int key = heap.getElement(rightIndex).compareTo(heap.getElement(max));
                 if (key<0){
                     max++;
                 }
             }
-            int key = heap.get(i).compareTo(heap.get(max));
+            int key = heap.getElement(i).compareTo(heap.getElement(max));
             if (key>0){;
                 swap(heap, i,max);
                 i = max;
@@ -65,19 +63,19 @@ public class MinPriorityQueue<T extends Comparable<T>> {
 
     public T peek(){
         if (isEmpty()) return null;
-        return heap.get(0);
+        return heap.getElement(0);
     }
 
     public T extractMin(){
-        if (heap.size()==0){
+        if (heap.getSize()==0){
             return null;
         }
-        if (heap.size()==1)
+        if (heap.getSize()==1)
             return heap.remove(0);
 
-        T temp = heap.get(0);
+        T temp = heap.getElement(0);
         //Replace the first element with the last data in the heap
-        heap.set(0, heap.remove(heap.size()-1));
+        heap.set(0, heap.remove(heap.getSize()-1));
         moveDown();
         return temp;
     }
@@ -87,9 +85,9 @@ public class MinPriorityQueue<T extends Comparable<T>> {
     }
 
     //--------------------------Helper Methods--------------------------------
-    private void swap(MyGrowingArrayList<T> arr, int a, int b){
-        T temp = arr.get(a);
-        arr.set(a, arr.get(b));
+    private void swap(ArrayList<T> arr, int a, int b){
+        T temp = arr.getElement(a);
+        arr.set(a, arr.getElement(b));
         arr.set(b, temp);
     }
 
