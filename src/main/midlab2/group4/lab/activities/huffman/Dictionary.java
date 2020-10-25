@@ -1,15 +1,21 @@
-package lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman;
 
-import lab.util.ArrayList;
-import lab.util.List;
+import main.midlab2.group4.lab.util.ArrayList;
+import main.midlab2.group4.lab.util.List;
 
 import java.util.NoSuchElementException;
 
-public class Dictionary<K, V>{
+/**
+ * Custom struct for the huffman coding project. Based on the Dictionary in python or Map in java.
+ *
+ * @param <K> key
+ * @param <V> value
+ */
+public class Dictionary<K, V> {
 
     List<Node<K, V>> elements;
 
-    private static class Node<K, V> {
+    public static class Node<K, V> {
         K key;
         V val;
 
@@ -19,7 +25,7 @@ public class Dictionary<K, V>{
         }
 
         public String toString() {
-            return key + ":" + val;
+            return String.format("%-30s%-30s%n", key, val);
         }
     }
 
@@ -27,8 +33,12 @@ public class Dictionary<K, V>{
         elements = new ArrayList<>();
     }
 
+    public int size() {
+        return elements.getSize();
+    }
+
     public void put(K k, V v) {
-        final Node<K,V> temp = get(elements, k);
+        final Node<K, V> temp = get(elements, k);
         if (temp != null)
             temp.val = v;
         else {
@@ -41,6 +51,10 @@ public class Dictionary<K, V>{
         if (toReturn == null) throw new NoSuchElementException();
 
         return toReturn.val;
+    }
+
+    public Node<K, V> getAt(int pos) {
+        return elements.getElement(pos);
     }
 
     private Node<K, V> get(List<Node<K, V>> list, K k) {

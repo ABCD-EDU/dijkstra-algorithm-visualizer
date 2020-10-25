@@ -1,4 +1,4 @@
-package lab.util;
+package main.midlab2.group4.lab.util;
 
 public interface Stack<T> {
     int size(); /* returns the size of the stack */

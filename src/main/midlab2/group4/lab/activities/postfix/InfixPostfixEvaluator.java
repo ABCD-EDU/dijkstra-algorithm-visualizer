@@ -1,7 +1,7 @@
-package lab.activities.postfix;
+package main.midlab2.group4.lab.activities.postfix;
 
-import lab.util.SinglyLinkedList;
-import lab.util.Stack;
+import main.midlab2.group4.lab.util.SinglyLinkedList;
+import main.midlab2.group4.lab.util.Stack;
 
 public class InfixPostfixEvaluator {
 

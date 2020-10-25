@@ -1,4 +1,4 @@
-package lab.activities.postfix;
+package main.midlab2.group4.lab.activities.postfix;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -49,7 +49,7 @@ public class EvaluatorWindow {
 
     public EvaluatorWindow() {
         frame = new JFrame("Converter");
-        frame.setIconImage(new ImageIcon("src/lab/activities/postfix/asset/DINO.png").getImage());
+        frame.setIconImage(new ImageIcon("src/midlab2.group4.lab/activities/postfix/asset/DINO.png").getImage());
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         frame.setMinimumSize(new Dimension(800, 500));

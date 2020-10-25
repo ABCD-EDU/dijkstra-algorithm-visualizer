@@ -1,4 +1,4 @@
-package lab.util;
+package main.midlab2.group4.lab.util;
 
 /**
  * Only the enqueue, dequeue, firstElement functions were coded in the MyLinkedList.java class due to conflict
@@ -15,4 +15,6 @@ public interface Queue<E> {
     void enqueue(E data);
 
     E dequeue();
+
+    E peek();
 }

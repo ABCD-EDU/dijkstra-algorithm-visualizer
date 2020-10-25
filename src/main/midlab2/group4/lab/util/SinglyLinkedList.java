@@ -1,4 +1,4 @@
-package lab.util;
+package main.midlab2.group4.lab.util;
 
 public class SinglyLinkedList<T> implements Stack<T> {
     private Node<T> top;
