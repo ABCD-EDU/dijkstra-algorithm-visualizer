@@ -5,7 +5,8 @@ import main.midlab2.group4.lab.util.Queue;
 
 public class Huffman {
     private final Dictionary<Character, Integer> pairCharWeight;
-    TreeNode root;
+    private TreeNode root;
+    private final String text;
 
     /**
      * Step by step process for the huffman code
@@ -17,9 +18,10 @@ public class Huffman {
      *
      * @param text to compress
      */
-    public Huffman(String text) {
-        if (text.isBlank()) throw new IllegalArgumentException();
+    public Huffman(String data) {
+        if (data.isBlank()) throw new IllegalArgumentException();
 
+        text = data;
         pairCharWeight = countLetters(text);
         Queue<TreeNode> nodeQueue = generateNodes(pairCharWeight);
         generateTree(nodeQueue);
@@ -27,6 +29,10 @@ public class Huffman {
 
     public TreeNode getRoot() {
         return root;
+    }
+
+    public String getText() {
+        return text;
     }
 
     /**

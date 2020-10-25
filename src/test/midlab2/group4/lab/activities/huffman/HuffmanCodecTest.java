@@ -21,7 +21,7 @@ public class HuffmanCodecTest {
     @BeforeAll
     static void setUp() {
         huffman = new Huffman(text);
-        codec = new HuffmanCodec(text, huffman.getRoot());
+        codec = new HuffmanCodec(huffman);
     }
 
     @AfterAll
@@ -35,7 +35,7 @@ public class HuffmanCodecTest {
         assertThrows(IllegalArgumentException.class, () -> {
             Huffman testH = new Huffman("");
             @SuppressWarnings("unused")
-            HuffmanCodec testC = new HuffmanCodec("", testH.getRoot());
+            HuffmanCodec testC = new HuffmanCodec(testH);
         });
     }
 

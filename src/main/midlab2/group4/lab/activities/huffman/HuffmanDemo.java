@@ -13,7 +13,7 @@ public class HuffmanDemo {
         System.out.println("Frequency Values");
         System.out.println(h.toString());
 
-        HuffmanCodec t = new HuffmanCodec(text, h.getRoot());
+        HuffmanCodec t = new HuffmanCodec(h);
 
         System.out.println(t.toString());
 

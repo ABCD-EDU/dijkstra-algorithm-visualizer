@@ -7,15 +7,15 @@ public class HuffmanCodec {
     private final Dictionary<String, Character> pairCodeChar;
     private final Dictionary<Character, String> pairCharCode;
 
-    public HuffmanCodec(String text, TreeNode root) {
-        if (text.isBlank() || root == null) throw new IllegalArgumentException();
+    public HuffmanCodec(Huffman tree) {
+        if (tree.getText().isBlank() || tree.getRoot() == null) throw new IllegalArgumentException();
 
-        original = text;
+        original = tree.getText();
         encoded = "";
         decoded = "";
         pairCharCode = new Dictionary<>();
         pairCodeChar = new Dictionary<>();
-        buildHuffmanCode(root);
+        buildHuffmanCode(tree.getRoot());
     }
 
     private void buildHuffmanCode(TreeNode node) {
