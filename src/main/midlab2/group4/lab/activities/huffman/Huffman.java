@@ -3,10 +3,21 @@ package main.midlab2.group4.lab.activities.huffman;
 import main.midlab2.group4.lab.util.MinPriorityQueue;
 import main.midlab2.group4.lab.util.Queue;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
+/**
+ * Before using this class, using the setText() method first to set a text to parse then proceed to generateTree() method
+ * for the huffman tree. In case the text string is still blank, a {@code NullPointerException} will be thrown.
+ */
 public class Huffman {
-    private final Dictionary<Character, Integer> pairCharWeight;
+    private Dictionary<Character, Integer> pairCharWeight;
+    private Queue<TreeNode> nodeQueue;
     private TreeNode root;
-    private final String text;
+    private String text;
 
     /**
      * Step by step process for the huffman code
@@ -15,20 +26,39 @@ public class Huffman {
      * <p>3. Generate the tree by using the huffman coding algorithm</p>
      * <p>4. Encode the bits for each character</p>
      * <p>5. Decode the encoded bits for each character</p>
-     *
-     * @param text to compress
      */
-    public Huffman(String data) {
-        if (data.isBlank()) throw new IllegalArgumentException();
+    public Huffman() {
+        text = "";
+        pairCharWeight = new Dictionary<>();
+        nodeQueue = new MinPriorityQueue<>();
+    }
 
-        text = data;
+    public void generateTree() {
+        if (text.isBlank()) throw new NullPointerException("Set prefix first before generating");
+
         pairCharWeight = countLetters(text);
-        Queue<TreeNode> nodeQueue = generateNodes(pairCharWeight);
+        nodeQueue = generateNodes(pairCharWeight);
         generateTree(nodeQueue);
     }
 
     public TreeNode getRoot() {
         return root;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setText(Path file) {
+        StringBuilder sb = new StringBuilder();
+
+        try (Stream<String> stream = Files.lines(file, StandardCharsets.UTF_8)) {
+            stream.forEach(sb::append);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            text = sb.toString();
+        }
     }
 
     public String getText() {

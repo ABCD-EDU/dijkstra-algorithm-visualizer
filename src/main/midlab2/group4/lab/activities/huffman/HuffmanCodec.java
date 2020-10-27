@@ -1,30 +1,42 @@
 package main.midlab2.group4.lab.activities.huffman;
 
+/**
+ * This class can only be used if the given Huffman Tree using {@link Huffman} class has a string
+ * already set. In order to use the codec, build the huffman code first using the {@code buildHuffmanCode()}
+ * method then encode (using encode()) to get the compressed bits then decode (using decode())
+ * to get the decoded message.
+ * <p>
+ * {@link Huffman}
+ */
 public class HuffmanCodec {
-    private final String original;
+    private String original;
     private String encoded;
     private String decoded;
     private final Dictionary<String, Character> pairCodeChar;
     private final Dictionary<Character, String> pairCharCode;
+    private final Huffman huffman;
 
     public HuffmanCodec(Huffman tree) {
-        if (tree.getText().isBlank() || tree.getRoot() == null) throw new IllegalArgumentException();
-
+        huffman = tree;
         original = tree.getText();
         encoded = "";
         decoded = "";
         pairCharCode = new Dictionary<>();
         pairCodeChar = new Dictionary<>();
-        buildHuffmanCode(tree.getRoot());
     }
 
-    private void buildHuffmanCode(TreeNode node) {
+    public void buildHuffmanCode() {
+        if (huffman.getText().isBlank() || huffman.getRoot() == null) throw new IllegalArgumentException();
+        original = huffman.getText();
+
         String code = "";
-        buildCode(node, code);
+        buildCode(huffman.getRoot(), code);
     }
 
     /**
      * Works just like the three common BST Traversals using recursion or the implemented search method in {@link main.midlab2.group4.lab.util.BinaryTree}
+     * <p>
+     * NOTE: this is a helper class
      *
      * @param node current node
      * @param code bits
@@ -49,6 +61,8 @@ public class HuffmanCodec {
      * @return encoded bits
      */
     public String encode() {
+        if (huffman.getText().isBlank() || huffman.getRoot() == null) throw new NullPointerException();
+
         StringBuilder code = new StringBuilder();
         char letter;
         for (int i = 0; i < original.length(); i++) {
@@ -66,6 +80,9 @@ public class HuffmanCodec {
      * @return decoded string
      */
     public String decode() {
+        if (huffman.getText().isBlank() || huffman.getRoot() == null || encoded.isBlank())
+            throw new NullPointerException();
+
         StringBuilder text = new StringBuilder();
         String temp = "";
         for (int i = 0; i < encoded.length(); i++) {

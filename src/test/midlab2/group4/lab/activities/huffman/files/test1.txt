@@ -1,0 +1,5 @@
+this sentence contains one hundred and ninety-seven letters:
+ four a's, one b, three c's, five d's, thirty-four e's, seven f's,
+ one g, six h's, twelve i's, three l's, twenty-six n's, ten o's,
+ ten r's, twenty-nine s's, nineteen t's, six u's, seven v's,
+ four w's, four x's, five y's, and one z.
