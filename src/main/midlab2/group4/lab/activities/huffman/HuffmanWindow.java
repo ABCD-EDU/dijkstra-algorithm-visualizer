@@ -1,7 +1,10 @@
 package main.midlab2.group4.lab.activities.huffman;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -28,6 +31,28 @@ public class HuffmanWindow {
     private JButton importFromTextFile;
     private File textFile;
 
+    private JPanel outputPanel;
+    private JLabel outputLabel;
+
+    private DefaultTableModel freqTableDefTabMod;
+    private JTable freqTable;
+    private JScrollPane freqTableScrollPane;
+    private DefaultTableModel codeTableDefTabMod;
+    private JTable codeTable;
+    private JScrollPane codeTableScrollPane;
+
+    private JLabel encodedLabel;
+    private JTextArea encodedOutputTextArea;
+    private JScrollPane encodedOutputTextScrollPane;
+    private JLabel origSizeLabel;
+    private JTextField origSizeField;
+    private JLabel compSizeLabel;
+    private JTextField compSizeField;
+    private JLabel compRateLabel;
+    private JTextField compRateField;
+    private JLabel noLossLabel;
+    private JTextField noLossField;
+
     private Color backgroundColor, headerColor, uneditableFieldColor;
     private Color mainForeground, secondaryForeground;
 
@@ -36,7 +61,7 @@ public class HuffmanWindow {
     public HuffmanWindow() {
         frame.setTitle("Huffman Coding");
         frame.setIconImage(new ImageIcon("src/assets/Tree.png").getImage());
-        frame.setMinimumSize(new Dimension(1280, 720));
+        frame.setMinimumSize(new Dimension(1600, 720));
         backgroundPanel.setLayout(new GridBagLayout());
 
         try{
@@ -66,16 +91,20 @@ public class HuffmanWindow {
         gbc = new GridBagConstraints();
 
         initializeInputPanel();
+        initializeOutputPanel();
 
         gbc.insets = new Insets(1,1,1,1);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = gbc.weighty = 1;
         mainPanel.add(inputPanel, gbc);
+        gbc.gridx++;
+        mainPanel.add(outputPanel, gbc);
     }
 
     private void initializeInputPanel() {
         gbc = new GridBagConstraints();
         inputPanel = new JPanel(new GridBagLayout());
+        inputPanel.setBorder(new EmptyBorder(3,3,3,3));
         inputTextLabel = new JLabel("Input Text Here: ");
         inputTextArea = new JTextArea(28,35);
         textConvertButton = new JButton("Convert");
@@ -84,7 +113,7 @@ public class HuffmanWindow {
 
         setInputPanelComponentProperties();
 
-        gbc.insets = new Insets(2,4,2,4);
+        gbc.insets = new Insets(2,2,2,2);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = gbc.weighty = 1;
         gbc.gridx = gbc.gridy = 0;
@@ -95,7 +124,7 @@ public class HuffmanWindow {
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         inputPanel.add(importFromTextFile, gbc);
-        gbc.insets = new Insets(2,0,2,4);
+        gbc.insets = new Insets(2,0,2,2);
         gbc.gridx = 1;
         inputPanel.add(textConvertButton, gbc);
     }
@@ -121,7 +150,6 @@ public class HuffmanWindow {
             }
             doTheMagic(inputTextArea.getText());
         });
-
         importFromTextFile.addActionListener((e) -> promptFileSelection());
 
         inputPanel.setBackground(new Color(0, 150, 167));
@@ -158,6 +186,118 @@ public class HuffmanWindow {
             e.printStackTrace();
         }
         inputTextArea.setText(content);
+    }
+
+    private void initializeOutputPanel() {
+        outputPanel = new JPanel(new GridBagLayout());
+        outputPanel.setBackground(new Color(0, 150, 167));
+        outputPanel.setBorder(new EmptyBorder(3,3,3,3));
+        outputLabel = new JLabel("Output: ");
+        outputLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+
+        initializeOutputTables();
+        initializeFields();
+
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(2,2,2,2);
+        gbc.weightx = gbc.weighty = 1;
+        gbc.gridwidth = 4;
+        outputPanel.add(outputLabel, gbc);
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        outputPanel.add(freqTableScrollPane, gbc);
+        gbc.gridx = 2;
+        outputPanel.add(codeTableScrollPane, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        outputPanel.add(encodedLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridwidth = 3;
+        outputPanel.add(encodedOutputTextScrollPane, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        outputPanel.add(origSizeLabel, gbc);
+        gbc.gridx = 1;
+        outputPanel.add(origSizeField, gbc);
+        gbc.gridx  = 2;
+        outputPanel.add(compRateLabel, gbc);
+        gbc.gridx = 3;
+        outputPanel.add(compRateField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        outputPanel.add(compSizeLabel, gbc);
+        gbc.gridx = 1;
+        outputPanel.add(compSizeField, gbc);
+        gbc.gridx = 2;
+        outputPanel.add(noLossLabel, gbc);
+        gbc.gridx = 3;
+        outputPanel.add(noLossField, gbc);
+    }
+
+    private void initializeOutputTables() {
+        freqTableDefTabMod = new DefaultTableModel();
+        freqTable = new JTable(freqTableDefTabMod);
+        freqTableScrollPane = new JScrollPane(freqTable);
+        initializeTable(freqTable, freqTableDefTabMod, new String[]{"Character", "Frequency"},
+                new int[]{50,50},freqTableScrollPane);
+
+        codeTableDefTabMod = new DefaultTableModel();
+        codeTable = new JTable(codeTableDefTabMod);
+        codeTableScrollPane = new JScrollPane(codeTable);
+        initializeTable(codeTable, codeTableDefTabMod, new String[]{"Character", "Code", "Bits"},
+                new int[]{50,50,50}, codeTableScrollPane);
+    }
+
+    private void initializeFields() {
+        encodedLabel = new JLabel("Encoded: ");
+        encodedOutputTextArea = new JTextArea(3,50);
+        encodedOutputTextArea.setFont(new Font("", Font.PLAIN, 14));
+        encodedOutputTextArea.setMargin(new Insets(2,2,2,2));
+        encodedOutputTextArea.setLineWrap(true);
+        encodedOutputTextArea.setWrapStyleWord(true);
+        encodedOutputTextScrollPane = new JScrollPane(encodedOutputTextArea);
+
+        origSizeLabel = new JLabel("Original Size: ");
+        origSizeField = new JTextField();
+        origSizeField.setColumns(30);
+
+        compSizeLabel = new JLabel("Compressed Size: ");
+        compSizeField = new JTextField();
+        compSizeField.setColumns(30);
+
+        compRateLabel = new JLabel("Compression Rate: ");
+        compRateField = new JTextField();
+        compRateField.setColumns(30);
+
+        noLossLabel = new JLabel("Lossless Compression: ");
+        noLossField = new JTextField();
+        noLossField.setColumns(30);
+    }
+
+    private void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames, int[] columnsWidth,
+                                 JScrollPane scrollPane) {
+        defaultTableModel.setColumnIdentifiers(columnNames);
+        defaultTableModel.setRowCount(0);
+        table.setEnabled(false);
+        table.setCellSelectionEnabled(false);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setRowHeight(50);
+        table.setOpaque(true);
+        table.setFillsViewportHeight(true);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setResizingAllowed(false);
+        table.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 12));
+
+        int i = 0;
+        for (int width : columnsWidth) {
+            TableColumn column = table.getColumnModel().getColumn(i++);
+            column.setMinWidth(width);
+            column.setPreferredWidth(width);
+        }
+        scrollPane.setVisible(true);
     }
 
     private void setMenuBar() {
@@ -297,11 +437,17 @@ public class HuffmanWindow {
         float compressedSize = encoded.length();
         float compressionRate = ((compressedSize - origSize) / origSize) * 100;
 
-        System.out.println("\nIs it the same as the original: " + (h.getText().equals(decoded)));
+        System.out.println("\nIs it the same as the original: " + (h.getText().equals(decoded)) );
         System.out.println("\nOriginal Size:    " + (int) origSize + " bits");
         System.out.println("Compressed Size:  " + (int) compressedSize + " bits");
         System.out.println("Compression Rate: " + -compressionRate + "%");
         System.out.println("=============================================================");
+
+        encodedOutputTextArea.setText(encoded);
+        origSizeField.setText((int) origSize + " bits");
+        compSizeField.setText((int) compressedSize + " bits");
+        compRateField.setText((int) -compressionRate + "%");
+        noLossField.setText((h.getText().equals(decoded)) + "");
     }
 
 }
