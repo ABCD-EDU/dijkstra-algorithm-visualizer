@@ -1,7 +1,16 @@
 package main.midlab2.group4.lab.activities.huffman;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HuffmanWindow {
     private final JFrame frame = new JFrame();
@@ -11,6 +20,14 @@ public class HuffmanWindow {
     private JMenu aboutSubMenu;
     private JMenu themesSubMenu;
 
+    private JPanel inputPanel;
+    private JLabel inputTextLabel;
+    private JTextArea inputTextArea;
+    private JButton textConvertButton;
+    private JScrollPane textAreaScrollPane;
+    private JButton importFromTextFile;
+    private File textFile;
+
     private Color backgroundColor, headerColor, uneditableFieldColor;
     private Color mainForeground, secondaryForeground;
 
@@ -19,17 +36,22 @@ public class HuffmanWindow {
     public HuffmanWindow() {
         frame.setTitle("Huffman Coding");
         frame.setIconImage(new ImageIcon("src/assets/Tree.png").getImage());
-        frame.setMinimumSize(new Dimension(800, 500));
+        frame.setMinimumSize(new Dimension(1280, 720));
         backgroundPanel.setLayout(new GridBagLayout());
+
+        try{
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }catch (Exception e) {
+            e.printStackTrace();
+        } // Prevent making Swing look like its from 1995
+
+        setMenuBar();
+        initializeMainPanel();
 
         gbc = new GridBagConstraints();
         gbc.weightx = gbc.weighty = 1;
         gbc.gridheight = gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.BOTH;
-
-        setMenuBar();
-        setMainPanel();
-//        setTheme("SLU");
 
         backgroundPanel.add(mainPanel, gbc);
         frame.add(backgroundPanel);
@@ -40,11 +62,102 @@ public class HuffmanWindow {
         frame.setVisible(true);
     }
 
-    private void setMainPanel() {
+    private void initializeMainPanel() {
         gbc = new GridBagConstraints();
+
+        initializeInputPanel();
+
         gbc.insets = new Insets(1,1,1,1);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = gbc.weighty = 1;
+        mainPanel.add(inputPanel, gbc);
+    }
+
+    private void initializeInputPanel() {
+        gbc = new GridBagConstraints();
+        inputPanel = new JPanel(new GridBagLayout());
+        inputTextLabel = new JLabel("Input Text Here: ");
+        inputTextArea = new JTextArea(28,35);
+        textConvertButton = new JButton("Convert");
+        textAreaScrollPane = new JScrollPane(inputTextArea);
+        importFromTextFile = new JButton("Import From File");
+
+        setInputPanelComponentProperties();
+
+        gbc.insets = new Insets(2,4,2,4);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = gbc.weighty = 1;
+        gbc.gridx = gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        inputPanel.add(inputTextLabel, gbc);
+        gbc.gridy = 1;
+        inputPanel.add(textAreaScrollPane, gbc);
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        inputPanel.add(importFromTextFile, gbc);
+        gbc.insets = new Insets(2,0,2,4);
+        gbc.gridx = 1;
+        inputPanel.add(textConvertButton, gbc);
+    }
+
+    private void setInputPanelComponentProperties() {
+        inputTextLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+        inputTextLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+        inputTextArea.setMargin(new Insets(4,4,4,4));
+        inputTextArea.setLineWrap(true);
+        inputTextArea.setWrapStyleWord(true);
+        inputTextArea.setFont(new Font("", Font.PLAIN, 14));
+
+        textAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        textConvertButton.setMinimumSize(new Dimension(35,40));
+
+        textConvertButton.addActionListener((e) -> {
+            if (inputTextArea.getText().equals("")){
+                JOptionPane.showMessageDialog(frame, "Text cannot be empty",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            doTheMagic(inputTextArea.getText());
+        });
+
+        importFromTextFile.addActionListener((e) -> promptFileSelection());
+
+        inputPanel.setBackground(new Color(0, 150, 167));
+    }
+
+    private void promptFileSelection() {
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
+        int choice = fc.showOpenDialog(frame);
+        if (choice == JFileChooser.APPROVE_OPTION) {
+            textFile = fc.getSelectedFile();
+            readLinesFromFile();
+            System.out.println("CHOSEN: " + textFile.getName());
+        }else {
+            System.out.println("File Selection Aborted");
+        }
+    }
+
+    private void readLinesFromFile() {
+        String content = "";
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(textFile.getPath()));
+            StringBuilder sb = new StringBuilder();
+            String line = reader.readLine();
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = reader.readLine();
+            }
+            content = sb.toString();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        inputTextArea.setText(content);
     }
 
     private void setMenuBar() {
@@ -153,4 +266,42 @@ public class HuffmanWindow {
                         "       Class #         :    CS 211\n",
                 "Course Specifications", JOptionPane.PLAIN_MESSAGE);
     }
+
+    // Temporary
+    private void doTheMagic(String text) {
+        Huffman h = new Huffman();
+        HuffmanCodec t = new HuffmanCodec(h);
+        h.setText(text);
+        h.generateTree();
+
+        System.out.println("=============================================================");
+        System.out.println("Frequency Values");
+        System.out.println(h.toString());
+
+        t.buildHuffmanCode();
+
+        System.out.println(t.toString());
+
+        String encoded = t.encode();
+        String decoded = t.decode();
+        System.out.println("=============================================================");
+        System.out.print("Encoded Text: ");
+        System.out.println(encoded);
+        System.out.print("Original Text: ");
+        System.out.println(h.getText());
+        System.out.print("Decoded Text:  ");
+        System.out.println(decoded);
+
+        // ---- OUTPUT VALUES COMPUTATION ----
+        float origSize = h.getText().length() * 7;
+        float compressedSize = encoded.length();
+        float compressionRate = ((compressedSize - origSize) / origSize) * 100;
+
+        System.out.println("\nIs it the same as the original: " + (h.getText().equals(decoded)));
+        System.out.println("\nOriginal Size:    " + (int) origSize + " bits");
+        System.out.println("Compressed Size:  " + (int) compressedSize + " bits");
+        System.out.println("Compression Rate: " + -compressionRate + "%");
+        System.out.println("=============================================================");
+    }
+
 }
