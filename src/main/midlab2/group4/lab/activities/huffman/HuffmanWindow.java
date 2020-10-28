@@ -443,11 +443,28 @@ public class HuffmanWindow {
         System.out.println("Compression Rate: " + -compressionRate + "%");
         System.out.println("=============================================================");
 
+        populateFreqValTable(h.returnFreqValuesAsTableArray());
+        populatePairCharCodeTable(t.returnPairCharCodeAsArr());
+
         encodedOutputTextArea.setText(encoded);
         origSizeField.setText((int) origSize + " bits");
         compSizeField.setText((int) compressedSize + " bits");
         compRateField.setText((int) -compressionRate + "%");
         noLossField.setText((h.getText().equals(decoded)) + "");
+    }
+
+    private void populateFreqValTable(String[][] arr) {
+        freqTableDefTabMod.setRowCount(0);
+        for (String[] row : arr) {
+            freqTableDefTabMod.addRow(row);
+        }
+    }
+
+    private void populatePairCharCodeTable(String[][] arr) {
+        codeTableDefTabMod.setRowCount(0);
+        for(String[] row : arr) {
+            codeTableDefTabMod.addRow(row);
+        }
     }
 
 }

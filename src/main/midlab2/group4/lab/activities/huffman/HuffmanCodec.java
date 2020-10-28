@@ -111,4 +111,15 @@ public class HuffmanCodec {
         }
         return string.toString();
     }
+
+    public String[][] returnPairCharCodeAsArr() {
+        String[][] values = new String[pairCharCode.size()][3];
+        for (int i = 0; i < pairCharCode.size(); i++) {
+            values[i][0] = pairCharCode.getAt(i).key.toString();
+            values[i][1] = pairCharCode.getAt(i).val;
+            values[i][2] = String.valueOf(pairCharCode.getAt(i).val.length());
+        }
+        return values;
+    }
+
 }

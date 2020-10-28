@@ -154,4 +154,14 @@ public class Huffman {
         }
         return text.toString();
     }
+
+    public String[][] returnFreqValuesAsTableArray() {
+        String[][] values = new String[pairCharWeight.size()][2];
+        for (int i = 0; i < pairCharWeight.size(); i++) {
+            values[i][0] = pairCharWeight.getAt(i).key.toString();
+            values[i][1] = pairCharWeight.getAt(i).val.toString();
+        }
+        return values;
+    }
+
 }
