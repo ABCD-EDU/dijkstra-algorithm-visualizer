@@ -2,6 +2,7 @@ package main.midlab2.group4.lab.activities.huffman;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -18,7 +19,6 @@ import java.nio.file.Paths;
 
 public class HuffmanWindow {
     private final JFrame frame = new JFrame();
-    private final JPanel backgroundPanel = new JPanel(); // TRY frame.getContentPane.setBackground(color);
     private final JPanel mainPanel = new JPanel();
     private final JMenuBar menuBar = new JMenuBar();
     private JMenu aboutSubMenu;
@@ -35,6 +35,7 @@ public class HuffmanWindow {
     private JPanel outputPanel;
     private JLabel outputLabel;
 
+    private JButton showHuffmanTreeButton;
     private DefaultTableModel freqTableDefTabMod;
     private JTable freqTable;
     private JScrollPane freqTableScrollPane;
@@ -54,7 +55,7 @@ public class HuffmanWindow {
     private JLabel noLossLabel;
     private JTextField noLossField;
 
-    private Color backgroundColor, headerColor, uneditableFieldColor;
+    private Color backgroundColor, headerColor;
     private Color mainForeground, secondaryForeground;
 
     private GridBagConstraints gbc;
@@ -62,30 +63,26 @@ public class HuffmanWindow {
     public HuffmanWindow() {
         frame.setTitle("Huffman Coding");
         frame.setIconImage(new ImageIcon("src/assets/Tree.png").getImage());
-        frame.setMinimumSize(new Dimension(1600, 720));
-        backgroundPanel.setLayout(new GridBagLayout());
 
-        try{
+        try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } // Prevent making Swing look like its from 1995
 
         setMenuBar();
-        initializeMainPanel();
-
-        gbc = new GridBagConstraints();
-        gbc.weightx = gbc.weighty = 1;
-        gbc.gridheight = gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-
-        backgroundPanel.add(mainPanel, gbc);
-        frame.add(backgroundPanel);
+        initializeInputPanel();
+        initializeOutputPanel();
+        mainPanel.add(inputPanel);
+        mainPanel.add(outputPanel);
+        frame.add(mainPanel);
+        setTheme("SLU");
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.setResizable(true);
+        frame.setResizable(false);
         frame.setVisible(true);
+        frame.pack();
     }
 
     private void setMenuBar() {
@@ -141,45 +138,34 @@ public class HuffmanWindow {
         themesSubMenu.add(darkTheme);
     }
 
-    private void initializeMainPanel() {
-        gbc = new GridBagConstraints();
-
-        initializeInputPanel();
-        initializeOutputPanel();
-
-        gbc.insets = new Insets(1,1,1,1);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = gbc.weighty = 1;
-        mainPanel.add(inputPanel, gbc);
-        gbc.gridx++;
-        mainPanel.add(outputPanel, gbc);
-    }
-
     private void initializeInputPanel() {
         gbc = new GridBagConstraints();
         inputPanel = new JPanel(new GridBagLayout());
         inputPanel.setBorder(new EmptyBorder(3,3,3,3));
-        inputTextLabel = new JLabel("Input Text Here: ");
-        inputTextArea = new JTextArea(28,35);
+        inputTextLabel = new JLabel(" Input Text Here:                         ");
+        inputTextArea = new JTextArea(29,35);
         textConvertButton = new JButton("Convert");
         textAreaScrollPane = new JScrollPane(inputTextArea);
         importFromTextFile = new JButton("Import From File");
 
         setInputPanelComponentProperties();
 
-        gbc.insets = new Insets(2,2,2,2);
+        gbc.insets = new Insets(3,3,3,3);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = gbc.weighty = 1;
         gbc.gridx = gbc.gridy = 0;
         gbc.gridwidth = 2;
         inputPanel.add(inputTextLabel, gbc);
-        gbc.gridy = 1;
-        inputPanel.add(textAreaScrollPane, gbc);
-        gbc.gridy = 2;
+        gbc.gridx = 2;
         gbc.gridwidth = 1;
         inputPanel.add(importFromTextFile, gbc);
-        gbc.insets = new Insets(2,0,2,2);
-        gbc.gridx = 1;
+        gbc.insets = new Insets(3,3,5,3);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        inputPanel.add(textAreaScrollPane, gbc);
+        gbc.insets = new Insets(3,3,3,3);
+        gbc.gridy = 2;
         inputPanel.add(textConvertButton, gbc);
     }
 
@@ -194,7 +180,8 @@ public class HuffmanWindow {
 
         textAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        textConvertButton.setMinimumSize(new Dimension(35,40));
+        importFromTextFile.setFocusPainted(false);
+        textConvertButton.setFocusPainted(false);
 
         textConvertButton.addActionListener((e) -> {
             if (inputTextArea.getText().equals("")){
@@ -205,38 +192,36 @@ public class HuffmanWindow {
             doTheMagic(inputTextArea.getText());
         });
         importFromTextFile.addActionListener((e) -> promptFileSelection());
-
-        inputPanel.setBackground(new Color(0, 150, 167));
     }
 
     private void promptFileSelection() {
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(System.getProperty("user.home")));
-        fc.setAcceptAllFileFilterUsed(false);
-        fc.addChoosableFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
-        int choice = fc.showOpenDialog(frame);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
+        int choice = fileChooser.showOpenDialog(frame);
         if (choice == JFileChooser.APPROVE_OPTION) {
-            textFile = fc.getSelectedFile();
+            textFile = fileChooser.getSelectedFile();
             readLinesFromFile();
             System.out.println("CHOSEN: " + textFile.getName());
-        }else {
+        } else {
             System.out.println("File Selection Aborted");
         }
     }
 
     private void readLinesFromFile() {
         String content = "";
-        try{
+        try {
             BufferedReader reader = new BufferedReader(new FileReader(textFile.getPath()));
-            StringBuilder sb = new StringBuilder();
+            StringBuilder string = new StringBuilder();
             String line = reader.readLine();
             while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
+                string.append(line);
+                string.append(System.lineSeparator());
                 line = reader.readLine();
             }
-            content = sb.toString();
-        }catch (Exception e){
+            content = string.toString();
+        } catch (Exception e){
             e.printStackTrace();
         }
         inputTextArea.setText(content);
@@ -244,22 +229,26 @@ public class HuffmanWindow {
 
     private void initializeOutputPanel() {
         outputPanel = new JPanel(new GridBagLayout());
-        outputPanel.setBackground(new Color(0, 150, 167));
         outputPanel.setBorder(new EmptyBorder(3,3,3,3));
         outputLabel = new JLabel("Output: ");
         outputLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+        showHuffmanTreeButton = new JButton("Show Huffman Tree");
 
         initializeOutputTables();
         initializeFields();
 
         gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(2,2,2,2);
+        gbc.insets = new Insets(3,3,3,3);
         gbc.weightx = gbc.weighty = 1;
-        gbc.gridwidth = 4;
-        outputPanel.add(outputLabel, gbc);
-        gbc.gridy = 1;
         gbc.gridwidth = 2;
+        outputPanel.add(outputLabel, gbc);
+        gbc.gridwidth = 1;
+        gbc.gridx = 2;
+        outputPanel.add(showHuffmanTreeButton, gbc);
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         outputPanel.add(freqTableScrollPane, gbc);
         gbc.gridx = 2;
         outputPanel.add(codeTableScrollPane, gbc);
@@ -292,6 +281,9 @@ public class HuffmanWindow {
     }
 
     private void initializeOutputTables() {
+        showHuffmanTreeButton.setFocusPainted(false);
+        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
+
         freqTableDefTabMod = new DefaultTableModel();
         freqTable = new JTable(freqTableDefTabMod);
         freqTableScrollPane = new JScrollPane(freqTable);
@@ -414,6 +406,9 @@ public class HuffmanWindow {
         }
     }
 
+    private void showHuffmanTree() {
+
+    }
 
 
 
@@ -433,12 +428,14 @@ public class HuffmanWindow {
         UIManager.put("Button.select", headerColor);
         UIManager.put("Button.focus", backgroundColor);
 
+        mainPanel.setBackground(new Color(0, 150, 167));
+        inputPanel.setBackground(new Color(0, 150, 167));
+        outputPanel.setBackground(new Color(0, 150, 167));
     }
 
     private void setWhiteThemeProperties() {
         backgroundColor = Color.WHITE;
         headerColor = new Color(0x222222);
-        uneditableFieldColor = new Color(0xE5E5E5);
         mainForeground = Color.BLACK;
         secondaryForeground = Color.WHITE;
     }
@@ -446,7 +443,6 @@ public class HuffmanWindow {
     private void setDarkThemeProperties() {
         backgroundColor = new Color(0x333333);
         headerColor = Color.BLACK;
-        uneditableFieldColor = new Color(0x4A4A4A);
         mainForeground = Color.WHITE;
         secondaryForeground = Color.WHITE;
     }
@@ -454,9 +450,12 @@ public class HuffmanWindow {
     private void setSLUThemeProperties() {
         backgroundColor = new Color(0xF4D35E);
         headerColor = new Color(0x0D3B66);
-        uneditableFieldColor = new Color(0xFAF0CA);
         mainForeground = Color.BLACK;
         secondaryForeground = Color.WHITE;
+    }
+
+    private void setMetropolisThemeProperties() {
+
     }
 
     private void displayGroupMembers() {
