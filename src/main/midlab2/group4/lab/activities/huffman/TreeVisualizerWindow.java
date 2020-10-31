@@ -1,11 +1,12 @@
 package main.midlab2.group4.lab.activities.huffman;
 
 import main.midlab2.group4.lab.util.ArrayList;
+import main.midlab2.group4.lab.util.DoublyLinkedList;
 import main.midlab2.group4.lab.util.List;
+import main.midlab2.group4.lab.util.Queue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.LinkedList;
 
 public class TreeVisualizerWindow {
 
@@ -13,14 +14,14 @@ public class TreeVisualizerWindow {
     private List<GUITreeNode> nodes1D;
     private List<List<GUITreeNode>> nodes;
     private TreeCanvas treeCanvas;
-    private List<Dictionary<Integer, Integer >> nodeCoords;
-    private MyDictionary<Point, Point> lineCoordinates;
+    private List<Dictionary<Integer, Integer>> nodeCoords;
+    private PairList<Point, Point> lineCoordinates;
     private final int verticalGap = 50;
     private final int horizontalGap = 200;
     private final int xRad = 40;
     private final int yRad = 40;
-    private final int initialXGap = (int)(xRad*.60);
-    private final int initialYGap = (int)(yRad+yRad*.75);
+    private final int initialXGap = (int) (xRad * .60);
+    private final int initialYGap = (int) (yRad + yRad * .75);
 
     TreeVisualizerWindow(TreeNode root) {
         frame = new JFrame("Binary Tree Visualizer");
@@ -28,17 +29,14 @@ public class TreeVisualizerWindow {
         completeBinaryTree(root);
         this.nodes1D = convertTreeToArr(root);
         this.nodes = parseLevels(nodes1D);
-
-        int width = (int)(nodes.getElement(nodes.getSize()-1).getSize()*1.25)*xRad+(horizontalGap);
-        int height = verticalGap *2 + nodes.getSize()*(initialYGap);
-        frame.setMinimumSize(new Dimension(width,height));
+        int width = (int) (nodes.getElement(nodes.getSize() - 1).getSize() * 1.25) * xRad + (horizontalGap);
+        int height = verticalGap * 2 + nodes.getSize() * (initialYGap);
+        frame.setMinimumSize(new Dimension(width, height));
         this.nodeCoords = generateNodeCoordinates(nodes);
         this.lineCoordinates = generateLineCoordinates(nodeCoords, nodes);
         System.out.println(lineCoordinates);
-
         treeCanvas = new TreeCanvas();
         treeCanvas.setBackground(Color.LIGHT_GRAY);
-
         frame.add(treeCanvas);
 
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -46,7 +44,6 @@ public class TreeVisualizerWindow {
         frame.setResizable(true);
         frame.setVisible(true);
     }
-
 
 
     private class TreeCanvas extends Canvas {
@@ -61,7 +58,7 @@ public class TreeVisualizerWindow {
 
         private void paintCircles(Graphics g) {
 
-            g.translate(-xRad/2,-yRad/2);
+            g.translate(-xRad / 2, -yRad / 2);
 
             for (int i = 0; i < nodes.getSize(); i++) {
                 Dictionary<Integer, Integer> coords = nodeCoords.getElement(i);
@@ -74,10 +71,10 @@ public class TreeVisualizerWindow {
                         g.setColor(Color.WHITE);
                         if (currentNode.getCharacter().equals("\0")) {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
-                                    coordinate.key+(xRad/2)-4, coordinate.val+(yRad/2)+3);
-                        }else {
+                                    coordinate.key + (xRad / 2) - 4, coordinate.val + (yRad / 2) + 3);
+                        } else {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
-                                    coordinate.key+(xRad/2)-11, coordinate.val+(yRad/2)+3);
+                                    coordinate.key + (xRad / 2) - 11, coordinate.val + (yRad / 2) + 3);
                         }
                         System.out.println("Drawing " + i + "|" + j + " at: " + coordinate.key + ", " + coordinate.val);
                     }
@@ -88,10 +85,10 @@ public class TreeVisualizerWindow {
 
         private void paintLines(Graphics g) {
 
-            g.translate(xRad/2, yRad/2);
+            g.translate(xRad / 2, yRad / 2);
 
             for (int i = 0; i < lineCoordinates.size(); i++) {
-                MyDictionary.Node<Point, Point> point = lineCoordinates.getAt(i);
+                PairList.Node<Point, Point> point = lineCoordinates.getAt(i);
                 g.setColor(Color.DARK_GRAY);
                 g.drawLine(point.x.x, point.x.y, point.y.x, point.y.y);
             }
@@ -110,28 +107,28 @@ public class TreeVisualizerWindow {
 
         Dictionary<Integer, Integer> coords = new Dictionary<>();
 //        coords.put((frame.getWidth()/2)-xRad/2, verticalGap); // artificial translate
-        coords.put((frame.getWidth()/2), verticalGap);
+        coords.put((frame.getWidth() / 2), verticalGap);
 //        System.out.println("Frame.getWidth/2: " + frameey);
         toReturn.insert(coords);
 
         for (int i = 1; i < nodes.getSize(); i++) {
             coords = new Dictionary<>();
-            Dictionary.Node<Integer, Integer> firstNode = toReturn.getElement(i-1).getAt(0);
-            coords.put(firstNode.key-(xGap/4), firstNode.val+yGap);
+            Dictionary.Node<Integer, Integer> firstNode = toReturn.getElement(i - 1).getAt(0);
+            coords.put(firstNode.key - (xGap / 4), firstNode.val + yGap);
             for (int j = 1; j < nodes.getElement(i).getSize(); j++) {
-                Dictionary.Node<Integer, Integer> precedingNode = coords.getAt(j-1);
-                coords.put(precedingNode.key+xGap/2, precedingNode.val);
+                Dictionary.Node<Integer, Integer> precedingNode = coords.getAt(j - 1);
+                coords.put(precedingNode.key + xGap / 2, precedingNode.val);
             }
             toReturn.insert(coords);
-            xGap = xGap/2;
+            xGap = xGap / 2;
         }
 
         return toReturn;
     }
 
-    private MyDictionary<Point, Point> generateLineCoordinates(List<Dictionary<Integer, Integer>> nodeCoords,
-                                                               List<List<GUITreeNode>> nodes) {
-        MyDictionary<Point, Point> lineCoordinates = new MyDictionary<>();
+    private PairList<Point, Point> generateLineCoordinates(List<Dictionary<Integer, Integer>> nodeCoords,
+                                                           List<List<GUITreeNode>> nodes) {
+        PairList<Point, Point> lineCoordinates = new PairList<>();
         Dictionary.Node<Integer, Integer> parentNode = nodeCoords.getElement(0).getAt(0);
 
         for (int i = 1; i < nodeCoords.getSize(); i++) {
@@ -140,12 +137,12 @@ public class TreeVisualizerWindow {
             for (int j = 0; j < nodeCoords.getElement(i).size(); j++) {
                 Point parentPoint = new Point(parentNode.key, parentNode.val);
                 Point childPoint = new Point(nodeCoords.getElement(i).getAt(j).key, nodeCoords.getElement(i).getAt(j).val);
-                if (nodes.getElement(i-1).getElement(idxOfParent).getWeight() != -1 // only generate coords of lines connecting to non filler nodes
+                if (nodes.getElement(i - 1).getElement(idxOfParent).getWeight() != -1 // only generate coords of lines connecting to non filler nodes
                         && nodes.getElement(i).getElement(j).getWeight() != -1)
                     lineCoordinates.put(parentPoint, childPoint);
                 if (j != nodeCoords.getElement(i).size() && ctr % 2 == 0) {
                     idxOfParent++;
-                    parentNode = nodeCoords.getElement(i-1).getAt(idxOfParent);
+                    parentNode = nodeCoords.getElement(i - 1).getAt(idxOfParent);
                 }
                 ctr++;
             }
@@ -173,7 +170,7 @@ public class TreeVisualizerWindow {
 
         for (int i = 0, toInsert = 0; i < nodesPerLevel.getSize(); i++) {
             List<GUITreeNode> level = new ArrayList<>();
-            for (int j =  0; j < nodesPerLevel.getElement(i); j++, toInsert++) {
+            for (int j = 0; j < nodesPerLevel.getElement(i); j++, toInsert++) {
                 level.insert(nodes1dArr.getElement(toInsert));
             }
             nodes2dArr.insert(level);
@@ -185,7 +182,7 @@ public class TreeVisualizerWindow {
     private List<Integer> computeNumOfNodesPerLevel(List<GUITreeNode> nodes) {
         List<Integer> qtyPerLevel = new ArrayList<>();
         for (int i = 0, j = 1; i < nodes.getSize(); i++) {
-            if (i == Math.pow(2,j-1)) {
+            if (i == Math.pow(2, j - 1)) {
                 qtyPerLevel.insert(i);
                 j++;
             }
@@ -195,18 +192,19 @@ public class TreeVisualizerWindow {
 
     private List<GUITreeNode> convertTreeToArr(TreeNode root) {
         List<GUITreeNode> list = new ArrayList<>();
+        System.out.println("test");
 
-        java.util.Queue<TreeNode> q = new LinkedList<>();
-        q.add(root);
+        Queue<TreeNode> q = new DoublyLinkedList<>();
+        q.enqueue(root);
 
         // tutorialspoint: bfs
         while (!q.isEmpty()) {
-            TreeNode tempNode = q.poll();
+            TreeNode tempNode = q.dequeue();
             list.insert(new GUITreeNode(String.valueOf(tempNode.letter), tempNode.weight));
             if (tempNode.left != null)
-                q.add(tempNode.left);
+                q.enqueue(tempNode.left);
             if (tempNode.right != null)
-                q.add(tempNode.right);
+                q.enqueue(tempNode.right);
         }
         return list;
     }
@@ -217,32 +215,29 @@ public class TreeVisualizerWindow {
 
     private TreeNode makeComplete(TreeNode node) {
         while (!isPerfect(node)) {
-            insert(node, new TreeNode('\0',-1,null,null));
+            insert(node, new TreeNode('\0', -1, null, null));
         }
         return node;
     }
 
-    static void insert(TreeNode temp, TreeNode newNode)
-    {
-        java.util.Queue<TreeNode> q = new LinkedList<TreeNode>();
-        q.add(temp);
+    static void insert(TreeNode temp, TreeNode newNode) {
+        Queue<TreeNode> q = new DoublyLinkedList<>();
+        q.enqueue(temp);
         // Do level order traversal until we find
         // an empty place.
         while (!q.isEmpty()) {
             temp = q.peek();
-            q.remove();
+            q.dequeue();
             if (temp.left == null) {
                 temp.left = newNode;
                 break;
-            }
-            else
-                q.add(temp.left);
+            } else
+                q.enqueue(temp.left);
             if (temp.right == null) {
                 temp.right = newNode;
                 break;
-            }
-            else
-                q.add(temp.right);
+            } else
+                q.enqueue(temp.right);
         }
     }
 
@@ -254,14 +249,14 @@ public class TreeVisualizerWindow {
         // If leaf node, then its depth must be same as
         // depth of all other leaves.
         if (root.left == null && root.right == null)
-            return (d == level+1);
+            return (d == level + 1);
 
         // If internal node and one child is empty
         if (root.left == null || root.right == null)
             return false;
 
         // Left and right subtrees must be perfect.
-        return isPerfectRec(root.left, d, level+1) && isPerfectRec(root.right, d, level+1);
+        return isPerfectRec(root.left, d, level + 1) && isPerfectRec(root.right, d, level + 1);
     }
 
     // Wrapper over isPerfectRec()
@@ -307,9 +302,9 @@ public class TreeVisualizerWindow {
         tree.left.left.left.left.left = new TreeNode('o', 7, null, null);
 //        tree.left.left.left.left.left.left = new TreeNode('o', 8, null, null);
 
-        try{
+        try {
             TreeVisualizerWindow w = new TreeVisualizerWindow(tree);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

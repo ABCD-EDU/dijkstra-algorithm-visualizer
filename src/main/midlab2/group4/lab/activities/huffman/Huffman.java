@@ -9,10 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-/**
- * Before using this class, using the setText() method first to set a text to parse then proceed to generateTree() method
- * for the huffman tree. In case the text string is still blank, a {@code NullPointerException} will be thrown.
- */
 public class Huffman {
     private Dictionary<Character, Integer> pairCharWeight;
     private Queue<TreeNode> nodeQueue;

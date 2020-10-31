@@ -3,11 +3,10 @@ package main.midlab2.group4.lab.activities.huffman;
 import main.midlab2.group4.lab.util.ArrayList;
 import main.midlab2.group4.lab.util.List;
 
-import java.util.NoSuchElementException;
+// TODO: RENAME
+public class PairList<K, V> {
 
-public class MyDictionary<K, V> {
-
-    List<MyDictionary.Node<K, V>> elements;
+    List<PairList.Node<K, V>> elements;
 
     public static class Node<K, V> {
         K x;
@@ -23,7 +22,7 @@ public class MyDictionary<K, V> {
         }
     }
 
-    MyDictionary() {
+    PairList() {
         elements = new ArrayList<>();
     }
 
@@ -32,7 +31,7 @@ public class MyDictionary<K, V> {
     }
 
     public void put(K k, V v) {
-        elements.insert(new MyDictionary.Node<>(k, v));
+        elements.insert(new PairList.Node<>(k, v));
     }
 //
 //    public V get(K k) {
@@ -42,7 +41,7 @@ public class MyDictionary<K, V> {
 //        return toReturn.val;
 //    }
 
-    public MyDictionary.Node<K, V> getAt(int pos) {
+    public PairList.Node<K, V> getAt(int pos) {
         return elements.getElement(pos);
     }
 
@@ -58,7 +57,7 @@ public class MyDictionary<K, V> {
 
     public boolean contains(K k) {
         for (int i = 0; i < elements.getSize(); i++) {
-            MyDictionary.Node<K, V> curr = elements.getElement(i);
+            PairList.Node<K, V> curr = elements.getElement(i);
             if (curr.x.equals(k))
                 return true;
         }

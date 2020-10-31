@@ -1,5 +1,6 @@
 package main.midlab2.group4.lab.util;
 
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class DoublyLinkedList<E>
@@ -74,7 +75,7 @@ public class DoublyLinkedList<E>
 
     @Override
     public void enqueue(E data) {
-        insertHead(data);
+        insertTail(data);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class DoublyLinkedList<E>
 
     @Override
     public E peek() throws StackException {
-        return tail.data;
+        return head.data;
     }
 
     @Override
@@ -143,15 +144,17 @@ public class DoublyLinkedList<E>
     }
 
     public E attainLast() {
-        final Node<E> newTail = tail.prev;
+        if (tail == null) throw new NullPointerException("List is empty");
+        Node<E> oldNode = new Node<>(tail.prev,tail.data,tail.next);
         deleteLast();
-        return newTail.data;
+        return oldNode.data;
     }
 
     public E attainFirst() {
-        final Node<E> newHead = head.next;
+        if (head == null) throw new NullPointerException("List is empty");
+        Node<E> oldNode = new Node<>(head.prev,head.data,head.next);
         deleteFirst();
-        return newHead.data;
+        return oldNode.data;
     }
 
     Node<E> findData(E node) {
@@ -190,8 +193,8 @@ public class DoublyLinkedList<E>
                 head.next = newHead.prev = null;
                 head = newHead;
             }
+            size--;
         }
-        size--;
     }
 
     void deleteEndNode(){
@@ -204,7 +207,19 @@ public class DoublyLinkedList<E>
                 tail.prev = newTail.next = null;
                 tail = newTail;
             }
+            size--;
         }
-        size--;
+    }
+
+    public static void main(String[] args) {
+        Queue<Integer> q = new DoublyLinkedList<>();
+
+        q.enqueue(10);
+        q.enqueue(20);
+        q.enqueue(30);
+
+        System.out.println(q.dequeue());
+        System.out.println(q.dequeue());
+        System.out.println(q.dequeue());
     }
 }
