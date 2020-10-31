@@ -58,6 +58,8 @@ public class HuffmanWindow {
     private Color backgroundColor, headerColor;
     private Color mainForeground, secondaryForeground;
 
+    private TreeNode root;
+
     private GridBagConstraints gbc;
 
     public HuffmanWindow() {
@@ -352,6 +354,7 @@ public class HuffmanWindow {
         HuffmanCodec t = new HuffmanCodec(h);
         h.setText(text);
         h.generateTree();
+        this.root = h.getRoot();
 
         System.out.println("=============================================================");
         System.out.println("Frequency Values");
@@ -407,12 +410,13 @@ public class HuffmanWindow {
     }
 
     private void showHuffmanTree() {
-
+        try {
+            TreeVisualizerWindow w = new TreeVisualizerWindow(root);
+        }catch (Exception e) {
+            JOptionPane.showMessageDialog(frame, "Convert text first!",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
-
-
-
-
 
     //TODO: Add more Themes
     private void setTheme(String theme) {

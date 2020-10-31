@@ -149,11 +149,16 @@ public class ArrayList<E>
     }
 
     public String toString() {
+        if (trueSize == 0) return "[ ]";
+        if (trueSize == 1) return "[ " + elementData[0] + " ]";
         StringBuilder sb = new StringBuilder();
 
-        for (var item: elementData) {
-            sb.append(item.toString()).append(" ");
+        sb.append("[ ").append(elementData[0].toString());
+        for (int i = 1; i < trueSize-1; i++) {
+            var item = elementData[i];
+            sb.append(", ").append(item.toString());
         }
+        sb.append((", ")).append(elementData[trueSize - 1]).append(" ]");
 
         return sb.toString();
     }
