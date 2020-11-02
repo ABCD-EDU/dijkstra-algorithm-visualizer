@@ -23,7 +23,15 @@ public class TreeVisualizerWindow {
     private final int initialXGap = (int) (xRad * .60);
     private final int initialYGap = (int) (yRad + yRad * .75);
 
-    TreeVisualizerWindow(TreeNode root) {
+    Color backgroundColor;
+    Color nodeColor;
+    Color nodeForeground;
+
+    TreeVisualizerWindow(TreeNode root, Color backgroundColor, Color nodeColor, Color nodeForeground) {
+        this.backgroundColor = backgroundColor;
+        this.nodeColor = nodeColor;
+        this.nodeForeground = nodeForeground;
+
         frame = new JFrame("Binary Tree Visualizer");
 
         completeBinaryTree(root);
@@ -36,7 +44,7 @@ public class TreeVisualizerWindow {
         this.lineCoordinates = generateLineCoordinates(nodeCoords, nodes);
         System.out.println(lineCoordinates);
         treeCanvas = new TreeCanvas();
-        treeCanvas.setBackground(Color.LIGHT_GRAY);
+        treeCanvas.setBackground(backgroundColor);
         frame.add(treeCanvas);
 
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -66,9 +74,9 @@ public class TreeVisualizerWindow {
                     if (nodes.getElement(i).getElement(j).getWeight() != -1) {
                         GUITreeNode currentNode = nodes.getElement(i).getElement(j);
                         Dictionary.Node<Integer, Integer> coordinate = coords.getAt(j);
-                        g.setColor(Color.DARK_GRAY);
+                        g.setColor(nodeColor);
                         g.fillOval(coordinate.key, coordinate.val, xRad, yRad);
-                        g.setColor(Color.WHITE);
+                        g.setColor(nodeForeground);
                         if (currentNode.getCharacter().equals("\0")) {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
                                     coordinate.key + (xRad / 2) - 4, coordinate.val + (yRad / 2) + 3);
@@ -89,7 +97,7 @@ public class TreeVisualizerWindow {
 
             for (int i = 0; i < lineCoordinates.size(); i++) {
                 PairList.Node<Point, Point> point = lineCoordinates.getAt(i);
-                g.setColor(Color.DARK_GRAY);
+                g.setColor(nodeColor);
                 g.drawLine(point.x.x, point.x.y, point.y.x, point.y.y);
             }
 
@@ -303,7 +311,7 @@ public class TreeVisualizerWindow {
 //        tree.left.left.left.left.left.left = new TreeNode('o', 8, null, null);
 
         try {
-            TreeVisualizerWindow w = new TreeVisualizerWindow(tree);
+            TreeVisualizerWindow w = new TreeVisualizerWindow(tree, Color.WHITE, Color.BLACK, Color.WHITE);
         } catch (Exception e) {
             e.printStackTrace();
         }

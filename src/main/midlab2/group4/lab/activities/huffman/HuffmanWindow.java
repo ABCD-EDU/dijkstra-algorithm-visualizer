@@ -7,17 +7,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class HuffmanWindow {
+    private final String INITIAL_THEME = "Light";
+
     private final JFrame frame = new JFrame();
     private final JPanel mainPanel = new JPanel();
     private final JMenuBar menuBar = new JMenuBar();
@@ -27,8 +24,8 @@ public class HuffmanWindow {
     private JPanel inputPanel;
     private JLabel inputTextLabel;
     private JTextArea inputTextArea;
-    private JButton textConvertButton;
     private JScrollPane textAreaScrollPane;
+    private JButton textConvertButton;
     private JButton importFromTextFile;
     private File textFile;
 
@@ -36,8 +33,9 @@ public class HuffmanWindow {
     private JLabel outputLabel;
 
     private JButton showHuffmanTreeButton;
+    private JButton showDecodedTextButton;
     private DefaultTableModel freqTableDefTabMod;
-    private JTable freqTable;
+    private JTable frequencyTable;
     private JScrollPane freqTableScrollPane;
     private DefaultTableModel codeTableDefTabMod;
     private JTable codeTable;
@@ -55,8 +53,8 @@ public class HuffmanWindow {
     private JLabel noLossLabel;
     private JTextField noLossField;
 
-    private Color backgroundColor, headerColor;
-    private Color mainForeground, secondaryForeground;
+    private Color backgroundColor, headerColor, mainFieldColor, uneditableFieldColor, accentColor;
+    private Color backgroundForeground, fieldForeground, buttonForeground, headerForeground;
 
     private TreeNode root;
 
@@ -64,21 +62,11 @@ public class HuffmanWindow {
 
     public HuffmanWindow() {
         frame.setTitle("Huffman Coding");
-        frame.setIconImage(new ImageIcon("src/assets/Tree.png").getImage());
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } // Prevent making Swing look like its from 1995
+        frame.setIconImage(new ImageIcon("asset/Tree.png").getImage());
 
         setMenuBar();
-        initializeInputPanel();
-        initializeOutputPanel();
-        mainPanel.add(inputPanel);
-        mainPanel.add(outputPanel);
-        frame.add(mainPanel);
-        setTheme("SLU");
+        setMainPanel();
+        setTheme(INITIAL_THEME);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -88,8 +76,8 @@ public class HuffmanWindow {
     }
 
     private void setMenuBar() {
+        menuBar.setPreferredSize(new Dimension(10, 29));
         menuBar.setBorderPainted(false);
-        menuBar.setPreferredSize(new Dimension(10, 25));
 
         JMenu menuItemSpacing1 = new JMenu();
         JMenu menuItemSpacing2 = new JMenu();
@@ -103,7 +91,6 @@ public class HuffmanWindow {
         menuBar.add(aboutSubMenu);
         menuBar.add(menuItemSpacing2);
         menuBar.add(themesSubMenu);
-
         frame.setJMenuBar(menuBar);
     }
 
@@ -129,29 +116,61 @@ public class HuffmanWindow {
         lightTheme.addActionListener(e -> setTheme("Light"));
         themesSubMenu.add(lightTheme);
 
+        JMenuItem darkTheme = new JMenuItem("Dark");
+        darkTheme.setMnemonic(KeyEvent.VK_D);
+        darkTheme.addActionListener(e -> setTheme("Dark"));
+        themesSubMenu.add(darkTheme);
+
         JMenuItem sluTheme = new JMenuItem("SLU");
         sluTheme.setMnemonic(KeyEvent.VK_S);
         sluTheme.addActionListener(e -> setTheme("SLU"));
         themesSubMenu.add(sluTheme);
 
-        JMenuItem darkTheme = new JMenuItem("Dark");
-        darkTheme.setMnemonic(KeyEvent.VK_D);
-        darkTheme.addActionListener(e -> setTheme("Dark"));
-        themesSubMenu.add(darkTheme);
+        JMenuItem draculaTheme = new JMenuItem("Dracula");
+        draculaTheme.setMnemonic(KeyEvent.VK_A);
+        draculaTheme.addActionListener(e -> setTheme("Dracula"));
+        themesSubMenu.add(draculaTheme);
+
+        JMenuItem gruvboxTheme = new JMenuItem("Gruvbox");
+        gruvboxTheme.setMnemonic(KeyEvent.VK_G);
+        gruvboxTheme.addActionListener(e -> setTheme("Gruvbox"));
+        themesSubMenu.add(gruvboxTheme);
+
+        JMenuItem godspeedTheme = new JMenuItem("Godspeed");
+        godspeedTheme.setMnemonic(KeyEvent.VK_E);
+        godspeedTheme.addActionListener(e -> setTheme("Godspeed"));
+        themesSubMenu.add(godspeedTheme);
+
+        JMenuItem Olive = new JMenuItem("Olive");
+        Olive.setMnemonic(KeyEvent.VK_V);
+        Olive.addActionListener(e -> setTheme("Olive"));
+        themesSubMenu.add(Olive);
+
+        JMenuItem halloweenTheme = new JMenuItem("Halloween");
+        halloweenTheme.setMnemonic(KeyEvent.VK_H);
+        halloweenTheme.addActionListener(e -> setTheme("Halloween"));
+        themesSubMenu.add(halloweenTheme);
+    }
+
+    private void setMainPanel() {
+        initializeInputPanel();
+        initializeOutputPanel();
+        mainPanel.add(inputPanel);
+        mainPanel.add(outputPanel);
+        frame.add(mainPanel);
     }
 
     private void initializeInputPanel() {
-        gbc = new GridBagConstraints();
         inputPanel = new JPanel(new GridBagLayout());
-        inputPanel.setBorder(new EmptyBorder(3,3,3,3));
-        inputTextLabel = new JLabel(" Input Text Here:                         ");
-        inputTextArea = new JTextArea(29,35);
-        textConvertButton = new JButton("Convert");
+        inputTextLabel = new JLabel("  Input Text Here                          ");
+        inputTextArea = new JTextArea();
         textAreaScrollPane = new JScrollPane(inputTextArea);
+        textConvertButton = new JButton("Convert");
         importFromTextFile = new JButton("Import From File");
 
         setInputPanelComponentProperties();
 
+        gbc = new GridBagConstraints();
         gbc.insets = new Insets(3,3,3,3);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = gbc.weighty = 1;
@@ -161,30 +180,31 @@ public class HuffmanWindow {
         gbc.gridx = 2;
         gbc.gridwidth = 1;
         inputPanel.add(importFromTextFile, gbc);
-        gbc.insets = new Insets(3,3,5,3);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
         inputPanel.add(textAreaScrollPane, gbc);
-        gbc.insets = new Insets(3,3,3,3);
+        gbc.insets = new Insets(5,4,3,4);
         gbc.gridy = 2;
         inputPanel.add(textConvertButton, gbc);
     }
 
     private void setInputPanelComponentProperties() {
-        inputTextLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+        inputTextLabel.setFont(new Font("Calibri", Font.BOLD, 18));
         inputTextLabel.setVerticalAlignment(SwingConstants.CENTER);
 
         inputTextArea.setMargin(new Insets(4,4,4,4));
+        inputTextArea.setFont(new Font("", Font.PLAIN, 14));
         inputTextArea.setLineWrap(true);
         inputTextArea.setWrapStyleWord(true);
-        inputTextArea.setFont(new Font("", Font.PLAIN, 14));
+        textAreaScrollPane.setPreferredSize(new Dimension(0, 511));
 
-        textAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
-
+        importFromTextFile.setPreferredSize(new Dimension(importFromTextFile.getPreferredSize().width, 30));
         importFromTextFile.setFocusPainted(false);
-        textConvertButton.setFocusPainted(false);
+        importFromTextFile.addActionListener((e) -> promptFileSelection());
 
+        textConvertButton.setPreferredSize(new Dimension(textConvertButton.getPreferredSize().width, 30));
+        textConvertButton.setFocusPainted(false);
         textConvertButton.addActionListener((e) -> {
             if (inputTextArea.getText().equals("")){
                 JOptionPane.showMessageDialog(frame, "Text cannot be empty",
@@ -193,7 +213,6 @@ public class HuffmanWindow {
             }
             doTheMagic(inputTextArea.getText());
         });
-        importFromTextFile.addActionListener((e) -> promptFileSelection());
     }
 
     private void promptFileSelection() {
@@ -231,10 +250,19 @@ public class HuffmanWindow {
 
     private void initializeOutputPanel() {
         outputPanel = new JPanel(new GridBagLayout());
-        outputPanel.setBorder(new EmptyBorder(3,3,3,3));
-        outputLabel = new JLabel("Output: ");
-        outputLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+        outputPanel.setBorder(new EmptyBorder(10,2,10,10));
+        outputLabel = new JLabel("  Output");
+        outputLabel.setFont(new Font("Calibri", Font.BOLD, 18));
+        showDecodedTextButton = new JButton("Show Decoded Text");
+        showDecodedTextButton.setPreferredSize(new Dimension(186, 30));
+        showDecodedTextButton.setFocusPainted(false);
+        showDecodedTextButton.addActionListener((e) -> showDecodedTextButton());
+        JLabel spacing = new JLabel();
+        spacing.setPreferredSize(new Dimension(170, 30));
         showHuffmanTreeButton = new JButton("Show Huffman Tree");
+        showHuffmanTreeButton.setPreferredSize(new Dimension(186, 30));
+        showHuffmanTreeButton.setFocusPainted(false);
+        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
 
         initializeOutputTables();
         initializeFields();
@@ -243,53 +271,61 @@ public class HuffmanWindow {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(3,3,3,3);
         gbc.weightx = gbc.weighty = 1;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         outputPanel.add(outputLabel, gbc);
         gbc.gridwidth = 1;
-        gbc.gridx = 2;
+        gbc.gridx = 3;
+        outputPanel.add(showDecodedTextButton, gbc);
+        gbc.gridx = 4;
+        outputPanel.add(spacing, gbc);
+        gbc.gridx = 5;
         outputPanel.add(showHuffmanTreeButton, gbc);
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.gridx = 0;
         gbc.gridy = 1;
         outputPanel.add(freqTableScrollPane, gbc);
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         outputPanel.add(codeTableScrollPane, gbc);
+        gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.gridwidth = 1;
         outputPanel.add(encodedLabel, gbc);
+        gbc.gridwidth = 5;
         gbc.gridx = 1;
-        gbc.gridwidth = 3;
         outputPanel.add(encodedOutputTextScrollPane, gbc);
+        gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 1;
         outputPanel.add(origSizeLabel, gbc);
+        gbc.gridwidth = 2;
         gbc.gridx = 1;
-        outputPanel.add(origSizeField, gbc);
-        gbc.gridx  = 2;
-        outputPanel.add(compRateLabel, gbc);
+        outputPanel.add(origSizeField ,gbc);
+        gbc.gridwidth = 1;
         gbc.gridx = 3;
+        outputPanel.add(compRateLabel, gbc);
+        gbc.gridwidth = 2;
+        gbc.gridx = 4;
         outputPanel.add(compRateField, gbc);
+        gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 4;
         outputPanel.add(compSizeLabel, gbc);
+        gbc.gridwidth = 2;
         gbc.gridx = 1;
         outputPanel.add(compSizeField, gbc);
-        gbc.gridx = 2;
-        outputPanel.add(noLossLabel, gbc);
+        gbc.gridwidth = 1;
         gbc.gridx = 3;
+        outputPanel.add(noLossLabel, gbc);
+        gbc.gridwidth = 2;
+        gbc.gridx = 4;
         outputPanel.add(noLossField, gbc);
     }
 
     private void initializeOutputTables() {
-        showHuffmanTreeButton.setFocusPainted(false);
-        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
-
         freqTableDefTabMod = new DefaultTableModel();
-        freqTable = new JTable(freqTableDefTabMod);
-        freqTableScrollPane = new JScrollPane(freqTable);
-        initializeTable(freqTable, freqTableDefTabMod, new String[]{"Character", "Frequency"},
+        frequencyTable = new JTable(freqTableDefTabMod);
+        freqTableScrollPane = new JScrollPane(frequencyTable);
+        initializeTable(frequencyTable, freqTableDefTabMod, new String[]{"Character", "Frequency"},
                 new int[]{50,50},freqTableScrollPane);
 
         codeTableDefTabMod = new DefaultTableModel();
@@ -300,28 +336,35 @@ public class HuffmanWindow {
     }
 
     private void initializeFields() {
-        encodedLabel = new JLabel("Encoded: ");
+        encodedLabel = new JLabel("  Encoded:");
         encodedOutputTextArea = new JTextArea(3,50);
+        encodedOutputTextArea.setEditable(false);
         encodedOutputTextArea.setFont(new Font("", Font.PLAIN, 14));
         encodedOutputTextArea.setMargin(new Insets(2,2,2,2));
         encodedOutputTextArea.setLineWrap(true);
         encodedOutputTextArea.setWrapStyleWord(true);
         encodedOutputTextScrollPane = new JScrollPane(encodedOutputTextArea);
 
-        origSizeLabel = new JLabel("Original Size: ");
+        origSizeLabel = new JLabel("  Original Size:");
         origSizeField = new JTextField();
+        origSizeField.setEditable(false);
         origSizeField.setColumns(30);
+        origSizeField.setPreferredSize(new Dimension(1, 25));
 
-        compSizeLabel = new JLabel("Compressed Size: ");
+        compSizeLabel = new JLabel("  Compressed Size:");
         compSizeField = new JTextField();
+        compSizeField.setEditable(false);
         compSizeField.setColumns(30);
+        compSizeField.setPreferredSize(new Dimension(1, 25));
 
-        compRateLabel = new JLabel("Compression Rate: ");
+        compRateLabel = new JLabel("  Compression Rate:");
         compRateField = new JTextField();
+        compRateField.setEditable(false);
         compRateField.setColumns(30);
 
-        noLossLabel = new JLabel("Lossless Compression: ");
+        noLossLabel = new JLabel("  Lossless Compression:");
         noLossField = new JTextField();
+        noLossField.setEditable(false);
         noLossField.setColumns(30);
     }
 
@@ -389,10 +432,10 @@ public class HuffmanWindow {
         populatePairCharCodeTable(t.returnPairCharCodeAsArr());
 
         encodedOutputTextArea.setText(encoded);
-        origSizeField.setText((int) origSize + " bits");
-        compSizeField.setText((int) compressedSize + " bits");
-        compRateField.setText((int) -compressionRate + "%");
-        noLossField.setText((h.getText().equals(decoded)) + "");
+        origSizeField.setText(" " + (int) origSize + " bits");
+        compSizeField.setText(" " + (int) compressedSize + " bits");
+        compRateField.setText(" " + (int) -compressionRate + "%");
+        noLossField.setText((" " + h.getText().equals(decoded)) + "");
     }
 
     private void populateFreqValTable(String[][] arr) {
@@ -411,55 +454,232 @@ public class HuffmanWindow {
 
     private void showHuffmanTree() {
         try {
-            TreeVisualizerWindow w = new TreeVisualizerWindow(root);
-        }catch (Exception e) {
+            TreeVisualizerWindow w = new TreeVisualizerWindow(root, backgroundColor, accentColor, buttonForeground);
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(frame, "Convert text first!",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    //TODO: Add more Themes
+    private void showDecodedTextButton(){
+
+    } // PUT CODE HERE
+
     private void setTheme(String theme) {
         if (theme.equalsIgnoreCase("Light")) setWhiteThemeProperties();
         else if (theme.equalsIgnoreCase("Dark")) setDarkThemeProperties();
         else if (theme.equalsIgnoreCase("SLU")) setSLUThemeProperties();
+        else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
+        else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
+        else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
+        else if (theme.equalsIgnoreCase("Halloween")) setHalloweenThemeProperties();
+        else if (theme.equalsIgnoreCase("Olive")) setOliveThemeProperties();
 
-        UIManager.put("OptionPane.background", headerColor);
-        UIManager.put("Panel.background", headerColor);
-        UIManager.put("OptionPane.messageForeground", secondaryForeground);
+        UIManager.put("OptionPane.background", accentColor);
+        UIManager.put("Panel.background", accentColor);
+        UIManager.put("OptionPane.messageForeground", buttonForeground);
         UIManager.put("Button.background", backgroundColor);
-        UIManager.put("Button.foreground", mainForeground);
+        UIManager.put("Button.foreground", headerForeground);
         UIManager.put("Button.select", headerColor);
         UIManager.put("Button.focus", backgroundColor);
 
-        mainPanel.setBackground(new Color(0, 150, 167));
-        inputPanel.setBackground(new Color(0, 150, 167));
-        outputPanel.setBackground(new Color(0, 150, 167));
+        setBackgrounds();
+        setForegrounds();
+        setButtonColors();
+        setBorders();
+        setTableColors();
+    }
+
+    private void setBackgrounds() {
+        menuBar.setBackground(headerColor);
+        mainPanel.setBackground(backgroundColor);
+        inputPanel.setBackground(backgroundColor);
+        outputPanel.setBackground(backgroundColor);
+        inputTextArea.setBackground(mainFieldColor);
+
+        encodedOutputTextArea.setBackground(uneditableFieldColor);
+        origSizeField.setBackground(uneditableFieldColor);
+        compSizeField.setBackground(uneditableFieldColor);
+        compRateField.setBackground(uneditableFieldColor);
+        noLossField.setBackground(uneditableFieldColor);
+    }
+
+    private void setForegrounds() {
+        aboutSubMenu.setForeground(headerForeground);
+        themesSubMenu.setForeground(headerForeground);
+
+        inputTextArea.setForeground(fieldForeground);
+        frequencyTable.setForeground(fieldForeground);
+        codeTable.setForeground(fieldForeground);
+
+        inputTextLabel.setForeground(backgroundForeground);
+        outputLabel.setForeground(backgroundForeground);
+        encodedLabel.setForeground(backgroundForeground);
+        origSizeLabel.setForeground(backgroundForeground);
+        compSizeLabel.setForeground(backgroundForeground);
+        compRateLabel.setForeground(backgroundForeground);
+        noLossLabel.setForeground(backgroundForeground);
+
+        encodedOutputTextArea.setForeground(fieldForeground);
+        origSizeField.setForeground(fieldForeground);
+        compSizeField.setForeground(fieldForeground);
+        compRateField.setForeground(fieldForeground);
+        noLossField.setForeground(fieldForeground);
+    }
+
+    private void setBorders() {
+        inputPanel.setBorder(new EmptyBorder(10,10,10,2));
+        textAreaScrollPane.setBorder(new LineBorder(backgroundColor));
+
+        freqTableScrollPane.setBorder(new LineBorder(backgroundColor));
+        codeTableScrollPane.setBorder(new LineBorder(backgroundColor));
+        frequencyTable.getTableHeader().setBorder(new LineBorder(headerColor));
+        codeTable.getTableHeader().setBorder(new LineBorder(headerColor));
+
+        encodedOutputTextScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        origSizeField.setBorder(new LineBorder(uneditableFieldColor));
+        compSizeField.setBorder(new LineBorder(uneditableFieldColor));
+        compRateField.setBorder(new LineBorder(uneditableFieldColor));
+        noLossField.setBorder(new LineBorder(uneditableFieldColor));
+    }
+
+    private void setTableColors() {
+        frequencyTable.getTableHeader().setPreferredSize(new Dimension(1, 24));
+        frequencyTable.getTableHeader().setFont(new Font("", Font.BOLD, 12));
+        frequencyTable.setBackground(mainFieldColor);
+        frequencyTable.getTableHeader().setBackground(headerColor);
+        frequencyTable.getTableHeader().setForeground(headerForeground);
+        freqTableScrollPane.setBackground(headerColor);
+
+        codeTable.getTableHeader().setPreferredSize(new Dimension(1, 24));
+        codeTable.getTableHeader().setFont(new Font("", Font.BOLD, 12));
+        codeTable.setBackground(mainFieldColor);
+        codeTable.getTableHeader().setBackground(headerColor);
+        codeTable.getTableHeader().setForeground(headerForeground);
+        codeTableScrollPane.setBackground(headerColor);
+
+    }
+
+    private void setButtonColors() {
+        importFromTextFile.setBackground(accentColor);
+        importFromTextFile.setForeground(buttonForeground);
+        importFromTextFile.setBorderPainted(false);
+
+        textConvertButton.setBackground(accentColor);
+        textConvertButton.setForeground(buttonForeground);
+        textConvertButton.setBorderPainted(false);
+
+        showDecodedTextButton.setBackground(accentColor);
+        showDecodedTextButton.setForeground(buttonForeground);
+        showDecodedTextButton.setBorderPainted(false);
+
+        showHuffmanTreeButton.setBackground(accentColor);
+        showHuffmanTreeButton.setForeground(buttonForeground);
+        showHuffmanTreeButton.setBorderPainted(false);
     }
 
     private void setWhiteThemeProperties() {
-        backgroundColor = Color.WHITE;
+        backgroundColor = new Color(0xD9D9D9);
         headerColor = new Color(0x222222);
-        mainForeground = Color.BLACK;
-        secondaryForeground = Color.WHITE;
+        mainFieldColor = new Color(0xFFFFFF);
+        uneditableFieldColor = new Color(0xECECEC);
+        accentColor = new Color(0x40798C);
+
+        backgroundForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.BLACK;
+        buttonForeground = Color.WHITE;
     }
 
     private void setDarkThemeProperties() {
         backgroundColor = new Color(0x333333);
-        headerColor = Color.BLACK;
-        mainForeground = Color.WHITE;
-        secondaryForeground = Color.WHITE;
+        headerColor = new Color(0x000000);
+        mainFieldColor = new Color(0x666666);
+        uneditableFieldColor = new Color(0x4A4A4A);
+        accentColor = new Color(0xCCCCCC);
+
+        backgroundForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.WHITE;
+        buttonForeground = Color.BLACK;
     }
 
     private void setSLUThemeProperties() {
         backgroundColor = new Color(0xF4D35E);
         headerColor = new Color(0x0D3B66);
-        mainForeground = Color.BLACK;
-        secondaryForeground = Color.WHITE;
+        mainFieldColor = new Color(0xFFFFFF);
+        uneditableFieldColor = new Color(0xFAF0CA);
+        accentColor = new Color(0x333333);
+
+        backgroundForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.BLACK;
+        buttonForeground = Color.WHITE;
     }
 
-    private void setMetropolisThemeProperties() {
+    private void setDraculaThemeProperties() {
+        backgroundColor = new Color(0x282A36);
+        headerColor = new Color(0x6272A4);
+        mainFieldColor = new Color(0x44475A);
+        uneditableFieldColor = new Color(0x363848);
+        accentColor = new Color(0xBD93F9);
 
+        backgroundForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.WHITE;
+        buttonForeground = Color.BLACK;
+    }
+
+    private void setGruvboxThemeProperties() {
+        backgroundColor = new Color(0x282828);
+        headerColor = new Color(0x689D6A);
+        mainFieldColor = new Color(0x1D2021);
+        uneditableFieldColor = new Color(0x3C3836);
+        accentColor = new Color(0xDED1AD);
+
+        backgroundForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.WHITE;
+        buttonForeground = Color.BLACK;
+    }
+
+    private void setGodspeedThemeProperties() {
+        backgroundColor = new Color(0x6A97B5);
+        headerColor = new Color(0x5A5E61);
+        mainFieldColor = new Color(0xEAE3D5);
+        uneditableFieldColor = new Color(0xAABDC5);
+        accentColor = new Color(0xFAEE69);
+
+        backgroundForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.BLACK;
+        buttonForeground = Color.BLACK;
+    }
+
+    private void setOliveThemeProperties() {
+        backgroundColor = new Color(0xB6B09A);
+        headerColor = new Color(0x2E2F33);
+        mainFieldColor = new Color(0xD9D2C8);
+        uneditableFieldColor = new Color(0xC7C1B1);
+        accentColor = new Color(0x6F8C70);
+
+        backgroundForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.BLACK;
+        buttonForeground = Color.WHITE;
+    }
+
+    private void setHalloweenThemeProperties() {
+        backgroundColor = new Color(0x1B1B1B);
+        headerColor = new Color(0x000000);
+        mainFieldColor = new Color(0x363636);
+        uneditableFieldColor = new Color(0x282828);
+        accentColor = new Color(0xFF9900);
+
+        backgroundForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        fieldForeground = Color.WHITE;
+        buttonForeground = Color.BLACK;
     }
 
     private void displayGroupMembers() {
@@ -474,10 +694,10 @@ public class HuffmanWindow {
 
     private void displayCourseSpecifications() {
         JOptionPane.showMessageDialog(frame,
-                "       Description :    Data Structures\n" +
-                        "       Instructor    :    Roderick Makil\n" +
-                        "       Class Code  :    9413\n" +
-                        "       Class #         :    CS 211\n",
+                "   Description:   Data Structures\n" +
+                        "   Instructor:   Roderick Makil\n" +
+                        "   Class Code:   9413\n" +
+                        "   Class #:   CS 211\n",
                 "Course Specifications", JOptionPane.PLAIN_MESSAGE);
     }
 }
