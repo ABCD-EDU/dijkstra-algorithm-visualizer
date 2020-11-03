@@ -42,7 +42,6 @@ public class TreeVisualizerWindow {
         frame.setMinimumSize(new Dimension(width, height));
         this.nodeCoords = generateNodeCoordinates(nodes);
         this.lineCoordinates = generateLineCoordinates(nodeCoords, nodes);
-        System.out.println(lineCoordinates);
         treeCanvas = new TreeCanvas();
         treeCanvas.setBackground(backgroundColor);
         frame.add(treeCanvas);
@@ -58,16 +57,12 @@ public class TreeVisualizerWindow {
 
         @Override
         public void paint(Graphics g) {
-
             paintLines(g);
             paintCircles(g);
-
         }
 
         private void paintCircles(Graphics g) {
-
             g.translate(-xRad / 2, -yRad / 2);
-
             for (int i = 0; i < nodes.getSize(); i++) {
                 Dictionary<Integer, Integer> coords = nodeCoords.getElement(i);
                 for (int j = 0; j < nodes.getElement(i).getSize(); j++) {
@@ -84,28 +79,24 @@ public class TreeVisualizerWindow {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
                                     coordinate.key + (xRad / 2) - 11, coordinate.val + (yRad / 2) + 3);
                         }
-                        System.out.println("Drawing " + i + "|" + j + " at: " + coordinate.key + ", " + coordinate.val);
+//                        System.out.println("Drawing " + i + "|" + j + " at: " + coordinate.key + ", " + coordinate.val);
                     }
                 }
             }
-
-        }
+        }// End of paintCircles
 
         private void paintLines(Graphics g) {
-
             g.translate(xRad / 2, yRad / 2);
-
             for (int i = 0; i < lineCoordinates.size(); i++) {
                 PairList.Node<Point, Point> point = lineCoordinates.getAt(i);
                 g.setColor(nodeColor);
                 g.drawLine(point.x.x, point.x.y, point.y.x, point.y.y);
             }
-
         }
 
-    }
+    }// End of TreeCanvas
 
-    // ------------------ MAGIC -----------------
+    // ------------------ Helper Methods -----------------
 
     private List<Dictionary<Integer, Integer>> generateNodeCoordinates(List<List<GUITreeNode>> nodes) {
         List<Dictionary<Integer, Integer>> toReturn = new ArrayList<>();
@@ -114,9 +105,7 @@ public class TreeVisualizerWindow {
         int yGap = initialYGap;
 
         Dictionary<Integer, Integer> coords = new Dictionary<>();
-//        coords.put((frame.getWidth()/2)-xRad/2, verticalGap); // artificial translate
         coords.put((frame.getWidth() / 2), verticalGap);
-//        System.out.println("Frame.getWidth/2: " + frameey);
         toReturn.insert(coords);
 
         for (int i = 1; i < nodes.getSize(); i++) {
@@ -130,7 +119,6 @@ public class TreeVisualizerWindow {
             toReturn.insert(coords);
             xGap = xGap / 2;
         }
-
         return toReturn;
     }
 
@@ -156,12 +144,10 @@ public class TreeVisualizerWindow {
             }
             parentNode = nodeCoords.getElement(i).getAt(0);
         }
-
         return lineCoordinates;
     }
 
     private int computeInitialXGap(int initialGap) {
-//        int toReturn = (int)(xRad*0.50 ) + initialGap;
         int toReturn = initialGap;
         for (int i = 0; i < nodes.getSize(); i++) {
             toReturn += toReturn;
@@ -183,7 +169,6 @@ public class TreeVisualizerWindow {
             }
             nodes2dArr.insert(level);
         }
-
         return nodes2dArr;
     }
 
@@ -200,12 +185,10 @@ public class TreeVisualizerWindow {
 
     private List<GUITreeNode> convertTreeToArr(TreeNode root) {
         List<GUITreeNode> list = new ArrayList<>();
-        System.out.println("test");
 
         Queue<TreeNode> q = new DoublyLinkedList<>();
         q.enqueue(root);
 
-        // tutorialspoint: bfs
         while (!q.isEmpty()) {
             TreeNode tempNode = q.dequeue();
             list.insert(new GUITreeNode(String.valueOf(tempNode.letter), tempNode.weight));
@@ -217,11 +200,7 @@ public class TreeVisualizerWindow {
         return list;
     }
 
-    private TreeNode completeBinaryTree(TreeNode root) {
-        return makeComplete(root);
-    }
-
-    private TreeNode makeComplete(TreeNode node) {
+    private TreeNode completeBinaryTree(TreeNode node) {
         while (!isPerfect(node)) {
             insert(node, new TreeNode('\0', -1, null, null));
         }
@@ -231,8 +210,7 @@ public class TreeVisualizerWindow {
     static void insert(TreeNode temp, TreeNode newNode) {
         Queue<TreeNode> q = new DoublyLinkedList<>();
         q.enqueue(temp);
-        // Do level order traversal until we find
-        // an empty place.
+        // Do level order traversal until we find an empty place.
         while (!q.isEmpty()) {
             temp = q.peek();
             q.dequeue();
@@ -250,24 +228,15 @@ public class TreeVisualizerWindow {
     }
 
     static boolean isPerfectRec(TreeNode root, int d, int level) {
-        // An empty tree is perfect
         if (root == null)
             return true;
-
-        // If leaf node, then its depth must be same as
-        // depth of all other leaves.
         if (root.left == null && root.right == null)
             return (d == level + 1);
-
-        // If internal node and one child is empty
         if (root.left == null || root.right == null)
             return false;
-
-        // Left and right subtrees must be perfect.
         return isPerfectRec(root.left, d, level + 1) && isPerfectRec(root.right, d, level + 1);
     }
 
-    // Wrapper over isPerfectRec()
     static boolean isPerfect(TreeNode root) {
         int d = findADepth(root);
         return isPerfectRec(root, d, 0);
@@ -280,21 +249,6 @@ public class TreeVisualizerWindow {
             node = node.left;
         }
         return d;
-    }
-
-    private int getHeight(TreeNode root) {
-        if (root == null)
-            return 0;
-        else {
-            /* compute the depth of each subtree */
-            int lDepth = getHeight(root.left);
-            int rDepth = getHeight(root.right);
-            /* use the larger one */
-            if (lDepth > rDepth)
-                return (lDepth + 1);
-            else
-                return (rDepth + 1);
-        }
     }
 
     //Do not execute: for debugging purposes only
@@ -315,7 +269,6 @@ public class TreeVisualizerWindow {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-}
+}// End of TreeVisualizerWindow

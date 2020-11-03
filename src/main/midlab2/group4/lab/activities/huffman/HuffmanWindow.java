@@ -27,7 +27,6 @@ public class HuffmanWindow {
     private JScrollPane textAreaScrollPane;
     private JButton textConvertButton;
     private JButton importFromTextFile;
-    private File textFile;
 
     private JPanel outputPanel;
     private JLabel outputLabel;
@@ -53,10 +52,17 @@ public class HuffmanWindow {
     private JLabel noLossLabel;
     private JTextField noLossField;
 
+    private JFrame decodedTextFrame;
+    private JLabel decodedTextLabel;
+    private JTextArea decodedTextArea;
+    private JScrollPane decodedTextScrollPane;
+
     private Color backgroundColor, headerColor, mainFieldColor, uneditableFieldColor, accentColor;
     private Color backgroundForeground, fieldForeground, buttonForeground, headerForeground;
 
-    private TreeNode root;
+    private File textFile;
+    private Huffman huffman;
+    private HuffmanCodec huffmanCodec;
 
     private GridBagConstraints gbc;
 
@@ -69,10 +75,11 @@ public class HuffmanWindow {
         setTheme(INITIAL_THEME);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
         frame.pack();
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation((d.width/2)-frame.getWidth()/2, (d.height/2)-frame.getHeight()/2);
     }
 
     private void setMenuBar() {
@@ -211,7 +218,7 @@ public class HuffmanWindow {
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            doTheMagic(inputTextArea.getText());
+            commenceHuffmanProcesses(inputTextArea.getText());
         });
     }
 
@@ -251,19 +258,10 @@ public class HuffmanWindow {
     private void initializeOutputPanel() {
         outputPanel = new JPanel(new GridBagLayout());
         outputPanel.setBorder(new EmptyBorder(10,2,10,10));
-        outputLabel = new JLabel("  Output");
-        outputLabel.setFont(new Font("Calibri", Font.BOLD, 18));
-        showDecodedTextButton = new JButton("Show Decoded Text");
-        showDecodedTextButton.setPreferredSize(new Dimension(186, 30));
-        showDecodedTextButton.setFocusPainted(false);
-        showDecodedTextButton.addActionListener((e) -> showDecodedTextButton());
         JLabel spacing = new JLabel();
         spacing.setPreferredSize(new Dimension(170, 30));
-        showHuffmanTreeButton = new JButton("Show Huffman Tree");
-        showHuffmanTreeButton.setPreferredSize(new Dimension(186, 30));
-        showHuffmanTreeButton.setFocusPainted(false);
-        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
 
+        setOutputPanelComponentButtonProperties();
         initializeOutputTables();
         initializeFields();
 
@@ -319,6 +317,24 @@ public class HuffmanWindow {
         gbc.gridwidth = 2;
         gbc.gridx = 4;
         outputPanel.add(noLossField, gbc);
+    }
+
+    private void setOutputPanelComponentButtonProperties() {
+        outputLabel = new JLabel("  Output");
+        outputLabel.setFont(new Font("Calibri", Font.BOLD, 18));
+        showDecodedTextButton = new JButton("Show Decoded Text");
+        showDecodedTextButton.setPreferredSize(new Dimension(186, 30));
+        showDecodedTextButton.setFocusPainted(false);
+        showDecodedTextButton.addActionListener((e) -> {
+            try { showDecodedText(); } catch (Exception e1) {
+                JOptionPane.showMessageDialog(frame, "Convert text first",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        showHuffmanTreeButton = new JButton("Show Huffman Tree");
+        showHuffmanTreeButton.setPreferredSize(new Dimension(186, 30));
+        showHuffmanTreeButton.setFocusPainted(false);
+        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
     }
 
     private void initializeOutputTables() {
@@ -391,51 +407,56 @@ public class HuffmanWindow {
         scrollPane.setVisible(true);
     }
 
-    // Temporary
-    private void doTheMagic(String text) {
-        Huffman h = new Huffman();
-        HuffmanCodec t = new HuffmanCodec(h);
-        h.setText(text);
-        h.generateTree();
-        this.root = h.getRoot();
+    private void commenceHuffmanProcesses(String text) {
+        huffman = new Huffman();
+        huffmanCodec = new HuffmanCodec(huffman);
+        huffman.setText(text);
+        huffman.generateTree();
+        huffmanCodec.buildHuffmanCode();
 
+        String encoded = huffmanCodec.encode();
+        String decodedText = huffmanCodec.decode();
+        float origSize = huffman.getText().length() * 7;
+        float compressedSize = encoded.length();
+        float compressionRate = ((compressedSize - origSize) / origSize) * 100;
+
+        printConsoleOutput(encoded, decodedText, origSize, compressedSize, compressionRate);
+        setGUIProperties(encoded, decodedText, origSize, compressedSize, compressionRate);
+    }
+
+    private void printConsoleOutput(String encoded, String decodedText, float origSize,
+                                    float compressedSize, float compressionRate) {
         System.out.println("=============================================================");
         System.out.println("Frequency Values");
-        System.out.println(h.toString());
+        System.out.println(huffman.toString());
 
-        t.buildHuffmanCode();
+        System.out.println(huffmanCodec.toString());
 
-        System.out.println(t.toString());
-
-        String encoded = t.encode();
-        String decoded = t.decode();
         System.out.println("=============================================================");
         System.out.print("Encoded Text: ");
         System.out.println(encoded);
         System.out.print("Original Text: ");
-        System.out.println(h.getText());
+        System.out.println(huffman.getText());
         System.out.print("Decoded Text:  ");
-        System.out.println(decoded);
+        System.out.println(decodedText);
 
-        // ---- OUTPUT VALUES COMPUTATION ----
-        float origSize = h.getText().length() * 7;
-        float compressedSize = encoded.length();
-        float compressionRate = ((compressedSize - origSize) / origSize) * 100;
-
-        System.out.println("\nIs it the same as the original: " + (h.getText().equals(decoded)) );
+        System.out.println("\nIs it the same as the original: " + (huffman.getText().equals(decodedText)) );
         System.out.println("\nOriginal Size:    " + (int) origSize + " bits");
         System.out.println("Compressed Size:  " + (int) compressedSize + " bits");
         System.out.println("Compression Rate: " + -compressionRate + "%");
         System.out.println("=============================================================");
+    }
 
-        populateFreqValTable(h.returnFreqValuesAsTableArray());
-        populatePairCharCodeTable(t.returnPairCharCodeAsArr());
+    private void setGUIProperties(String encoded, String decodedText, float origSize,
+                                  float compressedSize, float compressionRate) {
+        populateFreqValTable(huffman.returnFreqValuesAsTableArray());
+        populatePairCharCodeTable(huffmanCodec.returnPairCharCodeAsArr());
 
         encodedOutputTextArea.setText(encoded);
         origSizeField.setText(" " + (int) origSize + " bits");
         compSizeField.setText(" " + (int) compressedSize + " bits");
         compRateField.setText(" " + (int) -compressionRate + "%");
-        noLossField.setText((" " + h.getText().equals(decoded)) + "");
+        noLossField.setText((" " + huffman.getText().equals(decodedText)) + "");
     }
 
     private void populateFreqValTable(String[][] arr) {
@@ -454,16 +475,52 @@ public class HuffmanWindow {
 
     private void showHuffmanTree() {
         try {
-            TreeVisualizerWindow w = new TreeVisualizerWindow(root, backgroundColor, accentColor, buttonForeground);
+            TreeVisualizerWindow w = new TreeVisualizerWindow(huffman.getRoot(), backgroundColor, accentColor, buttonForeground);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Convert text first!",
+            JOptionPane.showMessageDialog(frame, "Convert text first",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void showDecodedTextButton(){
+    private void showDecodedText(){
+        decodedTextFrame = new JFrame("Decoded Text: ");
+        decodedTextLabel = new JLabel("Decoded Text: ");
+        decodedTextArea = new JTextArea(huffmanCodec.decode());
+        decodedTextScrollPane = new JScrollPane(decodedTextArea);
 
-    } // PUT CODE HERE
+        setDecodedFrameComponentProperties();
+
+        gbc = new GridBagConstraints();
+        gbc.insets = new Insets(3,3,3,3);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = gbc.weighty = 1;
+        gbc.gridx = gbc.gridy = 0;
+
+        decodedTextFrame.add(decodedTextLabel, gbc);
+        gbc.gridy++;
+        decodedTextFrame.add(decodedTextScrollPane, gbc);
+
+        decodedTextFrame.setMinimumSize(new Dimension(377,611));
+        decodedTextFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        decodedTextFrame.setLocationRelativeTo(null);
+        decodedTextFrame.setResizable(true);
+        decodedTextFrame.setVisible(true);
+    }
+
+    private void setDecodedFrameComponentProperties() {
+        decodedTextFrame.setLayout(new GridBagLayout());
+
+        decodedTextLabel.setFont(new Font("Calibri", Font.BOLD, 18));
+        decodedTextLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+        decodedTextArea.setMargin(new Insets(4,4,4,4));
+        decodedTextArea.setFont(new Font("", Font.PLAIN, 14));
+        decodedTextArea.setLineWrap(true);
+        decodedTextArea.setWrapStyleWord(true);
+        decodedTextArea.setEditable(false);
+        decodedTextScrollPane.setPreferredSize(new Dimension(0, 511));
+        decodedTextScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    }
 
     private void setTheme(String theme) {
         if (theme.equalsIgnoreCase("Light")) setWhiteThemeProperties();
