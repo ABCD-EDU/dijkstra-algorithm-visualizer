@@ -528,15 +528,16 @@ public class HuffmanWindow {
         else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
         else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
         else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
-        else if (theme.equalsIgnoreCase("Halloween")) setHalloweenThemeProperties();
         else if (theme.equalsIgnoreCase("Olive")) setOliveThemeProperties();
+        else if (theme.equalsIgnoreCase("Halloween")) setHalloweenThemeProperties();
 
         UIManager.put("OptionPane.background", accentColor);
         UIManager.put("Panel.background", accentColor);
         UIManager.put("OptionPane.messageForeground", buttonForeground);
         UIManager.put("Button.background", backgroundColor);
-        UIManager.put("Button.foreground", headerForeground);
-        UIManager.put("Button.select", headerColor);
+        UIManager.put("Button.foreground", backgroundForeground);
+        UIManager.put("Button.select", backgroundColor);
+        UIManager.put("Button.border", BorderFactory.createEmptyBorder(4,8,4,8));
         UIManager.put("Button.focus", backgroundColor);
 
         setBackgrounds();
@@ -634,7 +635,7 @@ public class HuffmanWindow {
         headerColor = new Color(0x222222);
         mainFieldColor = new Color(0xFFFFFF);
         uneditableFieldColor = new Color(0xECECEC);
-        accentColor = new Color(0x40798C);
+        accentColor = new Color(0x222222);
 
         backgroundForeground = Color.BLACK;
         headerForeground = Color.WHITE;
@@ -647,12 +648,12 @@ public class HuffmanWindow {
         headerColor = new Color(0x000000);
         mainFieldColor = new Color(0x666666);
         uneditableFieldColor = new Color(0x4A4A4A);
-        accentColor = new Color(0xCCCCCC);
+        accentColor = new Color(0x000000);
 
         backgroundForeground = Color.WHITE;
         headerForeground = Color.WHITE;
         fieldForeground = Color.WHITE;
-        buttonForeground = Color.BLACK;
+        buttonForeground = Color.WHITE;
     }
 
     private void setSLUThemeProperties() {
@@ -660,7 +661,7 @@ public class HuffmanWindow {
         headerColor = new Color(0x0D3B66);
         mainFieldColor = new Color(0xFFFFFF);
         uneditableFieldColor = new Color(0xFAF0CA);
-        accentColor = new Color(0x333333);
+        accentColor = new Color(0x0D3B66);
 
         backgroundForeground = Color.BLACK;
         headerForeground = Color.WHITE;
