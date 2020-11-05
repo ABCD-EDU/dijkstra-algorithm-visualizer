@@ -1,9 +1,9 @@
 package main.midlab2.group4.lab.util;
 
 public interface Stack<T> {
-    int size(); /* returns the size of the stack */
+    int size();
 
-    boolean isEmpty(); /* checks if empty */
+    boolean isEmpty();
 
     T pop() throws StackException;
 
@@ -12,8 +12,4 @@ public interface Stack<T> {
     T peek() throws StackException;
 
     void clear();
-
-//    void sort();
-
-//    int search(T item); /* return the location of T*/
 }

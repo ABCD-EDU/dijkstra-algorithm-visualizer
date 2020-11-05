@@ -1,13 +1,5 @@
 package main.midlab2.group4.lab.activities.huffman.codec;
 
-/**
- * This class can only be used if the given Huffman Tree using {@link Huffman} class has a string
- * already set. In order to use the codec, build the huffman code first using the {@code buildHuffmanCode()}
- * method then encode (using encode()) to get the compressed bits then decode (using decode())
- * to get the decoded message.
- * <p>
- * {@link Huffman}
- */
 public class HuffmanCodec {
     private String original;
     private String encoded;
@@ -33,33 +25,18 @@ public class HuffmanCodec {
         buildCode(huffman.getRoot(), code);
     }
 
-    /**
-     * Works just like the three common BST Traversals using recursion or the implemented search method in {@link main.midlab2.group4.lab.util.BinaryTree}
-     * <p>
-     * NOTE: this is a helper class
-     *
-     * @param node current node
-     * @param code bits
-     * @see main.midlab2.group4.lab.util.BinaryTree
-     */
     private void buildCode(TreeNode node, String code) {
         if (node != null) {
             if (!node.isLeaf()) {
-                buildCode(node.left, code + '0');  // left is 0
-                buildCode(node.right, code + '1'); // right is 1
-            } else { // if we've reached the character, insert the code to the dictionary
+                buildCode(node.left, code + '0');
+                buildCode(node.right, code + '1');
+            } else {
                 pairCharCode.put(node.letter, code);
                 pairCodeChar.put(code, node.letter);
             }
         }
     }
 
-    /**
-     * For each letter in the original string, insert the corresponding code into the {@code encoded} string.
-     * Repeat until the last character of the original string.
-     *
-     * @return encoded bits
-     */
     public String encode() {
         if (huffman.getText().isBlank() || huffman.getRoot() == null) throw new NullPointerException();
 
@@ -73,12 +50,6 @@ public class HuffmanCodec {
         return encoded;
     }
 
-    /**
-     * Add one bit at a time into the temporary variable until the temp matches a code from the dictionary.
-     * If it matches something, empty the temporary string and repeat the process.
-     *
-     * @return decoded string
-     */
     public String decode() {
         if (huffman.getText().isBlank() || huffman.getRoot() == null || encoded.isBlank())
             throw new NullPointerException();
@@ -96,11 +67,6 @@ public class HuffmanCodec {
         return decoded;
     }
 
-    /**
-     * Modify this if you want to print the values in a table format
-     *
-     * @return formatted values
-     */
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();

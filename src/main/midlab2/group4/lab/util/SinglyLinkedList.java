@@ -86,30 +86,12 @@ public class SinglyLinkedList<T> implements Stack<T> {
         numElements = 0;
     }
 
-    // temporarily removed due to conflicts with the interfaces TODO: fix
-//    @Override
-//    public int search(T item) {
-//        int pos = 0;
-//        for (Node<T> c = top; c != null; c = c.link) {
-//            if (c.info.equals(item))
-//                return pos;
-//            pos++;
-//        }
-//        return -1;
-//    }
-
-    /**
-     * This toString method returns top, top.next, ... , last item
-     * basically, 10,9,8,...,0 not 0,1,2,..,10
-     *
-     * @return string for
-     */
     @SuppressWarnings("unchecked")
     public String toString() {
         if (this.numElements == 0) return "";
         if (this.numElements == 1) return top.info.toString();
 
-        T[] symbolsArray = (T[])new Object[numElements];
+        T[] symbolsArray = (T[]) new Object[numElements];
         StringBuilder toReturn = new StringBuilder();
 
         // input values in array
@@ -117,7 +99,7 @@ public class SinglyLinkedList<T> implements Stack<T> {
         for (Node<T> s = top; s != null; s = s.link, i++)
             symbolsArray[i] = s.info;
         // append to string in reverse order of array
-        for (int j = symbolsArray.length-1; j > 0; j--)
+        for (int j = symbolsArray.length - 1; j > 0; j--)
             toReturn.append(symbolsArray[j].toString()).append(", ");
         toReturn.append(symbolsArray[0]); // to prevent tailing comma
 

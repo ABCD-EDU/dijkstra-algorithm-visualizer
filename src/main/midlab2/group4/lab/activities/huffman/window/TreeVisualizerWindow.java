@@ -81,11 +81,10 @@ public class TreeVisualizerWindow {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
                                     coordinate.key + (xRad / 2) - 11, coordinate.val + (yRad / 2) + 3);
                         }
-//                        System.out.println("Drawing " + i + "|" + j + " at: " + coordinate.key + ", " + coordinate.val);
                     }
                 }
             }
-        }// End of paintCircles
+        }
 
         private void paintLines(Graphics g) {
             g.translate(xRad / 2, yRad / 2);
@@ -96,7 +95,7 @@ public class TreeVisualizerWindow {
             }
         }
 
-    }// End of TreeCanvas
+    }
 
     // ------------------ Helper Methods -----------------
 
@@ -157,9 +156,6 @@ public class TreeVisualizerWindow {
         return toReturn;
     }
 
-    /**
-     * Passed TreeNode must be a complete binary tree
-     */
     private List<List<GUITreeNode>> parseLevels(List<GUITreeNode> nodes1dArr) {
         List<List<GUITreeNode>> nodes2dArr = new ArrayList<>();
         List<Integer> nodesPerLevel = computeNumOfNodesPerLevel(nodes1dArr);
@@ -212,7 +208,6 @@ public class TreeVisualizerWindow {
     static void insert(TreeNode temp, TreeNode newNode) {
         Queue<TreeNode> q = new DoublyLinkedList<>();
         q.enqueue(temp);
-        // Do level order traversal until we find an empty place.
         while (!q.isEmpty()) {
             temp = q.peek();
             q.dequeue();
@@ -252,25 +247,4 @@ public class TreeVisualizerWindow {
         }
         return d;
     }
-
-    //Do not execute: for debugging purposes only
-    public static void main(String[] args) {
-
-        TreeNode tree = new TreeNode('\0', 0, null, null);
-        tree.left = new TreeNode('o', 1, null, null);
-        tree.right = new TreeNode('o', 2, null, null);
-        tree.left.left = new TreeNode('o', 3, null, null);
-        tree.left.right = new TreeNode('o', 4, null, null);
-        tree.left.left.left = new TreeNode('o', 5, null, null);
-        tree.left.left.left.left = new TreeNode('o', 6, null, null);
-        tree.left.left.left.left.left = new TreeNode('o', 7, null, null);
-//        tree.left.left.left.left.left.left = new TreeNode('o', 8, null, null);
-
-        try {
-            TreeVisualizerWindow w = new TreeVisualizerWindow(tree, Color.WHITE, Color.BLACK, Color.WHITE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-}// End of TreeVisualizerWindow
+}

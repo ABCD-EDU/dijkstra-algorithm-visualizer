@@ -5,12 +5,6 @@ import main.midlab2.group4.lab.util.List;
 
 import java.util.NoSuchElementException;
 
-/**
- * Custom struct for the huffman coding project. Based on the Dictionary in python or Map in java.
- *
- * @param <K> key
- * @param <V> value
- */
 public class Dictionary<K, V> {
 
     List<Node<K, V>> elements;

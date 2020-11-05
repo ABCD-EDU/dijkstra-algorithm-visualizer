@@ -1,6 +1,5 @@
 package main.midlab2.group4.lab.util;
 
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class DoublyLinkedList<E>
@@ -209,17 +208,5 @@ public class DoublyLinkedList<E>
             }
             size--;
         }
-    }
-
-    public static void main(String[] args) {
-        Queue<Integer> q = new DoublyLinkedList<>();
-
-        q.enqueue(10);
-        q.enqueue(20);
-        q.enqueue(30);
-
-        System.out.println(q.dequeue());
-        System.out.println(q.dequeue());
-        System.out.println(q.dequeue());
     }
 }

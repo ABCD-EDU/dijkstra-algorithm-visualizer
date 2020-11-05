@@ -470,7 +470,7 @@ public class HuffmanWindow {
 
     private void showHuffmanTree() {
         try {
-            TreeVisualizerWindow w = new TreeVisualizerWindow(huffman.getRoot(), backgroundColor, accentColor, buttonForeground);
+            new TreeVisualizerWindow(huffman.getRoot(), backgroundColor, accentColor, buttonForeground);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(frame, "Convert text first",
                     "Error", JOptionPane.ERROR_MESSAGE);
