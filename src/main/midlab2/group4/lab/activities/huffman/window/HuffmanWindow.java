@@ -479,7 +479,9 @@ public class HuffmanWindow {
 
     private void showDecodedText() {
         decodedTextFrame = new JFrame("Decoded Text: ");
-        decodedTextLabel = new JLabel("Decoded Text: ");
+        decodedTextFrame.getContentPane().setBackground(backgroundColor);
+        decodedTextLabel = new JLabel("Decoded Text", SwingConstants.CENTER);
+        decodedTextLabel.setForeground(backgroundForeground);
         decodedTextArea = new JTextArea(huffmanCodec.decode());
         decodedTextScrollPane = new JScrollPane(decodedTextArea);
 
