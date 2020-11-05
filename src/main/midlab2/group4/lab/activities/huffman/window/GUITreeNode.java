@@ -1,4 +1,4 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.window;
 
 public class GUITreeNode {
 

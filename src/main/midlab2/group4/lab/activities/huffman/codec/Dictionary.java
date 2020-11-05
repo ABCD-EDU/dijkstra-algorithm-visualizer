@@ -1,4 +1,4 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.codec;
 
 import main.midlab2.group4.lab.util.ArrayList;
 import main.midlab2.group4.lab.util.List;
@@ -16,10 +16,10 @@ public class Dictionary<K, V> {
     List<Node<K, V>> elements;
 
     public static class Node<K, V> {
-        K key;
-        V val;
+        public K key;
+        public V val;
 
-        Node(K k, V v) {
+        public Node(K k, V v) {
             key = k;
             val = v;
         }
@@ -29,7 +29,7 @@ public class Dictionary<K, V> {
         }
     }
 
-    Dictionary() {
+    public Dictionary() {
         elements = new ArrayList<>();
     }
 

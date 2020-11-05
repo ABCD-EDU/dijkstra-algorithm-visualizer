@@ -1,5 +1,7 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.window;
 
+import main.midlab2.group4.lab.activities.huffman.codec.Dictionary;
+import main.midlab2.group4.lab.activities.huffman.codec.TreeNode;
 import main.midlab2.group4.lab.util.ArrayList;
 import main.midlab2.group4.lab.util.DoublyLinkedList;
 import main.midlab2.group4.lab.util.List;

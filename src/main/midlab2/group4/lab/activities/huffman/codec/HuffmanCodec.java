@@ -1,4 +1,4 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.codec;
 
 /**
  * This class can only be used if the given Huffman Tree using {@link Huffman} class has a string
