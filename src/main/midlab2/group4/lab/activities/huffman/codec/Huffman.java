@@ -1,4 +1,4 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.codec;
 
 import main.midlab2.group4.lab.util.MinPriorityQueue;
 import main.midlab2.group4.lab.util.Queue;
@@ -15,14 +15,6 @@ public class Huffman {
     private TreeNode root;
     private String text;
 
-    /**
-     * Step by step process for the huffman code
-     * <p>1. Count the frequency of each character and put it into a dictionary</p>
-     * <p>2. Create the nodes based on minheap using the {@link MinPriorityQueue}</p>
-     * <p>3. Generate the tree by using the huffman coding algorithm</p>
-     * <p>4. Encode the bits for each character</p>
-     * <p>5. Decode the encoded bits for each character</p>
-     */
     public Huffman() {
         text = "";
         pairCharWeight = new Dictionary<>();
@@ -61,12 +53,6 @@ public class Huffman {
         return text;
     }
 
-    /**
-     * Put's all of the characters and its count to a dictionary of char:weight
-     *
-     * @param text to parse
-     * @return dictionary of the character and its frequency
-     */
     private Dictionary<Character, Integer> countLetters(String text) {
         Dictionary<Character, Integer> pairCW = new Dictionary<>();
 
@@ -84,28 +70,20 @@ public class Huffman {
         return pairCW;
     }
 
-    /**
-     * Generation of the huffman tree is based on using the minheap queue in order to generate the nodes.
-     * It works similar with the Infix to Postfix conversion where you pop two items and add their weights
-     * to make a new parent node. Reinsert the node to the queue then repeat the process.
-     *
-     * @param nQ nodes to process
-     * @see <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman Coding</a>
-     */
     private void generateTree(Queue<TreeNode> nQ) {
         TreeNode left, right;
         while (!nQ.isEmpty()) {
             left = nQ.dequeue();
-            if (nQ.peek() != null) { // if we can still insert a node on both left and right side of tree
+            if (nQ.peek() != null) {
                 right = nQ.dequeue();
                 root = new TreeNode('\0', left.weight + right.weight, left, right);
-            } else { // no node left to dequeue
+            } else {
                 root = new TreeNode('\0', left.weight, left, null);
             }
 
             if (nQ.peek() != null) {
                 nQ.enqueue(root);
-            } else { // queue is empty
+            } else {
                 break;
             }
         }
@@ -121,12 +99,6 @@ public class Huffman {
         return nodes;
     }
 
-    /**
-     * This is used for a smaller format or for testing
-     * TODO: REMOVE THIS IN THE FINAL OUTPUT
-     *
-     * @return string
-     */
     public String getPairs() {
         StringBuilder pairs = new StringBuilder();
         for (int i = 0; i < pairCharWeight.size(); i++) {
@@ -136,15 +108,9 @@ public class Huffman {
         return pairs.toString();
     }
 
-    /**
-     * Modify this if you want to print the values in a table format
-     *
-     * @return formatted values
-     */
     @Override
     public String toString() {
         StringBuilder text = new StringBuilder();
-//        text.append(String.format("%-30s%-30s%n", "Character", "Weight")); // -- for the table format
         for (int i = 0; i < pairCharWeight.size(); i++) {
             text.append(pairCharWeight.getAt(i).toString());
         }

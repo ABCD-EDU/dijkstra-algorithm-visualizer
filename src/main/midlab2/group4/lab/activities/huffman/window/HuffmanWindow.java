@@ -1,4 +1,7 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.window;
+
+import main.midlab2.group4.lab.activities.huffman.codec.Huffman;
+import main.midlab2.group4.lab.activities.huffman.codec.HuffmanCodec;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,10 +14,9 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Arrays;
 
 public class HuffmanWindow {
-    private final String INITIAL_THEME = "Light";
-
     private final JFrame frame = new JFrame();
     private final JPanel mainPanel = new JPanel();
     private final JMenuBar menuBar = new JMenuBar();
@@ -27,7 +29,6 @@ public class HuffmanWindow {
     private JScrollPane textAreaScrollPane;
     private JButton textConvertButton;
     private JButton importFromTextFile;
-    private File textFile;
 
     private JPanel outputPanel;
     private JLabel outputLabel;
@@ -53,26 +54,36 @@ public class HuffmanWindow {
     private JLabel noLossLabel;
     private JTextField noLossField;
 
+    private JFrame decodedTextFrame;
+    private JLabel decodedTextLabel;
+    private JTextArea decodedTextArea;
+    private JScrollPane decodedTextScrollPane;
+
     private Color backgroundColor, headerColor, mainFieldColor, uneditableFieldColor, accentColor;
     private Color backgroundForeground, fieldForeground, buttonForeground, headerForeground;
 
-    private TreeNode root;
+    private File textFile;
+    private Huffman huffman;
+    private HuffmanCodec huffmanCodec;
 
     private GridBagConstraints gbc;
 
     public HuffmanWindow() {
         frame.setTitle("Huffman Coding");
-        frame.setIconImage(new ImageIcon("asset/Tree.png").getImage());
+        frame.setIconImage(new ImageIcon("src/main/midlab2/group4/lab/activities/huffman/asset/Tree.png").getImage());
 
         setMenuBar();
         setMainPanel();
+        String INITIAL_THEME = "Light";
         setTheme(INITIAL_THEME);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        frame.setVisible(true);
         frame.pack();
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation((d.width / 2) - frame.getWidth() / 2, (d.height / 2) - frame.getHeight() / 2);
+        frame.revalidate();
+        frame.setVisible(true);
     }
 
     private void setMenuBar() {
@@ -171,7 +182,7 @@ public class HuffmanWindow {
         setInputPanelComponentProperties();
 
         gbc = new GridBagConstraints();
-        gbc.insets = new Insets(3,3,3,3);
+        gbc.insets = new Insets(3, 3, 3, 3);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = gbc.weighty = 1;
         gbc.gridx = gbc.gridy = 0;
@@ -184,19 +195,13 @@ public class HuffmanWindow {
         gbc.gridy = 1;
         gbc.gridwidth = 3;
         inputPanel.add(textAreaScrollPane, gbc);
-        gbc.insets = new Insets(5,4,3,4);
+        gbc.insets = new Insets(5, 4, 3, 4);
         gbc.gridy = 2;
         inputPanel.add(textConvertButton, gbc);
     }
 
     private void setInputPanelComponentProperties() {
-        inputTextLabel.setFont(new Font("Calibri", Font.BOLD, 18));
-        inputTextLabel.setVerticalAlignment(SwingConstants.CENTER);
-
-        inputTextArea.setMargin(new Insets(4,4,4,4));
-        inputTextArea.setFont(new Font("", Font.PLAIN, 14));
-        inputTextArea.setLineWrap(true);
-        inputTextArea.setWrapStyleWord(true);
+        modifyDecodedField(inputTextLabel, inputTextArea);
         textAreaScrollPane.setPreferredSize(new Dimension(0, 511));
 
         importFromTextFile.setPreferredSize(new Dimension(importFromTextFile.getPreferredSize().width, 30));
@@ -206,12 +211,12 @@ public class HuffmanWindow {
         textConvertButton.setPreferredSize(new Dimension(textConvertButton.getPreferredSize().width, 30));
         textConvertButton.setFocusPainted(false);
         textConvertButton.addActionListener((e) -> {
-            if (inputTextArea.getText().equals("")){
+            if (inputTextArea.getText().equals("")) {
                 JOptionPane.showMessageDialog(frame, "Text cannot be empty",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            doTheMagic(inputTextArea.getText());
+            commenceHuffmanProcesses(inputTextArea.getText());
         });
     }
 
@@ -242,7 +247,7 @@ public class HuffmanWindow {
                 line = reader.readLine();
             }
             content = string.toString();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         inputTextArea.setText(content);
@@ -250,26 +255,17 @@ public class HuffmanWindow {
 
     private void initializeOutputPanel() {
         outputPanel = new JPanel(new GridBagLayout());
-        outputPanel.setBorder(new EmptyBorder(10,2,10,10));
-        outputLabel = new JLabel("  Output");
-        outputLabel.setFont(new Font("Calibri", Font.BOLD, 18));
-        showDecodedTextButton = new JButton("Show Decoded Text");
-        showDecodedTextButton.setPreferredSize(new Dimension(186, 30));
-        showDecodedTextButton.setFocusPainted(false);
-        showDecodedTextButton.addActionListener((e) -> showDecodedTextButton());
+        outputPanel.setBorder(new EmptyBorder(10, 2, 10, 10));
         JLabel spacing = new JLabel();
         spacing.setPreferredSize(new Dimension(170, 30));
-        showHuffmanTreeButton = new JButton("Show Huffman Tree");
-        showHuffmanTreeButton.setPreferredSize(new Dimension(186, 30));
-        showHuffmanTreeButton.setFocusPainted(false);
-        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
 
+        setOutputPanelComponentButtonProperties();
         initializeOutputTables();
         initializeFields();
 
         gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(3,3,3,3);
+        gbc.insets = new Insets(3, 3, 3, 3);
         gbc.weightx = gbc.weighty = 1;
         gbc.gridwidth = 3;
         outputPanel.add(outputLabel, gbc);
@@ -296,29 +292,44 @@ public class HuffmanWindow {
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 3;
-        outputPanel.add(origSizeLabel, gbc);
-        gbc.gridwidth = 2;
-        gbc.gridx = 1;
-        outputPanel.add(origSizeField ,gbc);
-        gbc.gridwidth = 1;
-        gbc.gridx = 3;
-        outputPanel.add(compRateLabel, gbc);
-        gbc.gridwidth = 2;
-        gbc.gridx = 4;
-        outputPanel.add(compRateField, gbc);
+        modifyLabel(origSizeLabel, origSizeField, compRateLabel, compRateField);
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 4;
-        outputPanel.add(compSizeLabel, gbc);
+        modifyLabel(compSizeLabel, compSizeField, noLossLabel, noLossField);
+    }
+
+    private void modifyLabel(JLabel xLabel, JTextField xField, JLabel yLabel, JTextField yField) {
+        outputPanel.add(xLabel, gbc);
         gbc.gridwidth = 2;
         gbc.gridx = 1;
-        outputPanel.add(compSizeField, gbc);
+        outputPanel.add(xField, gbc);
         gbc.gridwidth = 1;
         gbc.gridx = 3;
-        outputPanel.add(noLossLabel, gbc);
+        outputPanel.add(yLabel, gbc);
         gbc.gridwidth = 2;
         gbc.gridx = 4;
-        outputPanel.add(noLossField, gbc);
+        outputPanel.add(yField, gbc);
+    }
+
+    private void setOutputPanelComponentButtonProperties() {
+        outputLabel = new JLabel("  Output");
+        outputLabel.setFont(new Font("Calibri", Font.BOLD, 18));
+        showDecodedTextButton = new JButton("Show Decoded Text");
+        showDecodedTextButton.setPreferredSize(new Dimension(186, 30));
+        showDecodedTextButton.setFocusPainted(false);
+        showDecodedTextButton.addActionListener((e) -> {
+            try {
+                showDecodedText();
+            } catch (Exception e1) {
+                JOptionPane.showMessageDialog(frame, "Convert text first",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        showHuffmanTreeButton = new JButton("Show Huffman Tree");
+        showHuffmanTreeButton.setPreferredSize(new Dimension(186, 30));
+        showHuffmanTreeButton.setFocusPainted(false);
+        showHuffmanTreeButton.addActionListener((e) -> showHuffmanTree());
     }
 
     private void initializeOutputTables() {
@@ -326,21 +337,21 @@ public class HuffmanWindow {
         frequencyTable = new JTable(freqTableDefTabMod);
         freqTableScrollPane = new JScrollPane(frequencyTable);
         initializeTable(frequencyTable, freqTableDefTabMod, new String[]{"Character", "Frequency"},
-                new int[]{50,50},freqTableScrollPane);
+                new int[]{50, 50}, freqTableScrollPane);
 
         codeTableDefTabMod = new DefaultTableModel();
         codeTable = new JTable(codeTableDefTabMod);
         codeTableScrollPane = new JScrollPane(codeTable);
         initializeTable(codeTable, codeTableDefTabMod, new String[]{"Character", "Code", "Bits"},
-                new int[]{50,50,50}, codeTableScrollPane);
+                new int[]{50, 50, 50}, codeTableScrollPane);
     }
 
     private void initializeFields() {
         encodedLabel = new JLabel("  Encoded:");
-        encodedOutputTextArea = new JTextArea(3,50);
+        encodedOutputTextArea = new JTextArea(3, 50);
         encodedOutputTextArea.setEditable(false);
         encodedOutputTextArea.setFont(new Font("", Font.PLAIN, 14));
-        encodedOutputTextArea.setMargin(new Insets(2,2,2,2));
+        encodedOutputTextArea.setMargin(new Insets(2, 2, 2, 2));
         encodedOutputTextArea.setLineWrap(true);
         encodedOutputTextArea.setWrapStyleWord(true);
         encodedOutputTextScrollPane = new JScrollPane(encodedOutputTextArea);
@@ -391,51 +402,56 @@ public class HuffmanWindow {
         scrollPane.setVisible(true);
     }
 
-    // Temporary
-    private void doTheMagic(String text) {
-        Huffman h = new Huffman();
-        HuffmanCodec t = new HuffmanCodec(h);
-        h.setText(text);
-        h.generateTree();
-        this.root = h.getRoot();
+    private void commenceHuffmanProcesses(String text) {
+        huffman = new Huffman();
+        huffmanCodec = new HuffmanCodec(huffman);
+        huffman.setText(text);
+        huffman.generateTree();
+        huffmanCodec.buildHuffmanCode();
 
+        String encoded = huffmanCodec.encode();
+        String decodedText = huffmanCodec.decode();
+        float origSize = huffman.getText().length() * 8;
+        float compressedSize = encoded.length();
+        float compressionRate = ((compressedSize - origSize) / origSize) * 100;
+
+        printConsoleOutput(encoded, decodedText, origSize, compressedSize, compressionRate);
+        setGUIProperties(encoded, decodedText, origSize, compressedSize, compressionRate);
+    }
+
+    private void printConsoleOutput(String encoded, String decodedText, float origSize,
+                                    float compressedSize, float compressionRate) {
         System.out.println("=============================================================");
         System.out.println("Frequency Values");
-        System.out.println(h.toString());
+        System.out.println(huffman.toString());
 
-        t.buildHuffmanCode();
+        System.out.println(huffmanCodec.toString());
 
-        System.out.println(t.toString());
-
-        String encoded = t.encode();
-        String decoded = t.decode();
         System.out.println("=============================================================");
         System.out.print("Encoded Text: ");
         System.out.println(encoded);
         System.out.print("Original Text: ");
-        System.out.println(h.getText());
+        System.out.println(huffman.getText());
         System.out.print("Decoded Text:  ");
-        System.out.println(decoded);
+        System.out.println(decodedText);
 
-        // ---- OUTPUT VALUES COMPUTATION ----
-        float origSize = h.getText().length() * 7;
-        float compressedSize = encoded.length();
-        float compressionRate = ((compressedSize - origSize) / origSize) * 100;
-
-        System.out.println("\nIs it the same as the original: " + (h.getText().equals(decoded)) );
+        System.out.println("\nIs it the same as the original: " + (huffman.getText().equals(decodedText)));
         System.out.println("\nOriginal Size:    " + (int) origSize + " bits");
         System.out.println("Compressed Size:  " + (int) compressedSize + " bits");
         System.out.println("Compression Rate: " + -compressionRate + "%");
         System.out.println("=============================================================");
+    }
 
-        populateFreqValTable(h.returnFreqValuesAsTableArray());
-        populatePairCharCodeTable(t.returnPairCharCodeAsArr());
+    private void setGUIProperties(String encoded, String decodedText, float origSize,
+                                  float compressedSize, float compressionRate) {
+        populateFreqValTable(huffman.returnFreqValuesAsTableArray());
+        populatePairCharCodeTable(huffmanCodec.returnPairCharCodeAsArr());
 
         encodedOutputTextArea.setText(encoded);
         origSizeField.setText(" " + (int) origSize + " bits");
         compSizeField.setText(" " + (int) compressedSize + " bits");
         compRateField.setText(" " + (int) -compressionRate + "%");
-        noLossField.setText((" " + h.getText().equals(decoded)) + "");
+        noLossField.setText((" " + huffman.getText().equals(decodedText)) + "");
     }
 
     private void populateFreqValTable(String[][] arr) {
@@ -447,23 +463,65 @@ public class HuffmanWindow {
 
     private void populatePairCharCodeTable(String[][] arr) {
         codeTableDefTabMod.setRowCount(0);
-        for(String[] row : arr) {
+        for (String[] row : arr) {
             codeTableDefTabMod.addRow(row);
         }
     }
 
     private void showHuffmanTree() {
         try {
-            TreeVisualizerWindow w = new TreeVisualizerWindow(root, backgroundColor, accentColor, buttonForeground);
+            new TreeVisualizerWindow(huffman.getRoot(), backgroundColor, accentColor, buttonForeground);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Convert text first!",
+            JOptionPane.showMessageDialog(frame, "Convert text first",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void showDecodedTextButton(){
+    private void showDecodedText() {
+        decodedTextFrame = new JFrame("Decoded Text: ");
+        decodedTextFrame.getContentPane().setBackground(backgroundColor);
+        decodedTextLabel = new JLabel("Decoded Text", SwingConstants.CENTER);
+        decodedTextLabel.setForeground(backgroundForeground);
+        decodedTextArea = new JTextArea(huffmanCodec.decode());
+        decodedTextScrollPane = new JScrollPane(decodedTextArea);
 
-    } // PUT CODE HERE
+        setDecodedFrameComponentProperties();
+
+        gbc = new GridBagConstraints();
+        gbc.insets = new Insets(3, 3, 3, 3);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = gbc.weighty = 1;
+        gbc.gridx = gbc.gridy = 0;
+
+        decodedTextFrame.add(decodedTextLabel, gbc);
+        gbc.gridy++;
+        decodedTextFrame.add(decodedTextScrollPane, gbc);
+
+        decodedTextFrame.setMinimumSize(new Dimension(377, 611));
+        decodedTextFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        decodedTextFrame.setLocationRelativeTo(null);
+        decodedTextFrame.setResizable(true);
+        decodedTextFrame.setVisible(true);
+    }
+
+    private void setDecodedFrameComponentProperties() {
+        decodedTextFrame.setLayout(new GridBagLayout());
+
+        modifyDecodedField(decodedTextLabel, decodedTextArea);
+        decodedTextArea.setEditable(false);
+        decodedTextScrollPane.setPreferredSize(new Dimension(0, 511));
+        decodedTextScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    }
+
+    private void modifyDecodedField(JLabel decodedTextLabel, JTextArea decodedTextArea) {
+        decodedTextLabel.setFont(new Font("Calibri", Font.BOLD, 18));
+        decodedTextLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+        decodedTextArea.setMargin(new Insets(4, 4, 4, 4));
+        decodedTextArea.setFont(new Font("", Font.PLAIN, 14));
+        decodedTextArea.setLineWrap(true);
+        decodedTextArea.setWrapStyleWord(true);
+    }
 
     private void setTheme(String theme) {
         if (theme.equalsIgnoreCase("Light")) setWhiteThemeProperties();
@@ -472,15 +530,16 @@ public class HuffmanWindow {
         else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
         else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
         else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
-        else if (theme.equalsIgnoreCase("Halloween")) setHalloweenThemeProperties();
         else if (theme.equalsIgnoreCase("Olive")) setOliveThemeProperties();
+        else if (theme.equalsIgnoreCase("Halloween")) setHalloweenThemeProperties();
 
         UIManager.put("OptionPane.background", accentColor);
         UIManager.put("Panel.background", accentColor);
         UIManager.put("OptionPane.messageForeground", buttonForeground);
         UIManager.put("Button.background", backgroundColor);
-        UIManager.put("Button.foreground", headerForeground);
-        UIManager.put("Button.select", headerColor);
+        UIManager.put("Button.foreground", backgroundForeground);
+        UIManager.put("Button.select", backgroundColor);
+        UIManager.put("Button.border", BorderFactory.createEmptyBorder(4,8,4,8));
         UIManager.put("Button.focus", backgroundColor);
 
         setBackgrounds();
@@ -505,30 +564,26 @@ public class HuffmanWindow {
     }
 
     private void setForegrounds() {
-        aboutSubMenu.setForeground(headerForeground);
-        themesSubMenu.setForeground(headerForeground);
+        for (JMenu jMenu : Arrays.asList(aboutSubMenu, themesSubMenu)) {
+            jMenu.setForeground(headerForeground);
+        }
 
         inputTextArea.setForeground(fieldForeground);
         frequencyTable.setForeground(fieldForeground);
         codeTable.setForeground(fieldForeground);
 
-        inputTextLabel.setForeground(backgroundForeground);
-        outputLabel.setForeground(backgroundForeground);
-        encodedLabel.setForeground(backgroundForeground);
-        origSizeLabel.setForeground(backgroundForeground);
-        compSizeLabel.setForeground(backgroundForeground);
-        compRateLabel.setForeground(backgroundForeground);
-        noLossLabel.setForeground(backgroundForeground);
+        for (JLabel jLabel : Arrays.asList(inputTextLabel, outputLabel, encodedLabel, origSizeLabel, compSizeLabel, compRateLabel, noLossLabel)) {
+            jLabel.setForeground(backgroundForeground);
+        }
 
         encodedOutputTextArea.setForeground(fieldForeground);
-        origSizeField.setForeground(fieldForeground);
-        compSizeField.setForeground(fieldForeground);
-        compRateField.setForeground(fieldForeground);
-        noLossField.setForeground(fieldForeground);
+        for (JTextField jTextField : Arrays.asList(origSizeField, compSizeField, compRateField, noLossField)) {
+            jTextField.setForeground(fieldForeground);
+        }
     }
 
     private void setBorders() {
-        inputPanel.setBorder(new EmptyBorder(10,10,10,2));
+        inputPanel.setBorder(new EmptyBorder(10, 10, 10, 2));
         textAreaScrollPane.setBorder(new LineBorder(backgroundColor));
 
         freqTableScrollPane.setBorder(new LineBorder(backgroundColor));
@@ -544,20 +599,19 @@ public class HuffmanWindow {
     }
 
     private void setTableColors() {
-        frequencyTable.getTableHeader().setPreferredSize(new Dimension(1, 24));
-        frequencyTable.getTableHeader().setFont(new Font("", Font.BOLD, 12));
-        frequencyTable.setBackground(mainFieldColor);
-        frequencyTable.getTableHeader().setBackground(headerColor);
-        frequencyTable.getTableHeader().setForeground(headerForeground);
-        freqTableScrollPane.setBackground(headerColor);
+        modifyTableHeaders(frequencyTable, freqTableScrollPane);
 
-        codeTable.getTableHeader().setPreferredSize(new Dimension(1, 24));
-        codeTable.getTableHeader().setFont(new Font("", Font.BOLD, 12));
-        codeTable.setBackground(mainFieldColor);
-        codeTable.getTableHeader().setBackground(headerColor);
-        codeTable.getTableHeader().setForeground(headerForeground);
-        codeTableScrollPane.setBackground(headerColor);
+        modifyTableHeaders(codeTable, codeTableScrollPane);
 
+    }
+
+    private void modifyTableHeaders(JTable table, JScrollPane scrollPane) {
+        table.getTableHeader().setPreferredSize(new Dimension(1, 24));
+        table.getTableHeader().setFont(new Font("", Font.BOLD, 12));
+        table.setBackground(mainFieldColor);
+        table.getTableHeader().setBackground(headerColor);
+        table.getTableHeader().setForeground(headerForeground);
+        scrollPane.setBackground(headerColor);
     }
 
     private void setButtonColors() {
@@ -583,7 +637,7 @@ public class HuffmanWindow {
         headerColor = new Color(0x222222);
         mainFieldColor = new Color(0xFFFFFF);
         uneditableFieldColor = new Color(0xECECEC);
-        accentColor = new Color(0x40798C);
+        accentColor = new Color(0x222222);
 
         backgroundForeground = Color.BLACK;
         headerForeground = Color.WHITE;
@@ -596,12 +650,12 @@ public class HuffmanWindow {
         headerColor = new Color(0x000000);
         mainFieldColor = new Color(0x666666);
         uneditableFieldColor = new Color(0x4A4A4A);
-        accentColor = new Color(0xCCCCCC);
+        accentColor = new Color(0x000000);
 
         backgroundForeground = Color.WHITE;
         headerForeground = Color.WHITE;
         fieldForeground = Color.WHITE;
-        buttonForeground = Color.BLACK;
+        buttonForeground = Color.WHITE;
     }
 
     private void setSLUThemeProperties() {
@@ -609,7 +663,7 @@ public class HuffmanWindow {
         headerColor = new Color(0x0D3B66);
         mainFieldColor = new Color(0xFFFFFF);
         uneditableFieldColor = new Color(0xFAF0CA);
-        accentColor = new Color(0x333333);
+        accentColor = new Color(0x0D3B66);
 
         backgroundForeground = Color.BLACK;
         headerForeground = Color.WHITE;

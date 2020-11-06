@@ -1,9 +1,9 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.window;
 
 public class GUITreeNode {
 
-    private String character;
-    private int weight;
+    protected String character;
+    protected int weight;
 
     GUITreeNode(String character, int weight) {
         this.character = character;
@@ -14,16 +14,8 @@ public class GUITreeNode {
         return character;
     }
 
-    public void setCharacter(String character) {
-        this.character = character;
-    }
-
     public int getWeight() {
         return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
     }
 
     @Override

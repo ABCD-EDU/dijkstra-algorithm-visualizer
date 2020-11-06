@@ -1,11 +1,12 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.codec;
 
 public class TreeNode implements Comparable<TreeNode> {
-    protected int weight;
-    protected char letter;
-    protected TreeNode left, right;
+    public int weight;
+    public char letter;
+    public TreeNode left;
+    public TreeNode right;
 
-    protected TreeNode(char letter, int weight, TreeNode left, TreeNode right) {
+    public TreeNode(char letter, int weight, TreeNode left, TreeNode right) {
         this.letter = letter;
         this.weight = weight;
         this.left = left;

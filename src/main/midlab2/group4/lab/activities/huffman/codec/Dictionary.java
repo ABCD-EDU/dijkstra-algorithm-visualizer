@@ -1,25 +1,19 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.codec;
 
 import main.midlab2.group4.lab.util.ArrayList;
 import main.midlab2.group4.lab.util.List;
 
 import java.util.NoSuchElementException;
 
-/**
- * Custom struct for the huffman coding project. Based on the Dictionary in python or Map in java.
- *
- * @param <K> key
- * @param <V> value
- */
 public class Dictionary<K, V> {
 
     List<Node<K, V>> elements;
 
     public static class Node<K, V> {
-        K key;
-        V val;
+        public K key;
+        public V val;
 
-        Node(K k, V v) {
+        public Node(K k, V v) {
             key = k;
             val = v;
         }
@@ -29,7 +23,7 @@ public class Dictionary<K, V> {
         }
     }
 
-    Dictionary() {
+    public Dictionary() {
         elements = new ArrayList<>();
     }
 

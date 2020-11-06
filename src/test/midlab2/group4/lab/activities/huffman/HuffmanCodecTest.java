@@ -1,7 +1,7 @@
 package test.midlab2.group4.lab.activities.huffman;
 
-import main.midlab2.group4.lab.activities.huffman.Huffman;
-import main.midlab2.group4.lab.activities.huffman.HuffmanCodec;
+import main.midlab2.group4.lab.activities.huffman.codec.Huffman;
+import main.midlab2.group4.lab.activities.huffman.codec.HuffmanCodec;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

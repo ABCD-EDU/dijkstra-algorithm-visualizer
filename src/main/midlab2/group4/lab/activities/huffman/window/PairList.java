@@ -1,9 +1,9 @@
-package main.midlab2.group4.lab.activities.huffman;
+package main.midlab2.group4.lab.activities.huffman.window;
 
+import main.midlab2.group4.lab.activities.huffman.codec.Dictionary;
 import main.midlab2.group4.lab.util.ArrayList;
 import main.midlab2.group4.lab.util.List;
 
-// TODO: RENAME
 public class PairList<K, V> {
 
     List<PairList.Node<K, V>> elements;
@@ -33,13 +33,6 @@ public class PairList<K, V> {
     public void put(K k, V v) {
         elements.insert(new PairList.Node<>(k, v));
     }
-//
-//    public V get(K k) {
-//        Dictionary.Node<K, V> toReturn = get(elements, k);
-//        if (toReturn == null) throw new NoSuchElementException();
-//
-//        return toReturn.val;
-//    }
 
     public PairList.Node<K, V> getAt(int pos) {
         return elements.getElement(pos);
