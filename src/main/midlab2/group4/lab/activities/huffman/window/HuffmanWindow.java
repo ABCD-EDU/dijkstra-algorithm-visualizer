@@ -411,7 +411,7 @@ public class HuffmanWindow {
 
         String encoded = huffmanCodec.encode();
         String decodedText = huffmanCodec.decode();
-        float origSize = huffman.getText().length() * 7;
+        float origSize = huffman.getText().length() * 8;
         float compressedSize = encoded.length();
         float compressionRate = ((compressedSize - origSize) / origSize) * 100;
 
