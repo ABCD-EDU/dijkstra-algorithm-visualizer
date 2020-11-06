@@ -100,7 +100,16 @@ public class DoublyLinkedList<E>
 
     @Override
     public void clear() {
+        if (isEmpty()) throw new StackException("Stack is empty");
 
+        Node<E> curr = head;
+        while (curr != null) {
+            final Node<E> old = curr;
+            curr = curr.next;
+            old.data = null;
+            old.next = null;
+        }
+        size = 0;
     }
 
     @Override

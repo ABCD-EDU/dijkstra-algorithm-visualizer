@@ -2,20 +2,12 @@ package main.midlab2.group4.lab.util;
 
 import java.util.NoSuchElementException;
 
-public class PriorityQueue<T
-        extends Comparable<T>>
+public class PriorityQueue<T extends Comparable<T>>
         implements Queue<T> {
 
     ArrayList<T> heap;
 
     public PriorityQueue() {
-        heap = new ArrayList<>();
-    }
-
-    @Override
-    public void clear() {
-        // TODO: not the correct way. find a fix later
-        heap = null;
         heap = new ArrayList<>();
     }
 
@@ -45,7 +37,6 @@ public class PriorityQueue<T
             return heap.remove(0);
 
         T temp = heap.getElement(0);
-        //Replace the first element with the last data in the heap
         heap.set(0, heap.remove(heap.getSize() - 1));
         moveDown();
         return temp;
@@ -83,9 +74,7 @@ public class PriorityQueue<T
             T parent = heap.getElement(parentIndex);
             int key = data.compareTo(parent);
             if (key > 0) {
-                //swap
                 swap(heap, i, parentIndex);
-                //move up one level
                 i = parentIndex;
             } else {
                 break;
@@ -95,7 +84,7 @@ public class PriorityQueue<T
 
     private void moveDown() {
         int i = 0;
-        int leftIndex = getLeftIndex(i); //leftChild index
+        int leftIndex = getLeftIndex(i);
         while (leftIndex < heap.getSize()) {
             int max = leftIndex;
             int rightIndex = getRightIndex(i);
@@ -114,29 +103,5 @@ public class PriorityQueue<T
                 break;
             }
         }
-    }
-
-    public static void main(String[] args) {
-        PriorityQueue<Integer> pq = new PriorityQueue<>();
-        pq.enqueue(10);
-        pq.enqueue(12);
-        pq.enqueue(8);
-        pq.enqueue(4);
-        pq.enqueue(2);
-        pq.enqueue(19);
-        pq.enqueue(20);
-        pq.enqueue(6);
-        pq.enqueue(5);
-        pq.enqueue(1);
-        System.out.println("Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
-        System.out.println("Next Biggest is: " + pq.dequeue());
     }
 }

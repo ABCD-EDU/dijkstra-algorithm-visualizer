@@ -22,22 +22,11 @@ public class ArrayList<E>
         this.trueSize = 0;
     }
 
-    /**
-     * This returns the current size of the list
-     *
-     * @return size
-     */
     @Override
     public int getSize() {
         return trueSize;
     }
 
-    /**
-     * This inserts a given data at the end of the list.
-     *
-     * @param data element to be inserted
-     * @throws ListOverflowException in case the list exceeds the available capacity
-     */
     @Override
     public void insert(E data) throws ListOverflowException {
         try {
@@ -52,13 +41,6 @@ public class ArrayList<E>
         }
     }
 
-    /**
-     * This searches and returns the given element in the parameter if it exists.
-     *
-     * @param data to be searched
-     * @return data if it exists
-     * @throws NoSuchElementException in case the given element is not in the list
-     */
     @Override
     public E getElement(E data) throws NoSuchElementException {
         int indexOfElement = indexOf(data);
@@ -70,12 +52,6 @@ public class ArrayList<E>
         return elementData(pos);
     }
 
-    /**
-     * This deletes a given element if it is inside the list.
-     *
-     * @param data to be deleted
-     * @return a boolean that shows if the element is deleted
-     */
     @Override
     public boolean delete(E data) {
         int indexOfData = indexOf(data);
@@ -96,13 +72,6 @@ public class ArrayList<E>
         return null;
     }
 
-
-    /**
-     * Searches if a certain elem ent exists inside the list.
-     *
-     * @param data to be searched
-     * @return a boolean that shows if the element is inside the list
-     */
     @Override
     public boolean search(E data) {
         return indexOf(data) >= 0;
