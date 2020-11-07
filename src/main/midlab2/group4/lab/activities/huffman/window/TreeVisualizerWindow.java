@@ -16,36 +16,38 @@ public class TreeVisualizerWindow {
     private List<GUITreeNode> nodes1D;
     private List<List<GUITreeNode>> nodes;
     private TreeCanvas treeCanvas;
-    private List<Dictionary<Integer, Integer>> nodeCoords;
+    private List<Dictionary<Integer, Integer>> nodeCoordinates;
     private PairList<Point, Point> lineCoordinates;
-    private final int verticalGap = 50;
-    private final int horizontalGap = 200;
-    private final int xRad = 40;
-    private final int yRad = 40;
-    private final int initialXGap = (int) (xRad * .60);
-    private final int initialYGap = (int) (yRad + yRad * .75);
 
-    Color backgroundColor;
-    Color nodeColor;
-    Color nodeForeground;
+    private final int V_GAP = 50;
+    private final int H_GAP = 200;
+    private final int X_RADIUS = 40;
+    private final int Y_RAD = 40;
+    private final int INTIAL_XGAP = (int) (X_RADIUS * .60);
+    private final int INITIAL_YGAP = (int) (Y_RAD + Y_RAD * .75);
+
+    private Color backgroundColor;
+    private Color nodeColor;
+    private Color nodeForeground;
 
     TreeVisualizerWindow(TreeNode root, Color backgroundColor, Color nodeColor, Color nodeForeground) {
         this.backgroundColor = backgroundColor;
         this.nodeColor = nodeColor;
         this.nodeForeground = nodeForeground;
 
-        frame = new JFrame("Binary Tree Visualizer");
+        frame = new JFrame("Huffman Tree Visualizer");
+        frame.setIconImage(new ImageIcon("src/main/midlab2/group4/lab/activities/huffman/asset/Tree.png").getImage());
 
         completeBinaryTree(root);
         this.nodes1D = convertTreeToArr(root);
         this.nodes = parseLevels(nodes1D);
-        int width = (int) (nodes.getElement(nodes.getSize() - 1).getSize() * 1.25) * xRad + (horizontalGap);
-        int height = verticalGap * 2 + nodes.getSize() * (initialYGap);
+        int width = (int) (nodes.getElement(nodes.getSize() - 1).getSize() * 1.25) * X_RADIUS + (H_GAP);
+        int height = V_GAP * 2 + nodes.getSize() * (INITIAL_YGAP);
         frame.setMinimumSize(new Dimension(width, height));
-        this.nodeCoords = generateNodeCoordinates(nodes);
-        this.lineCoordinates = generateLineCoordinates(nodeCoords, nodes);
+        this.nodeCoordinates = generateNodeCoordinates(nodes);
+        this.lineCoordinates = generateLineCoordinates(nodeCoordinates, nodes);
         treeCanvas = new TreeCanvas();
-        treeCanvas.setBackground(backgroundColor);
+        treeCanvas.setBackground(this.backgroundColor);
         frame.add(treeCanvas);
 
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -64,22 +66,22 @@ public class TreeVisualizerWindow {
         }
 
         private void paintCircles(Graphics g) {
-            g.translate(-xRad / 2, -yRad / 2);
+            g.translate(-X_RADIUS / 2, -Y_RAD / 2);
             for (int i = 0; i < nodes.getSize(); i++) {
-                Dictionary<Integer, Integer> coords = nodeCoords.getElement(i);
+                Dictionary<Integer, Integer> coords = nodeCoordinates.getElement(i);
                 for (int j = 0; j < nodes.getElement(i).getSize(); j++) {
                     if (nodes.getElement(i).getElement(j).getWeight() != -1) {
                         GUITreeNode currentNode = nodes.getElement(i).getElement(j);
                         Dictionary.Node<Integer, Integer> coordinate = coords.getAt(j);
                         g.setColor(nodeColor);
-                        g.fillOval(coordinate.key, coordinate.val, xRad, yRad);
+                        g.fillOval(coordinate.key, coordinate.val, X_RADIUS, Y_RAD);
                         g.setColor(nodeForeground);
                         if (currentNode.getCharacter().equals("\0")) {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
-                                    coordinate.key + (xRad / 2) - 4, coordinate.val + (yRad / 2) + 3);
+                                    coordinate.key + (X_RADIUS / 2) - 4, coordinate.val + (Y_RAD / 2) + 3);
                         } else {
                             g.drawString(nodes.getElement(i).getElement(j).toString(),
-                                    coordinate.key + (xRad / 2) - 11, coordinate.val + (yRad / 2) + 3);
+                                    coordinate.key + (X_RADIUS / 2) - 11, coordinate.val + (Y_RAD / 2) + 3);
                         }
                     }
                 }
@@ -87,11 +89,15 @@ public class TreeVisualizerWindow {
         }
 
         private void paintLines(Graphics g) {
-            g.translate(xRad / 2, yRad / 2);
+            g.translate(X_RADIUS / 2, Y_RAD / 2);
             for (int i = 0; i < lineCoordinates.size(); i++) {
                 PairList.Node<Point, Point> point = lineCoordinates.getAt(i);
                 g.setColor(nodeColor);
                 g.drawLine(point.x.x, point.x.y, point.y.x, point.y.y);
+                if ((i+1) % 2 == 0)
+                    g.drawString("1",((point.x.x+point.y.x)/2)+10,(point.y.y+point.x.y)/2);
+                else
+                    g.drawString("0",((point.x.x+point.y.x)/2)-10,(point.y.y+point.x.y)/2);
             }
         }
 
@@ -102,11 +108,11 @@ public class TreeVisualizerWindow {
     private List<Dictionary<Integer, Integer>> generateNodeCoordinates(List<List<GUITreeNode>> nodes) {
         List<Dictionary<Integer, Integer>> toReturn = new ArrayList<>();
 
-        int xGap = computeInitialXGap(initialXGap);
-        int yGap = initialYGap;
+        int xGap = computeInitialXGap(INTIAL_XGAP);
+        int yGap = INITIAL_YGAP;
 
         Dictionary<Integer, Integer> coords = new Dictionary<>();
-        coords.put((frame.getWidth() / 2), verticalGap);
+        coords.put((frame.getWidth() / 2), V_GAP);
         toReturn.insert(coords);
 
         for (int i = 1; i < nodes.getSize(); i++) {
