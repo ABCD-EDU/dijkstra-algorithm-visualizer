@@ -1,36 +1,36 @@
-package main.finals.grp2.util;
+package main.finals.grp2.lab;
+
+import main.finals.grp2.util.ArrayList;
+import main.finals.grp2.util.List;
+
+import java.io.*;
 
 public class Graph<E extends Comparable<E>> {
-    public class Vertex<E> {
-        protected E value = null;
-        protected int weight = 0;
-        protected List<Edge<E>> edges = new ArrayList<>();
 
-        public Vertex(E value) {
+    public class Vertex<T> {
+        protected T value;
+        protected List<Edge<T>> edges = new ArrayList<>();
+
+        public Vertex(T value) {
             this.value = value;
-        }
-
-        public Vertex(E value, int weight) {
-            this(value);
-            this.weight = weight;
         }
 
         @Override
         public String toString() {
             final StringBuilder builder = new StringBuilder();
-            builder.append("Value=").append(value).append(" weight=").append(weight).append("\n");
+            builder.append("Value=").append(value).append("\n");
             for (int i = 0; i < edges.getSize(); i++)
                 builder.append("\t").append(edges.getElement(i).toString());
             return builder.toString();
         }
     }
 
-    public class Edge<E> {
-        protected Vertex<E> from = null;
-        protected Vertex<E> to = null;
-        protected int cost = 0;
+    public class Edge<T> {
+        protected Vertex<T> from;
+        protected Vertex<T> to;
+        protected int cost;
 
-        public Edge(int cost, Vertex<E> from, Vertex<E> to) {
+        public Edge(int cost, Vertex<T> from, Vertex<T> to) {
             if (from == null || to == null) {
                 throw (new NullPointerException("From and To vertices must be non-null"));
             }
@@ -40,13 +40,13 @@ public class Graph<E extends Comparable<E>> {
             this.to = to;
         }
 
-        private Edge(Edge<E> e) {
+        private Edge(Edge<T> e) {
             this(e.cost, e.from, e.to);
         }
 
         public String toString() {
-            return "[ " + from.value + "(" + from.weight + ") " + "]" + " -> " +
-                    "[ " + to.value + "(" + to.weight + ") " + "]" + " = " + cost + "\n";
+            return "[ " + from.value + "]" + " -> " +
+                    "[ " + to.value + "]" + " = " + cost + "\n";
         }
     }
 
@@ -68,19 +68,41 @@ public class Graph<E extends Comparable<E>> {
         this(TYPE.UNDIRECTED);
     }
 
-    public void addEdge(E from, E to, int weight) {
-        if (type == TYPE.UNDIRECTED) {
-            insertUndirected(weight, from, to);
-        } else if (type ==  TYPE.DIRECTED) {
-            insertDirected(weight, from, to);
+    @SuppressWarnings("unchecked")
+    public Graph(File file) {
+        vertices = new ArrayList<>();
+        try (BufferedReader in = new BufferedReader(new FileReader(file))) {
+            String line = in.readLine();
+            if (line.equalsIgnoreCase("DIRECTED"))
+                type = TYPE.DIRECTED;
+            if (line.equalsIgnoreCase("UNDIRECTED"))
+                type = TYPE.UNDIRECTED;
+
+            while (true) {
+                line = in.readLine();
+                if (line == null)
+                    break;
+
+                String[] data = line.split(",");
+                addEdge(Integer.parseInt(data[0]), (E) data[1], (E) data[2]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public void addEdge(int weight, E from, E to) {
+        if (type == TYPE.UNDIRECTED)
+            insertUndirected(weight, from, to);
+        else if (type == TYPE.DIRECTED)
+            insertDirected(weight, from, to);
     }
 
     private void insertDirected(int weight, E from, E to) {
         Vertex<E> origin = getVertex(from);
         if (origin != null) {
             origin.edges.insert(new Edge<>(weight, origin, new Vertex<>(to)));
-        }else {
+        } else {
             Vertex<E> start = new Vertex<>(from);
             Vertex<E> end = new Vertex<>(to);
             start.edges.insert(new Edge<>(weight, start, end));
@@ -88,39 +110,22 @@ public class Graph<E extends Comparable<E>> {
         }
     }
 
-    private void insertUndirected(int weight, E from, E to) {;
+    private void insertUndirected(int weight, E from, E to) {
         Vertex<E> head = getVertex(from);
-        Vertex<E> tail = getVertex(to);
-
-        if (head != null)
-            head.edges.insert(new Edge<>(weight, head, new Vertex<E>(to)));
-        if (tail != null)
-            tail.edges.insert(new Edge<>(weight, new Vertex<E>(from), tail));
-
-        if (head == null || tail == null) {
-            Vertex<E> start = new Vertex<>(from);
-            Vertex<E> end = new Vertex<>(to);
-
-            if (head == null) {
-                vertices.insert(start);
-                start.edges.insert(new Edge<>(weight, start, end));
+        if (head != null) {
+            Vertex<E> tail = getVertex(to);
+            if (tail != null) {
+                head.edges.insert(new Edge<>(weight, head, tail));
+                tail.edges.insert(new Edge<>(weight, tail, head));
+            } else {
+                head.edges.insert(new Edge<>(weight, head, new Vertex<>(to)));
             }
-            if (tail == null) {
-                end.edges.insert(new Edge<>(weight, end, start));
-                vertices.insert(end);
-            }
+        } else {
+            Vertex<E> temp = new Vertex<>(from);
+            Edge<E> temp2 = new Edge<>(weight, new Vertex<>(from), new Vertex<>(to));
+            temp.edges.insert(temp2);
+            vertices.insert(temp);
         }
-    }
-
-    // TODO: MIGHT DELTE THIS
-    private boolean contains(E item) {
-        final Vertex<E> temp = new Vertex<>(item);
-        for (int i = 0; i < vertices.getSize(); i++) {
-            if (vertices.getElement(i).value == temp.value)
-                return true;
-        }
-
-        return false;
     }
 
     private Vertex<E> getVertex(E item) {
@@ -165,8 +170,21 @@ public class Graph<E extends Comparable<E>> {
         g2.addEdge(3, 4, 0);
         System.out.println(g2.toString());
 
-        for (int i = 0; i < g.vertices.getSize(); i++) {
-            System.out.println(g.vertices.getElement(i).value);
-        }
+        Graph<Integer> g3 = new Graph<>(TYPE.UNDIRECTED);
+        System.out.println("UNDIRECTED");
+        g3.addEdge(0, 0, 1);
+        g3.addEdge(0, 0, 2);
+        g3.addEdge(0, 1, 2);
+        g3.addEdge(0, 1, 3);
+        g3.addEdge(0, 1, 4);
+        g3.addEdge(0, 2, 3);
+        g3.addEdge(0, 2, 4);
+        g3.addEdge(0, 3, 1);
+        g3.addEdge(0, 3, 2);
+        g3.addEdge(0, 4, 5);
+        System.out.println(g.toString());
+
+        Graph<Integer> g4 = new Graph<>(new File("D:\\git-repos\\9413-final-grp2\\src\\main\\finals\\grp2\\lab\\data\\in.csv"));
+        System.out.println(g4.toString());
     }
 }
