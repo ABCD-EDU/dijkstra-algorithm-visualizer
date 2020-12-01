@@ -112,9 +112,21 @@ public class Graph {
     private void insertDirected(int weight, String from, String to) {
         Vertex origin = getVertex(from);
         Vertex tail = getVertex(to);
+        if (origin == null && tail == null) {
+            if (from.equals(to)) { // if pointing at self
+                Vertex head = new Vertex(from);
+                head.edges.insert(new Edge(weight, head, head));
+                vertices.insert(head);
+                return;
+            }
+            Vertex head = new Vertex(from);
+            Vertex end = new Vertex(to);
+            head.edges.insert(new Edge(weight, head, end));
+            vertices.insert(head);
+            vertices.insert(end);
+        }
         if (origin != null && tail != null) {
             origin.edges.insert(new Edge(weight, origin, tail));
-            System.out.println("First");
         }
         if (origin != null && tail == null) {
             Vertex end = new Vertex(to);
@@ -126,19 +138,27 @@ public class Graph {
             head.edges.insert(new Edge(weight, head, tail));
             vertices.insert(head);
         }
-        if (origin == null && tail == null) {
-            Vertex head = new Vertex(from);
-            Vertex end = new Vertex(to);
-            head.edges.insert(new Edge(weight, head, end));
-            vertices.insert(head);
-            vertices.insert(end);
-        }
 
     }
 
     private void insertUndirected(int weight, String from, String to) {
         Vertex origin = getVertex(from);
         Vertex tail = getVertex(to);
+        if (origin == null && tail == null) {
+            if (from.equals(to)) { // if pointing at self
+                Vertex head = new Vertex(from);
+                head.edges.insert(new Edge(weight, head, head));
+                vertices.insert(head);
+                return;
+            }
+            Vertex head = new Vertex(from);
+            Vertex end = new Vertex(to);
+            head.edges.insert(new Edge(weight, head, end));
+            end.edges.insert(new Edge(weight, head, end));
+            vertices.insert(head);
+            vertices.insert(end);
+            return;
+        }
         if (origin != null && tail != null) {
             origin.edges.insert(new Edge(weight, origin, tail));
             tail.edges.insert(new Edge(weight, origin, tail));
@@ -154,14 +174,6 @@ public class Graph {
             head.edges.insert(new Edge(weight, head, tail));
             tail.edges.insert(new Edge(weight, head, tail));
             vertices.insert(head);
-        }
-        if (origin == null && tail == null) {
-            Vertex head = new Vertex(from);
-            Vertex end = new Vertex(to);
-            head.edges.insert(new Edge(weight, head, end));
-            end.edges.insert(new Edge(weight, head, end));
-            vertices.insert(head);
-            vertices.insert(end);
         }
     }
 
