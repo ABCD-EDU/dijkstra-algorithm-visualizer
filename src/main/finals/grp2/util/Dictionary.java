@@ -44,6 +44,13 @@ public class Dictionary<K, V> {
         return toReturn.val;
     }
 
+    public Node<K,V> getNode(K k) {
+        Node<K, V> toReturn = get(elements, k);
+        if (toReturn == null) throw new NoSuchElementException();
+
+        return toReturn;
+    }
+
     public Node<K, V> getAt(int pos) {
         return elements.getElement(pos);
     }

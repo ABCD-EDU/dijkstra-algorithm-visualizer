@@ -10,16 +10,16 @@ public class PairList<K, V> {
     List<Node<K, V>> elements;
 
     public static class Node<K, V> {
-        K x;
-        V y;
+        public K key;
+        public V val;
 
         Node(K k, V v) {
-            x = k;
-            y = v;
+            key = k;
+            val = v;
         }
 
         public String toString() {
-            return String.format("%-30s%-30s%n", x, y);
+            return String.format("%-30s%-30s%n", key, val);
         }
     }
 
@@ -41,8 +41,8 @@ public class PairList<K, V> {
 
     public V get(K key) {
         for (int i = 0; i < elements.getSize(); i++) {
-            if (elements.getElement(i).x.equals(key)) {
-                return elements.getElement(i).y;
+            if (elements.getElement(i).key.equals(key)) {
+                return elements.getElement(i).val;
             }
         }
         throw new InvalidParameterException("Key does not exist");
@@ -51,7 +51,7 @@ public class PairList<K, V> {
     public boolean contains(K k) {
         for (int i = 0; i < elements.getSize(); i++) {
             PairList.Node<K, V> curr = elements.getElement(i);
-            if (curr.x.equals(k))
+            if (curr.key.equals(k))
                 return true;
         }
         return false;

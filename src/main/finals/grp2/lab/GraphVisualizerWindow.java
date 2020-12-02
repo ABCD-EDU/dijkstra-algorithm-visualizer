@@ -1,11 +1,9 @@
 package main.finals.grp2.lab;
 
-import main.finals.grp2.util.ArrayList;
-import main.finals.grp2.util.List;
-
 import javax.swing.*;
 import java.awt.*;
 
+//TODO: INTEGRATE NEW GRAPH
 public class GraphVisualizerWindow {
 
     private JFrame frame = new JFrame("Graph Visualizer");
@@ -13,7 +11,7 @@ public class GraphVisualizerWindow {
 
     private Graph graph;
     private main.finals.grp2.util.List<Graph.Vertex> vertices;
-    private main.finals.grp2.util.List<Graph.Edge> edges;
+//    private main.finals.grp2.util.List<Graph.Edge> edges;
     private PairList<Graph.Vertex, PairList.Node<Integer, Integer>> vertexCoordsPairList;
 
     private int vSize;
@@ -28,10 +26,10 @@ public class GraphVisualizerWindow {
         vertices = this.graph.getVertices();
         vSize = vertices.getSize();
         vCoords = calculateVCoords();
-        edges = initializeEdges();
+//        edges = initializeEdges();
         vertexCoordsPairList = initializeVertexCoordsPairList();
 
-        System.out.println(edges);
+//        System.out.println(edges);
         System.out.println(        );
         System.out.println(graph);
 //        System.out.println(vertices);
@@ -74,22 +72,22 @@ public class GraphVisualizerWindow {
             for (int i = 0; i < vSize; i++) {
                 PairList.Node<Integer, Integer> coord = vCoords.getAt(i);
                 g.setColor(Color.BLACK);
-                g.fillOval(coord.x, coord.y, VRAD, VRAD);
+                g.fillOval(coord.key, coord.val, VRAD, VRAD);
                 g.setColor(Color.PINK);
                 g.translate(VRAD/2,VRAD/2);
-                g.drawString(Integer.toString(i), coord.x, coord.y);
+                g.drawString(Integer.toString(i), coord.key, coord.val);
                 g.translate(-VRAD/2, -VRAD/2);
             }
         }
 
         public void paintEdgesUndirected(Graphics g) {
-            for (int i = 0; i < edges.getSize(); i++) {
-                PairList.Node<Integer, Integer> p1 = vertexCoordsPairList.get(edges.getElement(i).from);
-                System.out.println("FROM: " + edges.getElement(i).from);
-                PairList.Node<Integer, Integer> p2 = vertexCoordsPairList.get(edges.getElement(i).to);
-                System.out.println("TO: " + edges.getElement(i).from);
-                g.drawLine(p1.x, p1.y, p2.x, p2.y);
-            }
+//            for (int i = 0; i < edges.getSize(); i++) {
+//                PairList.Node<Integer, Integer> p1 = vertexCoordsPairList.get(edges.getElement(i).from);
+//                System.out.println("FROM: " + edges.getElement(i).from);
+//                PairList.Node<Integer, Integer> p2 = vertexCoordsPairList.get(edges.getElement(i).to);
+//                System.out.println("TO: " + edges.getElement(i).from);
+//                g.drawLine(p1.x, p1.y, p2.x, p2.y);
+//            }
         }
 
         public void paintEdgesDirected(Graphics g) {
@@ -107,23 +105,23 @@ public class GraphVisualizerWindow {
         if (vSize == 1) return coords;
         PairList.Node<Integer, Integer> p = coords.getAt(0);
         for (int i = 0; i < vSize-1; i++) {
-            int x1 = (int)(p.x*Math.cos(d) + p.y*Math.sin(d));
-            int y1 = (int)(-p.x*Math.sin(d) + p.y*Math.cos(d));
+            int x1 = (int)(p.key *Math.cos(d) + p.val *Math.sin(d));
+            int y1 = (int)(-p.key *Math.sin(d) + p.val *Math.cos(d));
             d = d + incD;
             coords.put(x1,y1); // big brain moment
         }
         return coords;
     }
 
-    private ArrayList<Graph.Edge> initializeEdges() {
-        ArrayList<Graph.Edge> edges = new ArrayList<>();
-        for(int i = 0; i < vertices.getSize(); i++) {
-            for (int j = 0; j < vertices.getElement(i).edges.getSize(); j++) {
-                edges.insert((Graph.Edge) vertices.getElement(i).edges.getElement(j));
-            }
-        }
-        return edges;
-    }
+//    private ArrayList<Graph.Edge> initializeEdges() {
+//        ArrayList<Graph.Edge> edges = new ArrayList<>();
+//        for(int i = 0; i < vertices.getSize(); i++) {
+//            for (int j = 0; j < vertices.getElement(i).edges.getSize(); j++) {
+//                edges.insert((Graph.Edge) vertices.getElement(i).edges.getElement(j));
+//            }
+//        }
+//        return edges;
+//    }
 
     private PairList<Graph.Vertex, PairList.Node<Integer, Integer>> initializeVertexCoordsPairList() {
         PairList<Graph.Vertex, PairList.Node<Integer, Integer>> pl = new PairList<>();
