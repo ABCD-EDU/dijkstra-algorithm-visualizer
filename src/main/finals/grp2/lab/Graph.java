@@ -12,9 +12,9 @@ public class Graph {
 
     // ============================================ INNER CLASSES ============================================
 
-    public class Vertex {
+    public static class Vertex {
         protected String ID;
-        protected PairList<Vertex, String> edges = new PairList<>();
+        protected PairList<Vertex, Integer> edges = new PairList<>();
 
         public Vertex(String ID) {
             this.ID = ID;
@@ -25,7 +25,7 @@ public class Graph {
             final StringBuilder builder = new StringBuilder();
             builder.append("ID = ").append(ID).append("\n");
             for (int i = 0; i < edges.size(); i++) {
-                PairList.Node<Vertex, String> curr = edges.getAt(i);
+                PairList.Node<Vertex, Integer> curr = edges.getAt(i);
                 builder.append("\t EDGE = ").append(curr.key.ID).append(" WEIGHT = ").append(curr.val).append("\n");
             }
             return builder.toString();
@@ -33,41 +33,15 @@ public class Graph {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            Vertex vertex = (Vertex) o;
-            return ID.equals(vertex.ID);
+            if (!(o.getClass().equals(Vertex.class)))
+                return false;
+            return ((Vertex) o).ID.equalsIgnoreCase(this.ID);
         }
-
     }
-
-//    public class Edge {
-//        protected TestVertex from;
-//        protected TestVertex to;
-//        protected int weight;
-//
-//        public Edge(int weight, TestVertex from, TestVertex to) {
-//            if (from == null || to == null) {
-//                throw (new NullPointerException("From and To vertices must be non-null"));
-//            }
-//
-//            this.weight = weight;
-//            this.from = from;
-//            this.to = to;
-//        }
-//
-//        private Edge(TestEdge e) {
-//            this(e.weight, e.from, e.to);
-//        }
-//
-//        public String toString() {
-//            return "[ " + from.ID + "]" + " -> " +
-//                    "[ " + to.ID + "]" + " = " + weight + "\n";
-//        }
-//    }
 
     // ============================================ DATA MEMBERS ============================================
 
-    private List<Vertex> vertices;
+    private final List<Vertex> vertices;
     private TYPE type;
 
     public enum TYPE {
@@ -84,7 +58,6 @@ public class Graph {
         this(TYPE.UNDIRECTED);
     }
 
-    @SuppressWarnings("unchecked")
     public Graph(File file) {
         vertices = new ArrayList<>();
         try (BufferedReader in = new BufferedReader(new FileReader(file))) {
@@ -99,21 +72,21 @@ public class Graph {
                 if (line == null)
                     break;
                 String[] data = line.split(",");
-                addEdge(data[0], data[1], data[2]);
+                addEdge(Integer.parseInt(data[0]), data[1], data[2]);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addEdge(String weight, String from, String to) {
+    public void addEdge(int weight, String from, String to) {
         if (type == TYPE.UNDIRECTED)
             insertUndirected(weight, from, to);
         else if (type == TYPE.DIRECTED)
             insertDirected(weight, from, to);
     }
 
-    private void insertDirected(String weight, String from, String to) {
+    private void insertDirected(int weight, String from, String to) {
         Vertex v = getVertex(from);
         if (v != null) { // if node exists just insert the destination
             v.edges.put(new Vertex(to), weight);
@@ -124,7 +97,7 @@ public class Graph {
         }
     }
 
-    private void insertUndirected(String weight, String from, String to) {
+    private void insertUndirected(int weight, String from, String to) {
         Vertex start = getVertex(from);
         Vertex end = getVertex(to);
         Vertex nS = new Vertex(from);
@@ -187,18 +160,18 @@ public class Graph {
     /**
      * procedure DFS_iterative(G, v) is
      * let S be a stack
-     *  S.push(v)
-     *      while S is not empty do
-     *      v = S.pop()
-     *      if v is not labeled as discovered then
-     *          label v as discovered
-     *          if v is the goal then
-     *              return v
-     *          for all edges from v to w in G.adjacentEdges(v) do
-     *          S.push(w)
+     * S.push(v)
+     * while S is not empty do
+     * v = S.pop()
+     * if v is not labeled as discovered then
+     * label v as discovered
+     * if v is the goal then
+     * return v
+     * for all edges from v to w in G.adjacentEdges(v) do
+     * S.push(w)
      *
      * @param start starting pos
-     * @param end ending pos
+     * @param end   ending pos
      * @return pathway to ending pos
      */
     public Queue<String> depthFirstSearch(String start, String end) {
@@ -228,21 +201,21 @@ public class Graph {
     }
 
     /**
-     *  procedure BFS(G, root) is
-     *      let Q be a queue
-     *      label root as discovered
-     *      Q.enqueue(root)
-     *      while Q is not empty do
-     *          v := Q.dequeue()
-     *          if v is the goal then
-     *              return v
-     *          for all edges from v to w in G.adjacentEdges(v) do
-     *              if w is not labeled as discovered then
-     *                  label w as discovered
-     *                  Q.enqueue(w)
+     * procedure BFS(G, root) is
+     * let Q be a queue
+     * label root as discovered
+     * Q.enqueue(root)
+     * while Q is not empty do
+     * v := Q.dequeue()
+     * if v is the goal then
+     * return v
+     * for all edges from v to w in G.adjacentEdges(v) do
+     * if w is not labeled as discovered then
+     * label w as discovered
+     * Q.enqueue(w)
      *
      * @param start starting pos
-     * @param end ending pos
+     * @param end   ending pos
      * @return pathway to ending pos
      */
     public Queue<String> breadthFirstSearch(String start, String end) {
