@@ -13,8 +13,8 @@ public class Graph {
     // ============================================ INNER CLASSES ============================================
 
     public static class Vertex {
-        protected String ID;
-        protected PairList<Vertex, Integer> edges = new PairList<>();
+        public String ID;
+        public PairList<Vertex, Integer> edges = new PairList<>();
 
         public Vertex(String ID) {
             this.ID = ID;
@@ -33,7 +33,7 @@ public class Graph {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o.getClass().equals(Vertex.class)))
+            if (o != this)
                 return false;
             return ((Vertex) o).ID.equalsIgnoreCase(this.ID);
         }
@@ -140,11 +140,11 @@ public class Graph {
         return null;
     }
 
-    protected List<Vertex> getVertices() {
+    public List<Vertex> getVertices() {
         return vertices;
     }
 
-    protected boolean isDirected() {
+    public boolean isDirected() {
         return type == TYPE.DIRECTED;
     }
 

@@ -1,4 +1,7 @@
-package main.finals.grp2.lab;
+package main.finals.grp2.lab.UI;
+
+import main.finals.grp2.lab.Graph;
+import main.finals.grp2.lab.PairList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +23,7 @@ public class GraphVisualizerWindow extends JPanel {
 
     private final int VRAD = 30; // Vertex Radius
 
-    GraphVisualizerWindow(Graph graph) {
+    public GraphVisualizerWindow(Graph graph) {
 
         this.graph = graph;
         vertices = this.graph.getVertices();

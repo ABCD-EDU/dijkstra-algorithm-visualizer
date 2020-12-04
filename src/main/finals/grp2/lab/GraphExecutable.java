@@ -1,6 +1,6 @@
 package main.finals.grp2.lab;
 
-import java.io.File;
+import main.finals.grp2.lab.UI.GraphWindow;
 
 public class GraphExecutable {
 
@@ -13,8 +13,7 @@ public class GraphExecutable {
     }
 
     private static void run(){
-        Graph graph = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
-        new GraphVisualizerWindow(graph);
+        new GraphWindow();
     }
 
 }
