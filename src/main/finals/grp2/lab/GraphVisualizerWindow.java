@@ -3,8 +3,8 @@ package main.finals.grp2.lab;
 import javax.swing.*;
 import java.awt.*;
 
-//TODO: INTEGRATE NEW GRAPH
-public class GraphVisualizerWindow {
+// TODO: INTEGRATE NEW GRAPH
+public class GraphVisualizerWindow extends JPanel {
 
     private JFrame frame = new JFrame("Graph Visualizer");
     private GraphCanvas canvas = new GraphCanvas();
@@ -33,15 +33,15 @@ public class GraphVisualizerWindow {
         System.out.println(        );
         System.out.println(graph);
 //        System.out.println(vertices);
-
-        frame.add(canvas);
-        frame.setSize(1392,769);
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((d.width / 2) - frame.getWidth() / 2, (d.height / 2) - frame.getHeight() / 2);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(true);
-        frame.setVisible(true);
+        this.add(canvas);
+//        frame.add(canvas);
+//        frame.setSize(1392,769);
+//        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+//        frame.setLocation((d.width / 2) - frame.getWidth() / 2, (d.height / 2) - frame.getHeight() / 2);
+//        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        frame.setLocationRelativeTo(null);
+//        frame.setResizable(true);
+//        frame.setVisible(true);
 
 //        frame.addComponentListener(new ComponentAdapter() {
 //            @Override

@@ -117,6 +117,14 @@ public class ArrayList<E>
         elementData[index] = data;
     }
 
+    public E[] toArray(){
+        E[] toReturn = (E[]) new Object[this.getSize()];
+        for (int i=0;i<this.getSize();i++){
+            toReturn[i] = this.getElement(i);
+        }
+        return toReturn;
+    }
+
     public String toString() {
         if (trueSize == 0) return "[ ]";
         if (trueSize == 1) return "[ " + elementData[0] + " ]";
