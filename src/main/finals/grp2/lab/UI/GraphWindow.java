@@ -1,6 +1,7 @@
 package main.finals.grp2.lab.UI;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
@@ -32,8 +33,10 @@ public class GraphWindow {
     protected JButton inputFileButton;
     protected final JButton[] actionButtons = new JButton[]{
             new JButton("Play"),
-            new JButton("Step Backward"),
-            new JButton("Step Forward"),
+            new JButton("<<"),
+            new JButton("<"),
+            new JButton(">"),
+            new JButton(">>"),
     };
 
 
@@ -141,10 +144,10 @@ public class GraphWindow {
     // TODO: FIX FORMATTING
     protected void initInputPanel() {
         inputPanel = new JPanel();
+        inputPanel.setBorder(new EmptyBorder(10,10,0,10));
         inputPanel.setLayout(new GridLayout(1, 2));
 
         JLabel text = new JLabel();
-        text.setText("Browse file to input:");
         text.setHorizontalAlignment(SwingConstants.LEFT);
 
         // components in input panel
@@ -154,13 +157,42 @@ public class GraphWindow {
         inputPanel.add(inputFileButton);
     }
 
-
+    // TODO: CLEAN
     protected void initTablePanel() {
         tablePanel = new JPanel();
-        tablePanel.setLayout(new GridLayout(2, 1));
+        tablePanel.setLayout(new GridLayout(2,1));
 
-        tablePanel.add(inputTablePanel);
-        tablePanel.add(pathwayTablePanel);
+        final JPanel inputLabelPanel = new JPanel(new GridLayout(1,1));
+        inputLabelPanel.setBorder(new EmptyBorder(0,10,0,10));
+        final JPanel pathwayLabelPanel = new JPanel(new GridLayout(1,1));
+        pathwayLabelPanel.setBorder(new EmptyBorder(0,10,0,10));
+
+        final JLabel inputLabel = new JLabel();
+        inputLabel.setText("Input Table:");
+        inputLabel.setHorizontalAlignment(SwingConstants.LEFT);
+
+        final JLabel pathwayLabel = new JLabel();
+        pathwayLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        pathwayLabel.setText("Pathway Table");
+
+        // add label to own panel
+        inputLabelPanel.add(inputLabel);
+        pathwayLabelPanel.add(pathwayLabel);
+
+        final JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        final JPanel outputPanel = new JPanel();
+        outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.Y_AXIS));
+
+        // add label panel and table panel
+        inputPanel.add(inputLabelPanel);
+        inputPanel.add(inputTablePanel);
+
+        outputPanel.add(pathwayLabelPanel);
+        outputPanel.add(pathwayTablePanel);
+
+        tablePanel.add(inputPanel);
+        tablePanel.add(outputPanel);
     }
 
     protected void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames,
@@ -181,6 +213,7 @@ public class GraphWindow {
 
     protected void initInputTablePanel() {
         inputTablePanel = new JPanel();
+        inputTablePanel.setBorder(new EmptyBorder(10,10,10,10));
         inputTablePanel.setLayout(new GridLayout(1, 1));
 
         DefaultTableModel inputTableModel = new DefaultTableModel();
@@ -194,6 +227,7 @@ public class GraphWindow {
 
     protected void initPathwayTablePanel() {
         pathwayTablePanel = new JPanel();
+        pathwayTablePanel.setBorder(new EmptyBorder(10,10,10,10));
         pathwayTablePanel.setLayout(new GridLayout(1, 1));
 
         DefaultTableModel pathwayTableModel = new DefaultTableModel();
@@ -210,11 +244,15 @@ public class GraphWindow {
         actionPanel.setLayout(new GridLayout(3, 1));
 
         JPanel algoSelectionPanel = new JPanel(); // for the dropdown list
+        algoSelectionPanel.setBorder(new EmptyBorder(0,10,0,10));
 
         JPanel playPanel = new JPanel(); // to occupy all space
         JPanel stepPanel = new JPanel(); // to split the space into two
 
-        stepPanel.setLayout(new GridLayout(1, 2));
+        playPanel.setBorder(new EmptyBorder(10,10,0,10));
+        stepPanel.setBorder(new EmptyBorder(10,10,10,10));
+
+        stepPanel.setLayout(new GridLayout(1, 4,3,3));
         playPanel.setLayout(new GridLayout(1, 1));
         algoSelectionPanel.setLayout(new GridLayout(1, 1));
 
@@ -228,8 +266,10 @@ public class GraphWindow {
         setActionButtons(); // modify this to change button style
 
         playPanel.add(actionButtons[0]); // Play/Pause button
-        stepPanel.add(actionButtons[1]); // Step Backward Button
-        stepPanel.add(actionButtons[2]); // Step Forward Button
+        stepPanel.add(actionButtons[1]); // Go to start Button
+        stepPanel.add(actionButtons[2]); // Step backward Button
+        stepPanel.add(actionButtons[3]); // Step forward Button
+        stepPanel.add(actionButtons[4]); // Go to end Button
 
         // top: dropdown list, middle: wide play/pause button, bottom: steppers
         actionPanel.add(algoSelectionPanel);
