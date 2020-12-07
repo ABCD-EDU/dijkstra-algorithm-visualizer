@@ -428,30 +428,30 @@ public class GraphWindow {
         });
     }
 
-    private void initializePathQueue() {
-        // TODO: Validate input here
-        from = fromField.getText();
-        to = toField.getText();
-        graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
-        graphCanvas.repaint();
-        switch (algoSelectionBox.getSelectedItem()+"") {
-            case "None":
-                pathQueue = null;
-                break;
-            case "Depth First Search":
-                pathQueue = graph.depthFirstSearch(from, to);
-                break;
-            case "Breadth First Search":
-                pathQueue = graph.breadthFirstSearch(from, to);
-                break;
-            case "Dijkstra's Shortest Path":
-//                pathQueue = graph.PATH FIND
-                break;
-            default:
-                System.out.println("Combo Box Invalid Item");
-                break;
-        }
-    }
+//    private void initializePathQueue() {
+//        // TODO: Validate input here
+//        from = fromField.getText();
+//        to = toField.getText();
+//        graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
+//        graphCanvas.repaint();
+//        switch (algoSelectionBox.getSelectedItem()+"") {
+//            case "None":
+//                pathQueue = null;
+//                break;
+//            case "Depth First Search":
+//                pathQueue = graph.depthFirstSearch(from, to);
+//                break;
+//            case "Breadth First Search":
+//                pathQueue = graph.breadthFirstSearch(from, to);
+//                break;
+//            case "Dijkstra's Shortest Path":
+////                pathQueue = graph.PATH FIND
+//                break;
+//            default:
+//                System.out.println("Combo Box Invalid Item");
+//                break;
+//        }
+//    }
 
     private void initializePathStackToShow() {
         Stack<Graph.Vertex> temp = new Stack<>();
@@ -472,7 +472,7 @@ public class GraphWindow {
 
     private void setActionButtonsActionListeners() {
         actionButtons[5].addActionListener(e -> { // setFromTo
-            initializePathQueue();
+//            initializePathQueue();
             initializePathStackToShow();
             pathShownList = new ArrayList<>();
             System.out.println(pathToShowStack);

@@ -24,10 +24,11 @@ public class Graph {
         public String toString() {
             final StringBuilder builder = new StringBuilder();
             builder.append("ID = ").append(ID).append("\n");
-            for (int i = 0; i < edges.size(); i++) {
-                PairList.Node<Vertex, Integer> curr = edges.getAt(i);
-                builder.append("\t EDGE = ").append(curr.key.ID).append(" WEIGHT = ").append(curr.val).append("\n");
-            }
+            // UNCOMMENT THIS IF YOU WANT TO PRINT THE EDGES
+//            for (int i = 0; i < edges.size(); i++) {
+//                PairList.Node<Vertex, Integer> curr = edges.getAt(i);
+//                builder.append("\t EDGE = ").append(curr.key.ID).append(" WEIGHT = ").append(curr.val).append("\n");
+//            }
             return builder.toString();
         }
 
@@ -170,11 +171,10 @@ public class Graph {
      * S.push(w)
      *
      * @param start starting pos
-     * @param end   ending pos
      * @return pathway to ending pos
      */
-    public Queue<Vertex> depthFirstSearch(String start, String end) {
-        Queue<Vertex> path = new DoublyLinkedList<>();
+    public Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>> depthFirstSearch(String start) {
+        Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>> path = new DoublyLinkedList<>();
         Stack<Vertex> stack = new DoublyLinkedList<>();
         Dictionary<Vertex, Boolean> visitedNodes = initVisitedNodes();
 
@@ -183,20 +183,17 @@ public class Graph {
             Vertex v = stack.pop();
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
-                if (v.ID.equalsIgnoreCase(end)) return path;
-                path.enqueue(getVertex(v.ID));
+                path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.ID)));
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
-                    path.enqueue(getVertex(v.edges.getAt(i).key.ID));
-                    if (v.edges.getAt(i).key.ID.equalsIgnoreCase(end))
-                        return path;
-                    else
-                        stack.push(getVertex(v.edges.getAt(i).key.ID));
+                    path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.edges.getAt(i).key.ID)));
+                    stack.push(getVertex(v.edges.getAt(i).key.ID));
 
                 }
             }
         }
-        throw new NoSuchElementException("path not found");
+//        throw new NoSuchElementException("path not found");
+        return path;
     }
 
     /**
@@ -214,11 +211,10 @@ public class Graph {
      * Q.enqueue(w)
      *
      * @param start starting pos
-     * @param end   ending pos
      * @return pathway to ending pos
      */
-    public Queue<Vertex> breadthFirstSearch(String start, String end) {
-        Queue<Vertex> path = new DoublyLinkedList<>();
+    public Queue<Dictionary.Node<Vertex,Vertex>> breadthFirstSearch(String start) {
+        Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
         Queue<Vertex> stack = new DoublyLinkedList<>();
         Dictionary<Vertex, Boolean> visitedNodes = initVisitedNodes();
 
@@ -227,20 +223,17 @@ public class Graph {
             Vertex v = stack.dequeue();
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
-                if (v.ID.equalsIgnoreCase(end)) return path;
-                path.enqueue(getVertex(v.ID));
+                path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.ID)));
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
-                    path.enqueue(getVertex(v.edges.getAt(i).key.ID));
-                    if (v.edges.getAt(i).key.ID.equalsIgnoreCase(end))
-                        return path;
-                    else
-                        stack.enqueue(getVertex(v.edges.getAt(i).key.ID));
+                    path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.edges.getAt(i).key.ID)));
+                    stack.enqueue(getVertex(v.edges.getAt(i).key.ID));
 
                 }
             }
         }
-        throw new NoSuchElementException("path not found");
+//        throw new NoSuchElementException("path not found");
+        return path;
     }
 
     private Dictionary<Vertex, Boolean> initVisitedNodes() {
@@ -256,8 +249,10 @@ public class Graph {
         System.out.println("GRAPH");
         System.out.println(g.toString());
         System.out.println("BFS");
-        System.out.println(g.breadthFirstSearch("0","4").toString());
+        System.out.println(g.breadthFirstSearch("0").toString());
         System.out.println("DFS");
-        System.out.println(g.depthFirstSearch("0","4").toString());
+        System.out.println(g.depthFirstSearch("0").toString());
+        Queue<Dictionary.Node<Vertex,Vertex>> t = g.breadthFirstSearch("0");
+        System.out.println(t.dequeue());
     }
 }

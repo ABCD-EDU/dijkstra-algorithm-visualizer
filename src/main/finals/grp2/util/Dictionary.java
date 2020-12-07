@@ -16,7 +16,7 @@ public class Dictionary<K, V> {
         }
 
         public String toString() {
-            return String.format("%-30s%-30s%n", key, val);
+            return String.format("%s%s%s%s%n", "key", key, "val", val);
         }
     }
 
