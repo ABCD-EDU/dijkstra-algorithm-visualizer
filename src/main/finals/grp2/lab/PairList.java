@@ -14,7 +14,7 @@ public class PairList<K, V> {
         public K key;
         public V val;
 
-        Node(K k, V v) {
+        public Node(K k, V v) {
             key = k;
             val = v;
         }
@@ -25,8 +25,6 @@ public class PairList<K, V> {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
             Node<?, ?> node = (Node<?, ?>) o;
             return Objects.equals(key, node.key) &&
                     Objects.equals(val, node.val);

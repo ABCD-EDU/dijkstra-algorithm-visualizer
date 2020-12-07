@@ -1,7 +1,7 @@
 package main.finals.grp2.lab.UI;
 
-import jdk.dynalink.linker.LinkerServices;
 import main.finals.grp2.lab.Graph;
+import main.finals.grp2.lab.PairList;
 import main.finals.grp2.util.ArrayList;
 import main.finals.grp2.util.Dictionary;
 import main.finals.grp2.util.Queue;
@@ -14,8 +14,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
-import java.util.EmptyStackException;
+import java.io.*;
+import java.security.InvalidParameterException;
 import java.util.Stack;
 
 // COMMITS: WINDOW CENTERED, LAYOUT FIXES, PROMPT FILE SELECTION (NO FUNCTIONALITY)
@@ -35,6 +35,7 @@ import java.util.Stack;
  * TODO: Add JLabel to preview total cost for pathfind
  * TODO: JOptionPanes
  * TODO: Graph Visualizer Color Design
+ * TODO: Change path of files to actual chosen file path
  **/
 public class GraphWindow {
 
@@ -81,7 +82,8 @@ public class GraphWindow {
 
     protected JComboBox<String> algoSelectionBox;
 
-    protected File textFile;
+    protected DefaultTableModel inputTableModel;
+    protected DefaultTableModel pathwayTableModel;
 
     // THEME: Bento
     protected Color mainColor = new Color(0x2D394D);
@@ -89,6 +91,10 @@ public class GraphWindow {
     protected Color accentColor = new Color(0xF87A90);
     protected Color mainForeground = Color.WHITE;
     protected Color secondaryForeground = Color.BLACK;
+
+    protected File textFile;
+    protected PairList<String, String> weightsList;
+    protected final String EDGE_W_PAIRLIST_DELIMITER = "=Fr0Mt0=";
 
     VisualizerThread visualizerThread;
     private boolean paused = true;
@@ -341,7 +347,7 @@ public class GraphWindow {
         inputTablePanel.setBorder(new EmptyBorder(5,0,10,0));
         inputTablePanel.setLayout(new GridLayout(1, 1));
 
-        DefaultTableModel inputTableModel = new DefaultTableModel();
+        inputTableModel = new DefaultTableModel();
         inputTable = new JTable(inputTableModel);
         inputTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
         inputTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
@@ -358,7 +364,7 @@ public class GraphWindow {
         pathwayTablePanel.setBorder(new EmptyBorder(5,0,10,0));
         pathwayTablePanel.setLayout(new GridLayout(1, 1));
 
-        DefaultTableModel pathwayTableModel = new DefaultTableModel();
+        pathwayTableModel = new DefaultTableModel();
         pathwayTable = new JTable(pathwayTableModel);
         pathwayTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
         pathwayTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
@@ -489,6 +495,7 @@ public class GraphWindow {
             initializePathStackToShow();
             pathShownList = new ArrayList<>();
             graphCanvas.setPath(pathShownList);
+            updatePathTableValues();
         });
 
         actionButtons[0].addActionListener(e -> { // play
@@ -512,17 +519,20 @@ public class GraphWindow {
                 pathShownList.remove(i);
             }
             graphCanvas.setPath(pathShownList);
+            updatePathTableValues();
         });
 
         actionButtons[2].addActionListener(e -> { // backward
             pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
             pathShownList.remove(pathShownList.getSize()-1);
             graphCanvas.setPath(pathShownList);
+            updatePathTableValues();
         });
 
         actionButtons[3].addActionListener(e -> { // forward
             pathShownList.insert(pathToShowStack.pop());
             graphCanvas.setPath(pathShownList);
+            updatePathTableValues();
         });
 
         actionButtons[4].addActionListener(e -> { // skip to end
@@ -530,6 +540,7 @@ public class GraphWindow {
                 pathShownList.insert(pathToShowStack.pop());
             }
             graphCanvas.setPath(pathShownList);
+            updatePathTableValues();
         });
     }
 
@@ -542,9 +553,55 @@ public class GraphWindow {
         if (choice == JFileChooser.APPROVE_OPTION) { // initialize graph
             textFile = fileChooser.getSelectedFile();
             setVisualPanelProperties();
+            try {
+                initializeInputTableValues();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
             System.out.println("CHOSEN: " + textFile.getName());
         } else {
             System.out.println("File Selection Aborted");
+        }
+    }
+
+    private void initializeInputTableValues() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader("src/main/finals/grp2/lab/data/in.csv"));
+        weightsList = new PairList<>();
+        String line = "";
+        reader.readLine();
+        line = reader.readLine();
+        while (line != null) {
+            String[] data = line.split(",");
+            inputTableModel.addRow(new Object[]{
+                    data[0],
+                    data[1],
+                    data[2]
+            });
+            weightsList.put(
+                    data[1]+EDGE_W_PAIRLIST_DELIMITER+data[2]+"",
+                    data[0]
+            ); // initialize edgeWeightPairList
+            System.out.println(data[1]+EDGE_W_PAIRLIST_DELIMITER+data[2]);
+            line = reader.readLine();
+        }
+    }
+
+    private void updatePathTableValues() {
+        pathwayTableModel.setRowCount(0);
+        for (int i = 0; i < pathShownList.getSize(); i++) {
+            Dictionary.Node<Graph.Vertex, Graph.Vertex> edge = pathShownList.getElement(i);
+            String weight = "N/A";
+            try {
+                System.out.println(edge.key.ID+EDGE_W_PAIRLIST_DELIMITER+edge.val.ID);
+                weight = weightsList.get(edge.key.ID+EDGE_W_PAIRLIST_DELIMITER+edge.val.ID+"");
+            }catch (InvalidParameterException e) {
+                e.printStackTrace();
+            }
+            pathwayTableModel.addRow(new Object[]{
+                    weight,
+                    edge.key.ID,
+                    edge.val.ID
+            });
         }
     }
 
@@ -555,7 +612,6 @@ public class GraphWindow {
         visualPanel.add(graphCanvas);
         visualPanel.repaint();
         visualPanel.revalidate();
-
     }
 
     // TODO: play pause action
@@ -588,6 +644,7 @@ public class GraphWindow {
             while (true) {
                 pathShownList.insert(pathToShowStack.pop());
                 graphCanvas.setPath(pathShownList);
+                updatePathTableValues();
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
