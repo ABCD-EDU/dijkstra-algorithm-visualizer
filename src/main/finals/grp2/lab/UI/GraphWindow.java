@@ -30,7 +30,11 @@ import java.util.Stack;
  *                                                      -> tablePanel -> local components
  *                                                      -> actionPanel -> local components
  *                                                -> control panel
- *                                                      -> TODO: insert Graph Visualizer
+ *                                                      ->
+ * TODO: Add radiobox show/hide weights
+ * TODO: Add JLabel to preview total cost for pathfind
+ * TODO: JOptionPanes
+ * TODO: Graph Visualizer Color Design
  **/
 public class GraphWindow {
 
@@ -484,7 +488,7 @@ public class GraphWindow {
             initializePathQueue();
             initializePathStackToShow();
             pathShownList = new ArrayList<>();
-            System.out.println(pathToShowStack);
+            graphCanvas.setPath(pathShownList);
         });
 
         actionButtons[0].addActionListener(e -> { // play
@@ -503,7 +507,7 @@ public class GraphWindow {
         });
 
         actionButtons[1].addActionListener(e -> { // skip to start
-            for (int i = pathShownList.getSize(); i > -1; i--) {
+            for (int i = pathShownList.getSize()-1; i > -1; i--) {
                 pathToShowStack.push(pathShownList.getElement(i));
                 pathShownList.remove(i);
             }
@@ -514,7 +518,6 @@ public class GraphWindow {
             pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
             pathShownList.remove(pathShownList.getSize()-1);
             graphCanvas.setPath(pathShownList);
-
         });
 
         actionButtons[3].addActionListener(e -> { // forward
