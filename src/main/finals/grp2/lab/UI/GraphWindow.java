@@ -1,6 +1,7 @@
 package main.finals.grp2.lab.UI;
 
 import main.finals.grp2.lab.Graph;
+import main.finals.grp2.util.Queue;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,9 +9,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.BufferedReader;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.FileReader;
+import java.util.Stack;
 
 // COMMITS: WINDOW CENTERED, LAYOUT FIXES, PROMPT FILE SELECTION (NO FUNCTIONALITY)
 
@@ -52,6 +54,7 @@ public class GraphWindow {
             new JButton("<"),
             new JButton(">"),
             new JButton(">>"),
+            new JButton("Set")
     };
 
     protected JLabel inputLabel, pathwayLabel, algorithmLabel;
@@ -64,8 +67,9 @@ public class GraphWindow {
 
     protected JScrollPane inputTableScrollPane, pathwayTableScrollPane;
 
+    protected JPanel fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
 
-    protected JPanel algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
+    protected JTextField fromField, toField;
 
     protected JComboBox<String> algoSelectionBox;
 
@@ -78,7 +82,13 @@ public class GraphWindow {
     protected Color mainForeground = Color.WHITE;
     protected Color secondaryForeground = Color.BLACK;
 
+    private boolean paused = true;
     private Graph graph;
+    private Queue<Graph.Vertex> pathQueue;
+    private Stack<Graph.Vertex> pathToShowStack;
+    private Stack<Graph.Vertex> pathShownStack;
+    private String from;
+    private String to;
 
     public GraphWindow() {
         // init title bar
@@ -98,7 +108,7 @@ public class GraphWindow {
         initVisualPanel();
 
         // controls
-        controlHandling();
+        setActionButtonsActionListeners();
 
         // init main panel after creating all needed components
         initMainPanel();
@@ -154,6 +164,7 @@ public class GraphWindow {
         inputLabelPanel.setBackground(mainColor);
         pathwayLabelPanel.setBackground(mainColor);
 
+        fromToPanel.setBackground(mainColor);
         algoLabelPanel.setBackground(mainColor);
         algoSelectionPanel.setBackground(mainColor);
         playPanel.setBackground(mainColor);
@@ -352,12 +363,16 @@ public class GraphWindow {
 
     protected void initActionPanel() {
         actionPanel = new JPanel();
-        actionPanel.setLayout(new GridLayout(4, 1));
+        actionPanel.setLayout(new GridLayout(5, 1));
 
+        fromToPanel = new JPanel(new GridLayout(1, 3, 5, 5));
         algoLabelPanel = new JPanel(new GridLayout(1, 1));
         algoSelectionPanel = new JPanel(new GridLayout(1, 1));
         playPanel = new JPanel(new GridLayout(1, 1));
         stepPanel = new JPanel(new GridLayout(1, 4, 5, 5));
+
+        fromField = new JTextField();
+        toField = new JTextField();
 
         algoLabelPanel.setPreferredSize(new Dimension(100, 0));
         algoSelectionPanel.setPreferredSize(new Dimension(100, 20   ));
@@ -373,16 +388,14 @@ public class GraphWindow {
         algorithmLabel.setHorizontalAlignment(SwingConstants.CENTER);
         algoLabelPanel.add(algorithmLabel);
 
-        algoSelectionBox = new JComboBox<>(); // Dropdown list
-        algoSelectionBox.setFocusable(false);
-        algoSelectionBox.addItem("None");
-        algoSelectionBox.addItem("Depth First Search");
-        algoSelectionBox.addItem("Breadth First Search");
-        algoSelectionBox.addItem("Dijkstra's Shortest Path");
+        initializeAlgoSelectionBox();
         algoSelectionPanel.add(algoSelectionBox);
 
         setActionButtons(); // modify this to change button style
 
+        fromToPanel.add(fromField);
+        fromToPanel.add(toField);
+        fromToPanel.add(actionButtons[5]); // set
         playPanel.add(actionButtons[0]); // Play/Pause button
         stepPanel.add(actionButtons[1]); // Go to start Button
         stepPanel.add(actionButtons[2]); // Step backward Button
@@ -390,10 +403,59 @@ public class GraphWindow {
         stepPanel.add(actionButtons[4]); // Go to end Button
 
         // top: dropdown list, middle: wide play/pause button, bottom: steppers
+        actionPanel.add(fromToPanel);
         actionPanel.add(algoLabelPanel);
         actionPanel.add(algoSelectionPanel);
         actionPanel.add(playPanel);
         actionPanel.add(stepPanel);
+    }
+
+    private void initializeAlgoSelectionBox() {
+        algoSelectionBox = new JComboBox<String>(); // Dropdown list
+        algoSelectionBox.setFocusable(false);
+        algoSelectionBox.addItem("None");
+        algoSelectionBox.addItem("Depth First Search");
+        algoSelectionBox.addItem("Breadth First Search");
+        algoSelectionBox.addItem("Dijkstra's Shortest Path");
+        algoSelectionBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                // clear inputfields
+            }
+        });
+    }
+
+    private void initializePathQueue() {
+        // TODO: Validate input here
+        from = fromField.getText();
+        to = toField.getText();
+        graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
+        graphCanvas.repaint();
+        switch (algoSelectionBox.getSelectedItem()+"") {
+            case "None":
+                pathQueue = null;
+                break;
+            case "Depth First Search":
+                pathQueue = graph.depthFirstSearch(from, to);
+                break;
+            case "Breadth First Search":
+                pathQueue = graph.breadthFirstSearch(from, to);
+                break;
+            case "Dijkstra's Shortest Path":
+//                pathQueue = graph.PATH FIND
+                break;
+            default:
+                System.out.println("Combo Box Invalid Item");
+                break;
+        }
+    }
+
+    private void initializePathStackToShow() {
+        while (!pathQueue.isEmpty()) {
+//            System.out.println("");
+//            System.out.println(pathQueue.peek());
+            pathToShowStack.push(pathQueue.dequeue());
+        }
     }
 
     protected void setActionButtons() {
@@ -402,11 +464,31 @@ public class GraphWindow {
         }
     }
 
-    private boolean mode = true;
+    private void setActionButtonsActionListeners() {
+        actionButtons[5].addActionListener(e -> { // setFromTo
+            initializePathQueue();
+            initializePathStackToShow();
+        });
 
-    private void controlHandling() {
-        actionButtons[0].addActionListener(e -> {
-            changeMode(mode);
+        actionButtons[0].addActionListener(e -> { // play
+            System.out.println(from + " " + to + " " + algoSelectionBox.getSelectedItem()+"");
+            changeMode(paused);
+        });
+
+        actionButtons[1].addActionListener(e -> { // go start
+
+        });
+
+        actionButtons[1].addActionListener(e -> { // forward
+
+        });
+
+        actionButtons[1].addActionListener(e -> { // backward
+
+        });
+
+        actionButtons[1].addActionListener(e -> { // go end
+
         });
     }
 
@@ -432,11 +514,12 @@ public class GraphWindow {
         visualPanel.add(graphCanvas);
         visualPanel.repaint();
         visualPanel.revalidate();
+
     }
 
     // TODO: play pause action
     private void changeMode(boolean mode) {
         actionButtons[0].setText(mode ? "Pause" : "Play");
-        this.mode = !mode;
+        this.paused = !mode;
     }
 }

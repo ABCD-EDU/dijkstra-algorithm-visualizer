@@ -173,8 +173,8 @@ public class Graph {
      * @param end   ending pos
      * @return pathway to ending pos
      */
-    public Queue<String> depthFirstSearch(String start, String end) {
-        Queue<String> path = new DoublyLinkedList<>();
+    public Queue<Vertex> depthFirstSearch(String start, String end) {
+        Queue<Vertex> path = new DoublyLinkedList<>();
         Stack<Vertex> stack = new DoublyLinkedList<>();
         Dictionary<Vertex, Boolean> visitedNodes = initVisitedNodes();
 
@@ -184,10 +184,10 @@ public class Graph {
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
                 if (v.ID.equalsIgnoreCase(end)) return path;
-                path.enqueue(v.ID);
+                path.enqueue(v);
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
-                    path.enqueue(v.edges.getAt(i).key.ID);
+                    path.enqueue(v.edges.getAt(i).key);
                     if (v.edges.getAt(i).key.ID.equalsIgnoreCase(end))
                         return path;
                     else
@@ -217,8 +217,8 @@ public class Graph {
      * @param end   ending pos
      * @return pathway to ending pos
      */
-    public Queue<String> breadthFirstSearch(String start, String end) {
-        Queue<String> path = new DoublyLinkedList<>();
+    public Queue<Vertex> breadthFirstSearch(String start, String end) {
+        Queue<Vertex> path = new DoublyLinkedList<>();
         Queue<Vertex> stack = new DoublyLinkedList<>();
         Dictionary<Vertex, Boolean> visitedNodes = initVisitedNodes();
 
@@ -228,10 +228,10 @@ public class Graph {
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
                 if (v.ID.equalsIgnoreCase(end)) return path;
-                path.enqueue(v.ID);
+                path.enqueue(v);
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
-                    path.enqueue(v.edges.getAt(i).key.ID);
+                    path.enqueue(v.edges.getAt(i).key);
                     if (v.edges.getAt(i).key.ID.equalsIgnoreCase(end))
                         return path;
                     else
@@ -252,17 +252,17 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
-        System.out.println(g.toString());
-        Queue<String> depthPath = g.depthFirstSearch("0", "4");
-        System.out.println("DEPTH FIRST SEARCH");
-        while (!depthPath.isEmpty()) {
-            System.out.println(depthPath.dequeue());
-        }
-        Queue<String> breadthPath = g.breadthFirstSearch("0", "4");
-        System.out.println("BREADTH FIRST SEARCH");
-        while (!breadthPath.isEmpty()) {
-            System.out.println(breadthPath.dequeue());
-        }
+//        Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+//        System.out.println(g.toString());
+//        Queue<String> depthPath = g.depthFirstSearch("0", "4");
+//        System.out.println("DEPTH FIRST SEARCH");
+//        while (!depthPath.isEmpty()) {
+//            System.out.println(depthPath.dequeue());
+//        }
+//        Queue<String> breadthPath = g.breadthFirstSearch("0", "4");
+//        System.out.println("BREADTH FIRST SEARCH");
+//        while (!breadthPath.isEmpty()) {
+//            System.out.println(breadthPath.dequeue());
+//        }
     }
 }

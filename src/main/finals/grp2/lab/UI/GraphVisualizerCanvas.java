@@ -22,6 +22,9 @@ public class GraphVisualizerCanvas extends Canvas {
 
     private final int VRAD = 30; // Vertex Radius
 
+    private String algoLabel = "Algorithm";
+    private String fromLabel = "From";
+    private String toLabel = "To";
 
     public GraphVisualizerCanvas(Graph graph, Color bgColor) {
         this.setBackground(bgColor);
@@ -42,7 +45,8 @@ public class GraphVisualizerCanvas extends Canvas {
 
     public void paint(Graphics g) {
         super.paint(g);
-        System.out.println("Canvas paintintintiignignignginging");
+        System.out.println("Canvas Painting!");
+        g.drawString(algoLabel + ": " + fromLabel + " - " + toLabel, 10, 10);
         g.translate(this.getWidth()/2,this.getHeight()/2); // center
         g.drawOval(0,0, VRAD, VRAD);
         paintVertices(g);
@@ -68,7 +72,6 @@ public class GraphVisualizerCanvas extends Canvas {
     }
 
     public void paintEdgesUndirected(Graphics g) {
-        System.out.println("painting edges");
         for (int i = 0; i < vertices.getSize(); i++) {
 //            System.out.println("TO: " + vertices.getElement(i).edges.size());
             for (int j = 0; j <  vertices.getElement(i).edges.size(); j++) {
@@ -128,5 +131,12 @@ public class GraphVisualizerCanvas extends Canvas {
         }
         return pl;
     }
+
+    public void setLabels(String algoLabel, String fromLabel, String toLabel) {
+        this.algoLabel = algoLabel;
+        this.fromLabel = fromLabel;
+        this.toLabel = toLabel;
+    }
+
 
 }
