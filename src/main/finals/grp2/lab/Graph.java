@@ -183,7 +183,10 @@ public class Graph {
             Vertex v = stack.pop();
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
-                path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.ID)));
+                if (!path.isEmpty())
+                    path.enqueue(new Dictionary.Node<>(getVertex(path.peek().key.ID), getVertex(v.ID)));
+                else
+                    path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.ID)));
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
                     path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.edges.getAt(i).key.ID)));
@@ -223,7 +226,10 @@ public class Graph {
             Vertex v = stack.dequeue();
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
-                path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.ID)));
+                if (!path.isEmpty())
+                    path.enqueue(new Dictionary.Node<>(getVertex(path.peek().key.ID), getVertex(v.ID)));
+                else
+                    path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.ID)));
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
                     path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.edges.getAt(i).key.ID)));
