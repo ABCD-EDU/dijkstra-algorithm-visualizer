@@ -1,6 +1,8 @@
 package main.finals.grp2.lab.UI;
 
+import jdk.dynalink.linker.LinkerServices;
 import main.finals.grp2.lab.Graph;
+import main.finals.grp2.util.ArrayList;
 import main.finals.grp2.util.Queue;
 
 import javax.swing.*;
@@ -12,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 // COMMITS: WINDOW CENTERED, LAYOUT FIXES, PROMPT FILE SELECTION (NO FUNCTIONALITY)
@@ -86,7 +89,7 @@ public class GraphWindow {
     private Graph graph;
     private Queue<Graph.Vertex> pathQueue;
     private Stack<Graph.Vertex> pathToShowStack;
-    private Stack<Graph.Vertex> pathShownStack;
+    private ArrayList<Graph.Vertex> pathShownList;
     private String from;
     private String to;
 
@@ -451,10 +454,13 @@ public class GraphWindow {
     }
 
     private void initializePathStackToShow() {
+        Stack<Graph.Vertex> temp = new Stack<>();
+        pathToShowStack = new Stack<>();
         while (!pathQueue.isEmpty()) {
-//            System.out.println("");
-//            System.out.println(pathQueue.peek());
-            pathToShowStack.push(pathQueue.dequeue());
+            temp.push(pathQueue.dequeue());
+        }
+        while (!temp.isEmpty()) {
+            pathToShowStack.push(temp.pop());
         }
     }
 
@@ -468,27 +474,46 @@ public class GraphWindow {
         actionButtons[5].addActionListener(e -> { // setFromTo
             initializePathQueue();
             initializePathStackToShow();
+            pathShownList = new ArrayList<>();
+            System.out.println(pathToShowStack);
         });
 
         actionButtons[0].addActionListener(e -> { // play
-            System.out.println(from + " " + to + " " + algoSelectionBox.getSelectedItem()+"");
+            System.out.println(pathShownList);
             changeMode(paused);
         });
 
-        actionButtons[1].addActionListener(e -> { // go start
+        actionButtons[1].addActionListener(e -> { // skip to start
+            for (int i = pathShownList.getSize(); i > -1; i--) {
+                pathToShowStack.push(pathShownList.getElement(i));
+                pathShownList.remove(i);
+            }
+            graphCanvas.setPath(pathShownList);
+        });
+
+        actionButtons[2].addActionListener(e -> { // backward
+            if (pathShownList.getSize() == pathToShowStack.size()) {
+                pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
+                pathShownList.remove(pathShownList.getSize()-1);
+            }
+            pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
+            pathShownList.remove(pathShownList.getSize()-1);
+            graphCanvas.setPath(pathShownList);
 
         });
 
-        actionButtons[1].addActionListener(e -> { // forward
-
+        actionButtons[3].addActionListener(e -> { // forward
+            if (pathShownList.getSize() == 0)
+                pathShownList.insert(pathToShowStack.pop());
+            pathShownList.insert(pathToShowStack.pop());
+            graphCanvas.setPath(pathShownList);
         });
 
-        actionButtons[1].addActionListener(e -> { // backward
-
-        });
-
-        actionButtons[1].addActionListener(e -> { // go end
-
+        actionButtons[4].addActionListener(e -> { // skip to end
+            while (!pathToShowStack.isEmpty()) {
+                pathShownList.insert(pathToShowStack.pop());
+            }
+            graphCanvas.setPath(pathShownList);
         });
     }
 
