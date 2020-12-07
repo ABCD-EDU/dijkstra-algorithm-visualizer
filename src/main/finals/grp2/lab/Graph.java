@@ -33,8 +33,7 @@ public class Graph {
 
         @Override
         public boolean equals(Object o) {
-            if (o != this)
-                return false;
+
             return ((Vertex) o).ID.equalsIgnoreCase(this.ID);
         }
     }

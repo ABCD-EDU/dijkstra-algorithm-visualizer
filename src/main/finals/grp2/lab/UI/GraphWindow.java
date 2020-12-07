@@ -1,6 +1,7 @@
 package main.finals.grp2.lab.UI;
 
-import javax.sound.sampled.Line;
+import main.finals.grp2.lab.Graph;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -33,7 +34,9 @@ public class GraphWindow {
     protected JPanel mainPanel, titleBarPanel;
 
     // sub-panels for controls and visualizer
-    protected JPanel controlPanel, visualPanel;
+    protected JPanel controlPanel;
+    protected JPanel visualPanel;
+    GraphVisualizerCanvas graphCanvas;
 
     // sub panels for controlPanel;
     protected JPanel inputPanel, tablePanel, actionPanel;
@@ -75,7 +78,7 @@ public class GraphWindow {
     protected Color mainForeground = Color.WHITE;
     protected Color secondaryForeground = Color.BLACK;
 
-
+    private Graph graph;
 
     public GraphWindow() {
         // init title bar
@@ -120,7 +123,7 @@ public class GraphWindow {
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //        mainFrame.setUndecorated(true);
         mainFrame.pack();
-        mainFrame.setResizable(false);
+        mainFrame.setResizable(true);
         mainFrame.setTitle("Graph Visualizer");
         mainFrame.setSize(new Dimension(1500, 800));
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -413,31 +416,22 @@ public class GraphWindow {
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
         int choice = fileChooser.showOpenDialog(mainFrame);
-        if (choice == JFileChooser.APPROVE_OPTION) {
+        if (choice == JFileChooser.APPROVE_OPTION) { // initialize graph
             textFile = fileChooser.getSelectedFile();
-            readLinesFromFile();
+            setVisualPanelProperties();
             System.out.println("CHOSEN: " + textFile.getName());
         } else {
             System.out.println("File Selection Aborted");
         }
     }
 
-    // TODO: Transfer file info to input table
-    private void readLinesFromFile() {
-        String content = "";
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(textFile.getPath()));
-            StringBuilder string = new StringBuilder();
-            String line = reader.readLine();
-            while (line != null) {
-                string.append(line);
-                string.append(System.lineSeparator());
-                line = reader.readLine();
-            }
-            content = string.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void setVisualPanelProperties() {
+        graph = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+        graphCanvas = new GraphVisualizerCanvas(graph, secondaryColor);
+        graphCanvas.setPreferredSize(visualPanel.getPreferredSize());
+        visualPanel.add(graphCanvas);
+        visualPanel.repaint();
+        visualPanel.revalidate();
     }
 
     // TODO: play pause action
