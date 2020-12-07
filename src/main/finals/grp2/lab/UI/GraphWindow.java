@@ -3,6 +3,7 @@ package main.finals.grp2.lab.UI;
 import jdk.dynalink.linker.LinkerServices;
 import main.finals.grp2.lab.Graph;
 import main.finals.grp2.util.ArrayList;
+import main.finals.grp2.util.Dictionary;
 import main.finals.grp2.util.Queue;
 
 import javax.swing.*;
@@ -85,11 +86,12 @@ public class GraphWindow {
     protected Color mainForeground = Color.WHITE;
     protected Color secondaryForeground = Color.BLACK;
 
+    VisualizerThread visualizerThread;
     private boolean paused = true;
     private Graph graph;
-    private Queue<Graph.Vertex> pathQueue;
-    private Stack<Graph.Vertex> pathToShowStack;
-    private ArrayList<Graph.Vertex> pathShownList;
+    Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathQueue;
+    private Stack<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathToShowStack;
+    private ArrayList<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathShownList;
     private String from;
     private String to;
 
@@ -423,38 +425,45 @@ public class GraphWindow {
         algoSelectionBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                // clear inputfields
+                String selection = algoSelectionBox.getSelectedItem()+"";
+                if (selection.equals("Depth First Search") || selection.equals("Breadth First Search") ) {
+                    toField.setText("");
+                    toField.setEnabled(false);
+                }else {
+                    toField.setEnabled(true);
+                }
             }
         });
     }
 
-//    private void initializePathQueue() {
-//        // TODO: Validate input here
-//        from = fromField.getText();
-//        to = toField.getText();
-//        graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
-//        graphCanvas.repaint();
-//        switch (algoSelectionBox.getSelectedItem()+"") {
-//            case "None":
-//                pathQueue = null;
-//                break;
-//            case "Depth First Search":
-//                pathQueue = graph.depthFirstSearch(from, to);
-//                break;
-//            case "Breadth First Search":
-//                pathQueue = graph.breadthFirstSearch(from, to);
-//                break;
-//            case "Dijkstra's Shortest Path":
-////                pathQueue = graph.PATH FIND
-//                break;
-//            default:
-//                System.out.println("Combo Box Invalid Item");
-//                break;
-//        }
-//    }
+    private void initializePathQueue() {
+        // TODO: Validate input here
+        from = fromField.getText();
+        to = toField.getText();
+        graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
+        graphCanvas.repaint();
+        visualizerThread = new VisualizerThread();
+        switch (algoSelectionBox.getSelectedItem()+"") {
+            case "None":
+                pathQueue = null;
+                break;
+            case "Depth First Search":
+                pathQueue = graph.depthFirstSearch(from);
+                break;
+            case "Breadth First Search":
+                pathQueue = graph.breadthFirstSearch(from);
+                break;
+            case "Dijkstra's Shortest Path":
+//                pathQueue = graph.PATH FIND
+                break;
+            default:
+                System.out.println("Combo Box Invalid Item");
+                break;
+        }
+    }
 
     private void initializePathStackToShow() {
-        Stack<Graph.Vertex> temp = new Stack<>();
+        Stack<Dictionary.Node<Graph.Vertex, Graph.Vertex>> temp = new Stack<>();
         pathToShowStack = new Stack<>();
         while (!pathQueue.isEmpty()) {
             temp.push(pathQueue.dequeue());
@@ -470,17 +479,27 @@ public class GraphWindow {
         }
     }
 
-    private void setActionButtonsActionListeners() {
+    private synchronized void setActionButtonsActionListeners() {
         actionButtons[5].addActionListener(e -> { // setFromTo
-//            initializePathQueue();
+            initializePathQueue();
             initializePathStackToShow();
             pathShownList = new ArrayList<>();
             System.out.println(pathToShowStack);
         });
 
         actionButtons[0].addActionListener(e -> { // play
-            System.out.println(pathShownList);
             changeMode(paused);
+            if (!paused) {
+                if (visualizerThread.getState().toString().equals("TERMINATED")){
+                    System.out.println("Creating new thread");
+                    visualizerThread = new VisualizerThread();
+                    visualizerThread.start();
+                }else {
+                    visualizerThread.start();
+                }
+            }else {
+                visualizerThread.interrupt();
+            }
         });
 
         actionButtons[1].addActionListener(e -> { // skip to start
@@ -492,10 +511,6 @@ public class GraphWindow {
         });
 
         actionButtons[2].addActionListener(e -> { // backward
-            if (pathShownList.getSize() == pathToShowStack.size()) {
-                pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
-                pathShownList.remove(pathShownList.getSize()-1);
-            }
             pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
             pathShownList.remove(pathShownList.getSize()-1);
             graphCanvas.setPath(pathShownList);
@@ -503,8 +518,6 @@ public class GraphWindow {
         });
 
         actionButtons[3].addActionListener(e -> { // forward
-            if (pathShownList.getSize() == 0)
-                pathShownList.insert(pathToShowStack.pop());
             pathShownList.insert(pathToShowStack.pop());
             graphCanvas.setPath(pathShownList);
         });
@@ -546,5 +559,43 @@ public class GraphWindow {
     private void changeMode(boolean mode) {
         actionButtons[0].setText(mode ? "Pause" : "Play");
         this.paused = !mode;
+        if (!paused) {
+            inputFileButton.setEnabled(false);
+            for (int i = 1; i < actionButtons.length; i++) {
+                actionButtons[i].setEnabled(false);
+            }
+            fromField.setEnabled(false);
+            toField.setEnabled(false);
+            algoSelectionBox.setEnabled(false);
+        } else {
+            inputFileButton.setEnabled(true);
+            for (int i = 1; i < actionButtons.length; i++) {
+                actionButtons[i].setEnabled(true);
+            }
+            algoSelectionBox.setEnabled(true);
+            fromField.setEnabled(true);
+            toField.setEnabled(true);
+        }
+    }
+
+    private class VisualizerThread extends Thread {
+
+        @Override
+        public void run() {
+            while (true) {
+                pathShownList.insert(pathToShowStack.pop());
+                graphCanvas.setPath(pathShownList);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+                if (pathToShowStack.isEmpty()) {
+                    changeMode(paused);
+                    break;
+                }
+            }
+        }
+
     }
 }

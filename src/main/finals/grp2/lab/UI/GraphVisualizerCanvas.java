@@ -3,6 +3,7 @@ package main.finals.grp2.lab.UI;
 import main.finals.grp2.lab.Graph;
 import main.finals.grp2.lab.PairList;
 import main.finals.grp2.util.ArrayList;
+import main.finals.grp2.util.Dictionary;
 import main.finals.grp2.util.List;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ public class GraphVisualizerCanvas extends Canvas {
     private main.finals.grp2.util.ArrayList<Graph.Vertex> vertices;
 //    private main.finals.grp2.util.List<Graph.Edge> edges;
     private PairList<Graph.Vertex, PairList.Node<Integer, Integer>> vertexCoordsPairList;
-    private ArrayList<Graph.Vertex> path;
+    private ArrayList<Dictionary.Node<Graph.Vertex, Graph.Vertex>> path;
 
     private int vSize;
     private int rad = 200; // Graph Radius
@@ -50,50 +51,65 @@ public class GraphVisualizerCanvas extends Canvas {
         g.drawString(algoLabel + ": " + fromLabel + " - " + toLabel, 10, 10);
         g.translate(this.getWidth()/2,this.getHeight()/2); // center
         g.drawOval(0,0, VRAD, VRAD);
-        paintVertices(g);
         g.setColor(Color.BLACK);
-        g.translate(VRAD/2,VRAD/2);
         if (graph.isDirected()) {
             paintEdgesDirected(g);
         }else {
             paintEdgesUndirected(g);
         }
+        paintVertices(g);
     }
 
     public void paintVertices(Graphics g) {
+//        g.translate(-VRAD/2, -VRAD/2);
         for (int i = 0; i < vSize; i++) {
             PairList.Node<Integer, Integer> coord = vCoords.getAt(i);
             g.setColor(Color.BLACK);
+            g.translate(-VRAD/2, -VRAD/2);
             g.fillOval(coord.key, coord.val, VRAD, VRAD);
             g.setColor(Color.PINK);
             g.translate(VRAD/2,VRAD/2);
             g.drawString(Integer.toString(i), coord.key, coord.val);
+        }
+        if (path.getSize() != 0) {
             g.translate(-VRAD/2, -VRAD/2);
+            PairList.Node<Integer, Integer> head = vertexCoordsPairList.get(path.getElement(path.getSize()-1).val);
+            g.setColor(Color.WHITE);
+            g.drawOval(head.key, head.val, VRAD, VRAD);
+            g.translate(VRAD/2,VRAD/2);
+
         }
     }
 
     public void paintEdgesUndirected(Graphics g) {
+        g.translate(30,30);
         for (int i = 0; i < vertices.getSize(); i++) {
-//            System.out.println("TO: " + vertices.getElement(i).edges.size());
             for (int j = 0; j <  vertices.getElement(i).edges.size(); j++) {
                 PairList.Node<Integer, Integer> p1 = vertexCoordsPairList.get(vertices.getElement(i));
-//                System.out.println(vertices.getElement(i).edges.getAt(j).key);
-//                PairList.Node<Graph.Vertex, Integer> toFind = vertices.getElement(i).edges.getAt(j);
                 PairList.Node<Integer, Integer> p2 = vertexCoordsPairList.get(vertices.getElement(i).edges.getAt(j).key);
+                if (vertices.getElement(i).equals(vertices.getElement(i).edges.getAt(j).key)) {
+                    g.drawOval(p1.key, p1.val, VRAD, VRAD);
+                    continue;
+                }
                 int cost = vertices.getElement(i).edges.getAt(j).val;
                 g.setColor(Color.BLACK);
                 g.drawLine(p1.key, p1.val, p2.key, p2.val);
             }
-
         }
 
-        // paint path
-        for (int i = 1; i < path.getSize(); i++) {
-            PairList.Node<Integer, Integer> p1 = vertexCoordsPairList.get(path.getElement(i));
-            PairList.Node<Integer, Integer> p2 = vertexCoordsPairList.get(path.getElement(i-1));
+        for (int i = 0; i < path.getSize(); i++) {
+            PairList.Node<Integer, Integer> p1 = vertexCoordsPairList.get(path.getElement(i).key);
+            PairList.Node<Integer, Integer> p2 = vertexCoordsPairList.get(path.getElement(i).val);
             g.setColor(Color.GREEN);
+            if (i == path.getSize()-1)
+                g.setColor(Color.WHITE);
+            if (p1.equals(p2)) {
+                g.drawOval(p1.key, p1.val, VRAD, VRAD);
+                continue;
+            }
             g.drawLine(p1.key, p1.val, p2.key, p2.val);
         }
+
     }
 
     public void paintEdgesDirected(Graphics g) {
@@ -141,7 +157,7 @@ public class GraphVisualizerCanvas extends Canvas {
         this.toLabel = toLabel;
     }
 
-    public void setPath(ArrayList<Graph.Vertex> path) {
+    public void setPath(ArrayList<Dictionary.Node<Graph.Vertex, Graph.Vertex>> path) {
         this.path = path;
         this.repaint();
     }

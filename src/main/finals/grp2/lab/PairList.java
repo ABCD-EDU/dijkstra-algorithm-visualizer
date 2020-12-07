@@ -4,6 +4,7 @@ import main.finals.grp2.util.ArrayList;
 import main.finals.grp2.util.List;
 
 import java.security.InvalidParameterException;
+import java.util.Objects;
 
 public class PairList<K, V> {
 
@@ -21,6 +22,16 @@ public class PairList<K, V> {
         public String toString() {
             return String.format("%-30s%-30s%n", key, val);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node<?, ?> node = (Node<?, ?>) o;
+            return Objects.equals(key, node.key) &&
+                    Objects.equals(val, node.val);
+        }
+
     }
 
     public PairList() {
