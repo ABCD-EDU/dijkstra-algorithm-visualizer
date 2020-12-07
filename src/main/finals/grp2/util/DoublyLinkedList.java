@@ -94,7 +94,7 @@ public class DoublyLinkedList<E>
     }
 
     @Override
-    public E peek() throws StackException {
+    public E peek() {
         return head.data;
     }
 
