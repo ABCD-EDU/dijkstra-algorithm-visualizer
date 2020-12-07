@@ -184,10 +184,10 @@ public class Graph {
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
                 if (v.ID.equalsIgnoreCase(end)) return path;
-                path.enqueue(v);
+                path.enqueue(getVertex(v.ID));
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
-                    path.enqueue(v.edges.getAt(i).key);
+                    path.enqueue(getVertex(v.edges.getAt(i).key.ID));
                     if (v.edges.getAt(i).key.ID.equalsIgnoreCase(end))
                         return path;
                     else
@@ -228,10 +228,10 @@ public class Graph {
             if (!visitedNodes.getNode(v).val) {
                 Dictionary.Node<Vertex, Boolean> currNode = visitedNodes.getNode(v);
                 if (v.ID.equalsIgnoreCase(end)) return path;
-                path.enqueue(v);
+                path.enqueue(getVertex(v.ID));
                 currNode.val = true;
                 for (int i = 0; i < v.edges.size(); i++) {
-                    path.enqueue(v.edges.getAt(i).key);
+                    path.enqueue(getVertex(v.edges.getAt(i).key.ID));
                     if (v.edges.getAt(i).key.ID.equalsIgnoreCase(end))
                         return path;
                     else
@@ -252,17 +252,12 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-//        Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
-//        System.out.println(g.toString());
-//        Queue<String> depthPath = g.depthFirstSearch("0", "4");
-//        System.out.println("DEPTH FIRST SEARCH");
-//        while (!depthPath.isEmpty()) {
-//            System.out.println(depthPath.dequeue());
-//        }
-//        Queue<String> breadthPath = g.breadthFirstSearch("0", "4");
-//        System.out.println("BREADTH FIRST SEARCH");
-//        while (!breadthPath.isEmpty()) {
-//            System.out.println(breadthPath.dequeue());
-//        }
+        Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+        System.out.println("GRAPH");
+        System.out.println(g.toString());
+        System.out.println("BFS");
+        System.out.println(g.breadthFirstSearch("0","4").toString());
+        System.out.println("DFS");
+        System.out.println(g.depthFirstSearch("0","4").toString());
     }
 }

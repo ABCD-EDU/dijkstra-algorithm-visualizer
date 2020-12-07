@@ -218,4 +218,15 @@ public class DoublyLinkedList<E>
             size--;
         }
     }
+
+    @Override
+    public String toString() {
+        Node<E> curr = head;
+        StringBuilder sb = new StringBuilder();
+        while (curr != null) {
+            sb.append(curr.data);
+            curr = curr.next;
+        }
+        return sb.toString();
+    }
 }
