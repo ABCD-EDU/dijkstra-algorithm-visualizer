@@ -117,6 +117,16 @@ public class DoublyLinkedList<E>
         return findData(data) == null;
     }
 
+    @Override
+    public void set(int index, E data) {
+
+    }
+
+    @Override
+    public void reverse() {
+
+    }
+
     public void deleteFirst() {
         if (!isEmpty()) {
             deleteFirstNode();

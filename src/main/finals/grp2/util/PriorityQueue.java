@@ -1,5 +1,8 @@
 package main.finals.grp2.util;
 
+import main.finals.grp2.util.ArrayList;
+import main.finals.grp2.util.Queue;
+
 import java.util.NoSuchElementException;
 
 public class PriorityQueue<T extends Comparable<T>>
@@ -7,7 +10,7 @@ public class PriorityQueue<T extends Comparable<T>>
 
     ArrayList<T> heap;
 
-    public PriorityQueue() {
+    public PriorityQueue () {
         heap = new ArrayList<>();
     }
 
@@ -42,6 +45,11 @@ public class PriorityQueue<T extends Comparable<T>>
         return temp;
     }
 
+    public void remove(T toRemove){
+        heap.delete(toRemove);
+        moveUp();
+    }
+
     public String toString() {
         return heap.toString();
     }
@@ -73,7 +81,7 @@ public class PriorityQueue<T extends Comparable<T>>
             T data = heap.getElement(i);
             T parent = heap.getElement(parentIndex);
             int key = data.compareTo(parent);
-            if (key > 0) {
+            if (key < 0) {
                 swap(heap, i, parentIndex);
                 i = parentIndex;
             } else {
@@ -90,12 +98,12 @@ public class PriorityQueue<T extends Comparable<T>>
             int rightIndex = getRightIndex(i);
             if (rightIndex < heap.getSize()) {
                 int key = heap.getElement(rightIndex).compareTo(heap.getElement(max));
-                if (key > 0) {
+                if (key < 0) {
                     max++;
                 }
             }
             int key = heap.getElement(i).compareTo(heap.getElement(max));
-            if (key < 0) {
+            if (key > 0) {
                 swap(heap, i, max);
                 i = max;
                 leftIndex = getLeftIndex(i);

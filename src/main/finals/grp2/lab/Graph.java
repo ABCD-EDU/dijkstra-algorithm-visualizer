@@ -6,15 +6,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 
 public class Graph {
 
     // ============================================ INNER CLASSES ============================================
 
-    public static class Vertex {
+    public static class Vertex implements Comparable<Vertex> {
         public String ID;
         public PairList<Vertex, Integer> edges = new PairList<>();
+
+
+//        private boolean visited;
+//        private Vertex prevVertex;
+        private double minDistance = Double.POSITIVE_INFINITY;
+        private Vertex parent;
 
         public Vertex(String ID) {
             this.ID = ID;
@@ -23,7 +30,7 @@ public class Graph {
         @Override
         public String toString() {
             final StringBuilder builder = new StringBuilder();
-            builder.append("ID = ").append(ID).append("\n");
+            builder.append("ID = ").append(ID).append("");
             // UNCOMMENT THIS IF YOU WANT TO PRINT THE EDGES
 //            for (int i = 0; i < edges.size(); i++) {
 //                PairList.Node<Vertex, Integer> curr = edges.getAt(i);
@@ -34,8 +41,11 @@ public class Graph {
 
         @Override
         public boolean equals(Object o) {
-
             return ((Vertex) o).ID.equalsIgnoreCase(this.ID);
+        }
+
+        public int compareTo(Vertex otherVertex) {
+            return Double.compare(this.minDistance, otherVertex.minDistance);
         }
     }
 
@@ -234,11 +244,54 @@ public class Graph {
                 for (int i = 0; i < v.edges.size(); i++) {
                     path.enqueue(new Dictionary.Node<>(getVertex(v.ID),getVertex(v.edges.getAt(i).key.ID)));
                     stack.enqueue(getVertex(v.edges.getAt(i).key.ID));
-
                 }
             }
         }
-//        throw new NoSuchElementException("path not found");
+        return path;
+    }
+
+    public Queue<Dictionary.Node<Vertex, Vertex>> dijkstra(String start){
+        Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
+        Vertex startVertex = getVertex(start);
+        startVertex.minDistance = 0f;
+        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>();
+
+
+        priorityQueue.enqueue(startVertex);
+        while (!priorityQueue.isEmpty()){
+
+            Vertex parentVertex = priorityQueue.dequeue();
+            for (int i=0;i<parentVertex.edges.size();i++){
+
+                parentVertex.edges.set(i, new PairList.Node<Vertex, Integer>
+                        (getVertex(parentVertex.edges.getAt(i).key.ID), parentVertex.edges.getAt(i).val));
+                Vertex childVertex = parentVertex.edges.getAt(i).key;
+                double weight = parentVertex.edges.getAt(i).val;
+                double distanceFromParent = parentVertex.minDistance+weight;
+                path.enqueue(new Dictionary.Node<>(getVertex(parentVertex.ID),getVertex(childVertex.ID)));
+                if (childVertex.minDistance>distanceFromParent){
+                    priorityQueue.remove(parentVertex);
+                    relax(parentVertex, childVertex, distanceFromParent);
+                    priorityQueue.enqueue(childVertex);
+                }
+            }
+        }
+        return path;
+    }
+
+    public void relax(Vertex u, Vertex v, Double weight){
+        v.minDistance = weight;
+        v.parent = u;
+    }
+    public static List<Vertex> getShortestPathFrom(Vertex target){
+
+        //trace path from target to source
+        List<Vertex> path = new ArrayList<Vertex>();
+        for(Vertex node = target; node!=null; node = node.parent){
+            path.insert(node);
+        }
+        //reverse the order such that it will be from source to target
+
         return path;
     }
 
@@ -250,15 +303,26 @@ public class Graph {
         return vN;
     }
 
+
+
     public static void main(String[] args) {
         Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
-        System.out.println("GRAPH");
-        System.out.println(g.toString());
-        System.out.println("BFS");
-        System.out.println(g.breadthFirstSearch("0").toString());
-        System.out.println("DFS");
-        System.out.println(g.depthFirstSearch("0").toString());
-        Queue<Dictionary.Node<Vertex,Vertex>> t = g.breadthFirstSearch("0");
-        System.out.println(t.dequeue());
+
+        System.out.println(g.dijkstra("0"));
+
+        Vertex[] vertices = new Vertex[g.vertices.getSize()];
+        for (int i = 0; i < g.vertices.getSize();i++) {
+            vertices[i] = g.vertices.getElement(i);
+        }
+
+        for (Vertex n : vertices) {
+            System.out.println("Distance to " +
+                    n + ": " + n.minDistance);
+            List<Vertex> path = getShortestPathFrom(n);
+            System.out.println("Path: " + path);
+            System.out.println();
+        }
+        System.out.println(g.breadthFirstSearch("0"));
+
     }
 }

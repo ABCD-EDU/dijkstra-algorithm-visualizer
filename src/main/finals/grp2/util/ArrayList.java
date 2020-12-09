@@ -125,6 +125,21 @@ public class ArrayList<E>
         return toReturn;
     }
 
+    public void reverse(){
+        Object temp = null;
+        int tempStart =1;
+        int tempEnd = trueSize--;
+        while (tempStart < tempEnd){
+            temp = elementData[tempStart];
+            elementData[tempStart] = elementData[tempEnd];
+            elementData[tempEnd] = temp;
+            tempStart++;
+            tempEnd--;
+        }
+    }
+
+
+
     public String toString() {
         if (trueSize == 0) return "[ ]";
         if (trueSize == 1) return "[ " + elementData[0] + " ]";

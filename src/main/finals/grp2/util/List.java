@@ -14,5 +14,9 @@ public interface List<E> {
     boolean delete(E data);
 
     boolean search(E data);
+
+    void set(int index, E data);
+
+    void reverse();
 }
 

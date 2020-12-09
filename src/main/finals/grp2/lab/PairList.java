@@ -20,7 +20,7 @@ public class PairList<K, V> {
         }
 
         public String toString() {
-            return String.format("%-30s%-30s%n", key, val);
+            return String.format("%-20s%-20s%n", key, val);
         }
 
         @Override
@@ -64,6 +64,10 @@ public class PairList<K, V> {
                 return true;
         }
         return false;
+    }
+
+    public void set(Integer index, Node<K,V> newPair){
+        elements.set(index, newPair);
     }
 
     public String toString() {
