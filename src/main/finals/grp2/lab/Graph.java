@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 
@@ -250,12 +251,23 @@ public class Graph {
         return path;
     }
 
-    public Queue<Dictionary.Node<Vertex, Vertex>> dijkstra(String start){
+
+    private Dictionary<Vertex, Boolean> initVisitedNodes() {
+        Dictionary<Vertex, Boolean> vN = new Dictionary<>();
+        for (int i = 0; i < vertices.getSize(); i++) {
+            vN.put(vertices.getElement(i), false);
+        }
+        return vN;
+    }
+
+    public PairList<String[][], Queue<Dictionary.Node<Vertex, Vertex>>> dijkstra(String start){
+        PairList<String[][], Queue<Dictionary.Node<Vertex, Vertex>>> toReturn = new PairList<>();
         Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
+
+
         Vertex startVertex = getVertex(start);
         startVertex.minDistance = 0f;
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>();
-
 
         priorityQueue.enqueue(startVertex);
         while (!priorityQueue.isEmpty()){
@@ -276,32 +288,47 @@ public class Graph {
                 }
             }
         }
-        return path;
+        String[][] endWeightPathArr = getEndWeightPath(this);
+        toReturn.put(endWeightPathArr, path);
+        return toReturn;
     }
+
+
 
     public void relax(Vertex u, Vertex v, Double weight){
         v.minDistance = weight;
         v.parent = u;
     }
-    public static List<Vertex> getShortestPathFrom(Vertex target){
 
-        //trace path from target to source
+    public static List<Vertex> getShortestPathFrom(Vertex source){
         List<Vertex> path = new ArrayList<Vertex>();
-        for(Vertex node = target; node!=null; node = node.parent){
+        for(Vertex node = source; node!=null; node = node.parent){
             path.insert(node);
         }
-        //reverse the order such that it will be from source to target
-
+        path.reverse();
         return path;
     }
 
-    private Dictionary<Vertex, Boolean> initVisitedNodes() {
-        Dictionary<Vertex, Boolean> vN = new Dictionary<>();
-        for (int i = 0; i < vertices.getSize(); i++) {
-            vN.put(vertices.getElement(i), false);
+    public String[][] getEndWeightPath(Graph g){
+        int vertexCount = g.vertices.getSize();
+        String[][] toReturn = new String[3][vertexCount];
+        for (int i =0;i<vertexCount;i++){
+            toReturn[0][i] = g.vertices.getElement(i).ID;
+            toReturn[1][i] = String.valueOf(vertices.getElement(i).minDistance) ;
         }
-        return vN;
-    }
+        for (int i=0;i<vertexCount;i++){
+            String tempString = "";
+            List<Vertex> path = getShortestPathFrom(g.vertices.getElement(i));
+            for (int j=0;j<path.getSize();j++){
+                tempString += path.getElement(j)+"->";
+            }
+            toReturn[2][i] = tempString.substring(0,tempString.length()-2);
+        }
+
+        return toReturn;
+   }
+
+
 
 
 
@@ -309,19 +336,6 @@ public class Graph {
         Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
 
         System.out.println(g.dijkstra("0"));
-
-        Vertex[] vertices = new Vertex[g.vertices.getSize()];
-        for (int i = 0; i < g.vertices.getSize();i++) {
-            vertices[i] = g.vertices.getElement(i);
-        }
-
-        for (Vertex n : vertices) {
-            System.out.println("Distance to " +
-                    n + ": " + n.minDistance);
-            List<Vertex> path = getShortestPathFrom(n);
-            System.out.println("Path: " + path);
-            System.out.println();
-        }
         System.out.println(g.breadthFirstSearch("0"));
 
     }

@@ -117,6 +117,17 @@ public class ArrayList<E>
         elementData[index] = data;
     }
 
+    @Override
+    public void reverse() {
+        ArrayList<E> reversed = new ArrayList<>();
+        for (int i= this.trueSize - 1; i>=0; i--){
+            reversed.insert(this.getElement(i));
+        }
+        for (int i= 0; i< trueSize;i++){
+            this.set(i,reversed.getElement(i));
+        }
+    }
+
     public E[] toArray(){
         E[] toReturn = (E[]) new Object[this.getSize()];
         for (int i=0;i<this.getSize();i++){
@@ -125,18 +136,6 @@ public class ArrayList<E>
         return toReturn;
     }
 
-    public void reverse(){
-        Object temp = null;
-        int tempStart =1;
-        int tempEnd = trueSize--;
-        while (tempStart < tempEnd){
-            temp = elementData[tempStart];
-            elementData[tempStart] = elementData[tempEnd];
-            elementData[tempEnd] = temp;
-            tempStart++;
-            tempEnd--;
-        }
-    }
 
 
 
