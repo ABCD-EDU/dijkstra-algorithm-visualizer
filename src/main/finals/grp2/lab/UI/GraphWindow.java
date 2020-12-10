@@ -47,10 +47,14 @@ public class GraphWindow {
     // sub-panels for controls and visualizer
     protected JPanel controlPanel;
     protected JPanel visualPanel;
+    protected JPanel dijkstra;
     GraphVisualizerCanvas graphCanvas;
 
     // sub panels for controlPanel;
     protected JPanel inputPanel, tablePanel, actionPanel;
+
+    // sub panels for dijkstraPanel;
+    protected JPanel destinationPanel, costPanel, pathPanel;
 
     // panels in tablePanel (input and output);
     protected JPanel inputTablePanel, pathwayTablePanel;
@@ -121,6 +125,12 @@ public class GraphWindow {
         // init two main sub panels
         initControlPanel();
         initVisualPanel();
+        initDijkstraPanel();
+
+        // init three dijstrak sub panels
+        initDestination();
+        initCost();
+        initPath();
 
         // controls
         setActionButtonsActionListeners();
@@ -228,6 +238,46 @@ public class GraphWindow {
         mainPanel.add(controlPanel);
         mainPanel.add(visualPanel);
     }
+    // TODO: ALIGN DIJKSTRA PANEL TO SOUTH
+    protected void initDijkstraPanel() {
+        dijkstra = new JPanel();
+        dijkstra.setLayout(new BorderLayout());
+        dijkstra.setBorder(new EmptyBorder(35, 35, 60, 35));
+        dijkstra.setPreferredSize(new Dimension(800, 350));
+
+//        dijsktra.add(destinationPanel, BorderLayout.EAST);
+//        dijsktra.add(costPanel, BorderLayout.CENTER);
+//        dijsktra.add(pathPanel, BorderLayout.WEST);
+    }
+
+    protected void initDestination() {
+        destinationPanel = new JPanel();
+        destinationPanel.setBorder(new EmptyBorder(0,100,0,0));
+        destinationPanel.setLayout(new GridLayout(1, 2));
+
+        JLabel text = new JLabel();
+        //text.setHorizontalAlignment(SwingConstants.);
+    }
+
+    protected void initCost() {
+        costPanel = new JPanel();
+        costPanel.setBorder(new EmptyBorder(0,100,0,0));
+        costPanel.setLayout(new GridLayout(2, 1));
+
+        JLabel text = new JLabel();
+       // text.setHorizontalAlignment(SwingConstants.);
+    }
+
+    protected void initPath () {
+        pathPanel = new JPanel();
+        pathPanel.setBorder(new EmptyBorder(0,100,0,0));
+        pathPanel.setLayout(new GridLayout(1, 2));
+
+        JLabel text = new JLabel();
+        //text.setHorizontalAlignment(SwingConstants.);
+    }
+
+
 
     /**
      * Custom title bar
@@ -273,6 +323,7 @@ public class GraphWindow {
     protected void initVisualPanel() {
         visualPanel = new JPanel();
         visualPanel.setPreferredSize(new Dimension(1100, 800)); // makes the visual panel wider than controls
+
     }
 
     // TODO: FIX FORMATTING
@@ -439,7 +490,10 @@ public class GraphWindow {
                 if (selection.equals("Depth First Search") || selection.equals("Breadth First Search") ) {
                     toField.setText("");
                     toField.setEnabled(false);
-                }else {
+                }else if (selection.equals("Dijkstra's Shortest Path")) {
+                    initDijkstraPanel();
+                }
+                else {
                     toField.setEnabled(true);
                 }
             }
