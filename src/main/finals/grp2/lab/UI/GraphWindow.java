@@ -464,7 +464,7 @@ public class GraphWindow {
                 pathQueue = graph.breadthFirstSearch(from);
                 break;
             case "Dijkstra's Shortest Path":
-//                pathQueue = graph.PATH FIND
+//                pathQueue = graph.dijkstra(from);
                 break;
             default:
                 System.out.println("Combo Box Invalid Item");

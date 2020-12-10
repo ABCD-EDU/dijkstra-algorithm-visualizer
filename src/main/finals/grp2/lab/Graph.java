@@ -251,7 +251,6 @@ public class Graph {
         return path;
     }
 
-
     private Dictionary<Vertex, Boolean> initVisitedNodes() {
         Dictionary<Vertex, Boolean> vN = new Dictionary<>();
         for (int i = 0; i < vertices.getSize(); i++) {
@@ -260,10 +259,8 @@ public class Graph {
         return vN;
     }
 
-    public PairList<String[][], Queue<Dictionary.Node<Vertex, Vertex>>> dijkstra(String start){
-        PairList<String[][], Queue<Dictionary.Node<Vertex, Vertex>>> toReturn = new PairList<>();
+    public PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> dijkstra(String start){
         Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
-
 
         Vertex startVertex = getVertex(start);
         startVertex.minDistance = 0f;
@@ -288,9 +285,8 @@ public class Graph {
                 }
             }
         }
-        String[][] endWeightPathArr = getEndWeightPath(this);
-        toReturn.put(endWeightPathArr, path);
-        return toReturn;
+
+        return getEndWeightPath(this);
     }
 
 
@@ -309,34 +305,72 @@ public class Graph {
         return path;
     }
 
-    public String[][] getEndWeightPath(Graph g){
+
+    /*
+    Returns: PairList<String[], Queue<PairList.Node<Vertex, Vertex>>>
+    Where:
+    - Each index of PairList corresponds to 1 path
+    - String[0]: end vertex, String[1]: cost of path, String[2]: path in string format
+    - Queue<PairList.Node<Vertex, Vertex>>:
+        edges visited by path where first Vertex = from and second Vertex = to
+     */
+    public PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> getEndWeightPath(Graph g){
+        PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> toReturn = new PairList<>();
         int vertexCount = g.vertices.getSize();
-        String[][] toReturn = new String[3][vertexCount];
-        for (int i =0;i<vertexCount;i++){
-            toReturn[0][i] = g.vertices.getElement(i).ID;
-            toReturn[1][i] = String.valueOf(vertices.getElement(i).minDistance) ;
-        }
-        for (int i=0;i<vertexCount;i++){
-            String tempString = "";
+
+        for (int i = 0; i < vertexCount; i++) { // for every vertex
             List<Vertex> path = getShortestPathFrom(g.vertices.getElement(i));
-            for (int j=0;j<path.getSize();j++){
-                tempString += path.getElement(j)+"->";
-            }
-            toReturn[2][i] = tempString.substring(0,tempString.length()-2);
+            String[] tableRow = new String[3];
+            String pathString = "";
+            tableRow[0] = vertices.getElement(i).ID;
+            tableRow[1] = String.valueOf(vertices.getElement(i).minDistance);
+            for (int j=0;j<path.getSize();j++) pathString += path.getElement(j)+"->";
+            tableRow[2] = pathString.substring(0,pathString.length()-2);
+            toReturn.put(tableRow, pathListToQueue(path));
         }
 
         return toReturn;
    }
 
-
-
-
+   public Queue<PairList.Node<Vertex, Vertex>> pathListToQueue(List<Vertex> vertex) {
+       Queue<PairList.Node<Vertex, Vertex>> path = new DoublyLinkedList<>();
+       for (int i = 1; i < vertex.getSize(); i++)
+           path.enqueue(new PairList.Node<>(vertex.getElement(i-1),vertex.getElement(i)));
+       return path;
+   }
 
     public static void main(String[] args) {
         Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
 
-        System.out.println(g.dijkstra("0"));
-        System.out.println(g.breadthFirstSearch("0"));
+        PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> data = g.dijkstra("0");
+
+        for (int i = 0; i < data.size(); i++) {
+            for (int j = 0; j < 3; j++)
+                System.out.println(data.getAt(i).key[j]);
+            System.out.println(data.getAt(i).val);
+        }
 
     }
+
+    // for debugging only:
+
+    private static void print2DArr(String[][] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i][0]);
+            for (int j = 1; j < arr[i].length; j++) {
+                System.out.print(" " + arr[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    private static void print2DArrSpecial(String[][] arr) {
+        for (int i = 0; i < arr[0].length; i++) {
+            for (int j = 0; j < arr.length; j++) {
+                System.out.println(arr[j][i] + " ");
+            }
+            System.out.println();
+        }
+    }
+
 }
