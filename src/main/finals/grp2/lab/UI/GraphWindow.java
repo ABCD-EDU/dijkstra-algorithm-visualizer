@@ -478,7 +478,6 @@ public class GraphWindow {
                     visualPanel.remove(dTableMainPanel);
                 }
                 setVisualPanelProperties(false);
-                // TODO: remove dTable from visualizerPanel
             }
             visualPanel.revalidate();
             visualPanel.repaint();
@@ -541,16 +540,15 @@ public class GraphWindow {
             PairList<String[], Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>>> pathsList
             , int chosenIdx) {
         dTableModel.setRowCount(0);
-        for (int i = 0; i <pathsList.size(); i++) {
-            System.out.println(pathsList.getAt(i).key[0]);
+        for (int i = 0; i <pathsList.size(); i++)
             dTableModel.addRow(pathsList.getAt(i).key);
-        }
         dTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                            boolean hasFocus, int row, int column) {
                 final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 c.setBackground(row == chosenIdx ? accentColor : secondaryColor);
+                // TODO: change highlight color for higlighted row
                 return c;
             }
         });
@@ -589,7 +587,6 @@ public class GraphWindow {
             changeMode(paused);
             if (!paused) {
                 if (visualizerThread.getState().toString().equals("TERMINATED")){
-                    System.out.println("Creating new thread");
                     visualizerThread = new VisualizerThread();
                     visualizerThread.start();
                 }else {
@@ -706,7 +703,6 @@ public class GraphWindow {
         else
             visualPanel.setPreferredSize(new Dimension(1100,800));
         graphCanvas.setPreferredSize(visualPanel.getPreferredSize());
-        System.out.println("Graph canvas: " + graphCanvas.getWidth() + " " + graphCanvas.getHeight());
         visualPanel.add(graphCanvas);
         visualPanel.repaint();
         visualPanel.revalidate();

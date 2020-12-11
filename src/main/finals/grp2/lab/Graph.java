@@ -329,7 +329,20 @@ public class Graph {
             toReturn.put(tableRow, pathListToQueue(path));
         }
 
+        resetVertices();
+
         return toReturn;
+   }
+
+   private void resetVertices() {
+       for (int i = 0; i < vertices.getSize(); i++) {
+           vertices.getElement(i).minDistance = Double.POSITIVE_INFINITY;
+           vertices.getElement(i).parent = null;
+           for (int j = 0; j < vertices.getElement(i).edges.size(); j++) {
+               vertices.getElement(i).edges.getAt(j).key.minDistance = Double.POSITIVE_INFINITY;
+               vertices.getElement(i).edges.getAt(j).key.parent = null;
+           }
+       }
    }
 
    public Queue<Dictionary.Node<Vertex, Vertex>> pathListToQueue(List<Vertex> vertex) {
@@ -342,21 +355,9 @@ public class Graph {
     public static void main(String[] args) {
         Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
 
-        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data = g.dijkstra("0");
-        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data1 = g.dijkstra("3");
-        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data2 = g.dijkstra("5");
-        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data3 = g.dijkstra("2");
-
-        for (int i = 0; i < data.size(); i++) {
-            for (int j = 0; j < 3; j++)
-                System.out.println(data.getAt(i).key[j]);
-            System.out.println(data.getAt(i).val);
-        }
-
-        for (int i = 0; i < data3.size(); i++) {
-            for (int j = 0; j < 3; j++)
-                System.out.println(data3.getAt(i).key[j]);
-            System.out.println(data3.getAt(i).val);
+        for (int i = 0; i < 2; i++) {
+            PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data = g.dijkstra(String.valueOf(i));
+            System.out.println(i);
         }
 
     }
