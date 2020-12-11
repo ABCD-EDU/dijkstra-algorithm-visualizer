@@ -19,8 +19,6 @@ public class Graph {
         public PairList<Vertex, Integer> edges = new PairList<>();
 
 
-//        private boolean visited;
-//        private Vertex prevVertex;
         private double minDistance = Double.POSITIVE_INFINITY;
         private Vertex parent;
 
@@ -271,7 +269,6 @@ public class Graph {
 
             Vertex parentVertex = priorityQueue.dequeue();
             for (int i=0;i<parentVertex.edges.size();i++){
-
                 parentVertex.edges.set(i, new PairList.Node<Vertex, Integer>
                         (getVertex(parentVertex.edges.getAt(i).key.ID), parentVertex.edges.getAt(i).val));
                 Vertex childVertex = parentVertex.edges.getAt(i).key;

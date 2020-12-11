@@ -334,12 +334,13 @@ public class GraphWindow {
         table.setEnabled(false);
         table.setCellSelectionEnabled(false);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.setRowHeight(10);
+        table.setForeground(Color.WHITE);
+        table.setRowHeight(50);
         table.setOpaque(true);
         table.setFillsViewportHeight(true);
         table.getTableHeader().setReorderingAllowed(false);
         table.getTableHeader().setResizingAllowed(false);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
         scrollPane.setVisible(true);
     }
 
