@@ -259,7 +259,7 @@ public class Graph {
         return vN;
     }
 
-    public PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> dijkstra(String start){
+    public PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> dijkstra(String start){
         Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
 
         Vertex startVertex = getVertex(start);
@@ -314,8 +314,8 @@ public class Graph {
     - Queue<PairList.Node<Vertex, Vertex>>:
         edges visited by path where first Vertex = from and second Vertex = to
      */
-    public PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> getEndWeightPath(Graph g){
-        PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> toReturn = new PairList<>();
+    public PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> getEndWeightPath(Graph g){
+        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> toReturn = new PairList<>();
         int vertexCount = g.vertices.getSize();
 
         for (int i = 0; i < vertexCount; i++) { // for every vertex
@@ -332,22 +332,31 @@ public class Graph {
         return toReturn;
    }
 
-   public Queue<PairList.Node<Vertex, Vertex>> pathListToQueue(List<Vertex> vertex) {
-       Queue<PairList.Node<Vertex, Vertex>> path = new DoublyLinkedList<>();
+   public Queue<Dictionary.Node<Vertex, Vertex>> pathListToQueue(List<Vertex> vertex) {
+       Queue<Dictionary.Node<Vertex, Vertex>> path = new DoublyLinkedList<>();
        for (int i = 1; i < vertex.getSize(); i++)
-           path.enqueue(new PairList.Node<>(vertex.getElement(i-1),vertex.getElement(i)));
+           path.enqueue(new Dictionary.Node<>(vertex.getElement(i-1),vertex.getElement(i)));
        return path;
    }
 
     public static void main(String[] args) {
         Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
 
-        PairList<String[], Queue<PairList.Node<Vertex, Vertex>>> data = g.dijkstra("0");
+        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data = g.dijkstra("0");
+        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data1 = g.dijkstra("3");
+        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data2 = g.dijkstra("5");
+        PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data3 = g.dijkstra("2");
 
         for (int i = 0; i < data.size(); i++) {
             for (int j = 0; j < 3; j++)
                 System.out.println(data.getAt(i).key[j]);
             System.out.println(data.getAt(i).val);
+        }
+
+        for (int i = 0; i < data3.size(); i++) {
+            for (int j = 0; j < 3; j++)
+                System.out.println(data3.getAt(i).key[j]);
+            System.out.println(data3.getAt(i).val);
         }
 
     }
