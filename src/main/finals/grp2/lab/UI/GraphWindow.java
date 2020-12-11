@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
 import java.security.InvalidParameterException;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 // COMMITS: WINDOW CENTERED, LAYOUT FIXES, PROMPT FILE SELECTION (NO FUNCTIONALITY)
@@ -64,7 +65,7 @@ public class GraphWindow {
     protected JLabel inputLabel, pathwayLabel, dTableLabel;
 
     // button controllers
-    protected JButton inputFileButton;
+    protected JButton browseButton;
     protected final JButton[] actionButtons = new JButton[]{
             new JButton("Play"),
             new JButton("<<"),
@@ -92,12 +93,13 @@ public class GraphWindow {
     protected Color secondaryForeground = Color.BLACK;
 
     protected File textFile;
-    protected PairList<String, String> weightsList;
+    protected PairList<String, String> edgeWeightPairList;
     protected final String EDGE_W_PAIRLIST_DELIMITER = "=Fr0Mt0=";
 
     private VisualizerThread visualizerThread;
     private boolean paused = true;
     private Graph graph;
+    private List<Graph.Vertex> vertices;
     private ArrayList<String> verticesIDList;
     private Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathQueue;
     private Stack<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathToShowStack;
@@ -131,9 +133,11 @@ public class GraphWindow {
 
         initTheme();
 
+        disableControlPanel();
+        browseButton.setEnabled(true);
+        actionButtons[0].setEnabled(false);
         // only load the mainframe after inserting all components
         initMainFrame();
-
     }
 
     /**
@@ -207,10 +211,10 @@ public class GraphWindow {
     }
 
     protected void setButtons() {
-        inputFileButton.setBackground(accentColor);
-        inputFileButton.setForeground(mainForeground);
-        inputFileButton.setFocusPainted(false);
-        inputFileButton.setBorder(new EmptyBorder(5, 0, 5, 0));
+        browseButton.setBackground(accentColor);
+        browseButton.setForeground(mainForeground);
+        browseButton.setFocusPainted(false);
+        browseButton.setBorder(new EmptyBorder(5, 0, 5, 0));
 
         for (JButton button : actionButtons) {
             button.setBackground(secondaryColor);
@@ -286,11 +290,11 @@ public class GraphWindow {
         text.setHorizontalAlignment(SwingConstants.LEFT);
 
         // components in input panel
-        inputFileButton = new JButton("Browse");
-        inputFileButton.addActionListener((e) -> promptFileSelection());
+        browseButton = new JButton("Browse");
+        browseButton.addActionListener((e) -> promptFileSelection());
 
         inputPanel.add(text);
-        inputPanel.add(inputFileButton);
+        inputPanel.add(browseButton);
     }
 
     // TODO: CLEAN
@@ -419,6 +423,7 @@ public class GraphWindow {
 
         fromField = new JTextField();
         toComboBox = new JComboBox<>();
+        toComboBox.setEnabled(false);
 
         algoLabelPanel.setPreferredSize(new Dimension(100, 0));
         algoSelectionPanel.setPreferredSize(new Dimension(100, 20   ));
@@ -469,8 +474,7 @@ public class GraphWindow {
             if (selection.equals("Dijkstra's Shortest Path")) {
                 dijkstraChosen = true;
                 toComboBox.setEnabled(true);
-                setVisualPanelProperties(true);
-                visualPanel.add(dTableMainPanel);
+                setVisualPanelProperties(dijkstraChosen);
             }else {
                 toComboBox.setEnabled(false);
                 dijkstraChosen = false;
@@ -478,7 +482,7 @@ public class GraphWindow {
                     visualPanel.remove(graphCanvas);
                     visualPanel.remove(dTableMainPanel);
                 }
-                setVisualPanelProperties(false);
+                setVisualPanelProperties(dijkstraChosen);
             }
             visualPanel.revalidate();
             visualPanel.repaint();
@@ -487,10 +491,9 @@ public class GraphWindow {
 
 
     private void initializeVerticesIDList() {
-        List<Graph.Vertex> vList = graph.getVertices();
         verticesIDList = new ArrayList<>();
-        for (int i = 0; i < vList.getSize(); i++)
-            verticesIDList.insert(vList.getElement(i).ID);
+        for (int i = 0; i < vertices.getSize(); i++)
+            verticesIDList.insert(vertices.getElement(i).ID);
     }
 
     private void updateToComboBox() {
@@ -535,6 +538,7 @@ public class GraphWindow {
                 = pathsList.getAt(verticesIDList.indexOf(to));
         pathQueue = selectedPath.val;
         updateDTable(pathsList, verticesIDList.indexOf(to));
+        visualizerThread = new VisualizerThread();
     }
 
     private void updateDTable(
@@ -574,6 +578,7 @@ public class GraphWindow {
 
     private synchronized void setActionButtonsActionListeners() {
         actionButtons[5].addActionListener(e -> { // setFromTo
+            if (!readyToSet()) return;
             if (dijkstraChosen)
                 initializePathQueueDijkstra();
             else
@@ -585,6 +590,7 @@ public class GraphWindow {
         });
 
         actionButtons[0].addActionListener(e -> { // play
+            if (!readyToVisualize()) return;
             changeMode(paused);
             if (!paused) {
                 if (visualizerThread.getState().toString().equals("TERMINATED")){
@@ -599,34 +605,82 @@ public class GraphWindow {
         });
 
         actionButtons[1].addActionListener(e -> { // skip to start
+            if (!readyToVisualize()) return;
             for (int i = pathShownList.getSize()-1; i > -1; i--) {
                 pathToShowStack.push(pathShownList.getElement(i));
                 pathShownList.remove(i);
             }
             graphCanvas.setPath(pathShownList);
             updatePathTableValues();
+            JOptionPane.showMessageDialog(mainFrame, "Beginning of path reached.",
+                    "Successful", JOptionPane.INFORMATION_MESSAGE);
         });
 
         actionButtons[2].addActionListener(e -> { // backward
-            pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
+            if (!readyToVisualize()) return;
+            try{
+                pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
+            }catch (ArrayIndexOutOfBoundsException e1) {
+                JOptionPane.showMessageDialog(mainFrame, "Beginning of path reached.",
+                        "Warning", JOptionPane.INFORMATION_MESSAGE);
+            }
             pathShownList.remove(pathShownList.getSize()-1);
             graphCanvas.setPath(pathShownList);
             updatePathTableValues();
         });
 
         actionButtons[3].addActionListener(e -> { // forward
-            pathShownList.insert(pathToShowStack.pop());
+            if (!readyToVisualize()) return;
+            try {
+                pathShownList.insert(pathToShowStack.pop());
+            }catch (EmptyStackException e1) {
+                JOptionPane.showMessageDialog(mainFrame, "End of path reached.",
+                        "Warning", JOptionPane.INFORMATION_MESSAGE);
+            }
             graphCanvas.setPath(pathShownList);
             updatePathTableValues();
         });
 
         actionButtons[4].addActionListener(e -> { // skip to end
+            if (!readyToVisualize()) return;
             while (!pathToShowStack.isEmpty()) {
                 pathShownList.insert(pathToShowStack.pop());
             }
             graphCanvas.setPath(pathShownList);
             updatePathTableValues();
+            JOptionPane.showMessageDialog(mainFrame, "End of path reached.",
+                    "Successful", JOptionPane.INFORMATION_MESSAGE);
         });
+    }
+
+    private boolean readyToVisualize() {
+        if (pathToShowStack == null) {
+            JOptionPane.showMessageDialog(mainFrame, "Please press the set button first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean readyToSet() {
+        if (algoSelectionBox.getSelectedItem().toString().equals("None")) {
+            JOptionPane.showMessageDialog(mainFrame, "Please select an algorithm first",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        // check if inputted value in from exists
+        String from = fromField.getText();
+        boolean found = false;
+        for (int i = 0; i < verticesIDList.getSize(); i++) {
+            if (from.equals(verticesIDList.getElement(i))) {
+                found = true;
+                break;
+            }
+        }
+        if (found) return true;
+        JOptionPane.showMessageDialog(mainFrame, "Inputted starting vertex ID does not exist",
+                "Error", JOptionPane.ERROR_MESSAGE);
+        return false;
     }
 
     private void promptFileSelection() {
@@ -639,9 +693,16 @@ public class GraphWindow {
             textFile = fileChooser.getSelectedFile();
             // TODO: change path to actual textFile
             graph = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+            vertices = graph.getVertices();
             initializeVerticesIDList();
-            setVisualPanelProperties(false);
+            initializeEdgeWeightPairList();
+            setVisualPanelProperties(dijkstraChosen);
             updateToComboBox();
+            enableControlPanel();
+            actionButtons[0].setEnabled(true);
+            dTableModel.setRowCount(0);
+            inputTableModel.setRowCount(0);
+            pathwayTableModel.setRowCount(0);
             try {
                 initializeInputTableValues();
             }catch (IOException e) {
@@ -653,10 +714,20 @@ public class GraphWindow {
         }
     }
 
+    private void initializeEdgeWeightPairList() {
+        edgeWeightPairList = new PairList<>();
+        for (int i = 0; i < vertices.getSize(); i++) {
+            Graph.Vertex v = vertices.getElement(i);
+            for (int j = 0; j < v.edges.size(); j++) {
+                String edge = v.ID + EDGE_W_PAIRLIST_DELIMITER + v.edges.getAt(j).key.ID;
+                edgeWeightPairList.put(edge, String.valueOf(v.edges.getAt(j).val));
+            }
+        }
+    }
+
     private void initializeInputTableValues() throws IOException {
         inputTableModel.setRowCount(0);
         BufferedReader reader = new BufferedReader(new FileReader("src/main/finals/grp2/lab/data/in.csv"));
-        weightsList = new PairList<>();
         String line = "";
         reader.readLine();
         line = reader.readLine();
@@ -667,11 +738,6 @@ public class GraphWindow {
                     data[1],
                     data[2]
             });
-            weightsList.put(
-                    data[1]+EDGE_W_PAIRLIST_DELIMITER+data[2]+"",
-                    data[0]
-            ); // initialize edgeWeightPairList
-            System.out.println(data[1]+EDGE_W_PAIRLIST_DELIMITER+data[2]);
             line = reader.readLine();
         }
     }
@@ -682,12 +748,9 @@ public class GraphWindow {
             Dictionary.Node<Graph.Vertex, Graph.Vertex> edge = pathShownList.getElement(i);
             String weight = "N/A";
             try {
-                System.out.println(edge.key.ID+EDGE_W_PAIRLIST_DELIMITER+edge.val.ID);
-                // TODO: why the fuck edge cant be found sometimes
-                // check .equals method
-                weight = weightsList.get(edge.key.ID+EDGE_W_PAIRLIST_DELIMITER+edge.val.ID+"");
+                weight = edgeWeightPairList.get(edge.key.ID + EDGE_W_PAIRLIST_DELIMITER + edge.val.ID+"");
             }catch (InvalidParameterException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
             pathwayTableModel.addRow(new Object[]{
                     weight,
@@ -698,6 +761,7 @@ public class GraphWindow {
     }
 
     private void setVisualPanelProperties(boolean dTablePresent) {
+        visualPanel.removeAll();
         graphCanvas = new GraphVisualizerCanvas(graph, secondaryColor);
         if (dTablePresent)
             visualPanel.setPreferredSize(new Dimension(1100,550));
@@ -705,6 +769,8 @@ public class GraphWindow {
             visualPanel.setPreferredSize(new Dimension(1100,800));
         graphCanvas.setPreferredSize(visualPanel.getPreferredSize());
         visualPanel.add(graphCanvas);
+        if (dTablePresent)
+            visualPanel.add(dTableMainPanel);
         visualPanel.repaint();
         visualPanel.revalidate();
     }
@@ -713,23 +779,31 @@ public class GraphWindow {
     private void changeMode(boolean mode) {
         actionButtons[0].setText(mode ? "Pause" : "Play");
         this.paused = !mode;
-        if (!paused) {
-            inputFileButton.setEnabled(false);
-            for (int i = 1; i < actionButtons.length; i++) {
-                actionButtons[i].setEnabled(false);
-            }
-            fromField.setEnabled(false);
-            toComboBox.setEnabled(false);
-            algoSelectionBox.setEnabled(false);
-        } else {
-            inputFileButton.setEnabled(true);
-            for (int i = 1; i < actionButtons.length; i++) {
-                actionButtons[i].setEnabled(true);
-            }
-            algoSelectionBox.setEnabled(true);
-            fromField.setEnabled(true);
-            toComboBox.setEnabled(true);
+        if (!paused)
+            disableControlPanel();
+        else
+            enableControlPanel();
+    }
+
+    private void disableControlPanel() {
+        browseButton.setEnabled(false);
+        for (int i = 1; i < actionButtons.length; i++) {
+            actionButtons[i].setEnabled(false);
         }
+        fromField.setEnabled(false);
+        toComboBox.setEnabled(false);
+        algoSelectionBox.setEnabled(false);
+    }
+
+    private void enableControlPanel() {
+        browseButton.setEnabled(true);
+        for (int i = 1; i < actionButtons.length; i++) {
+            actionButtons[i].setEnabled(true);
+        }
+        algoSelectionBox.setEnabled(true);
+        fromField.setEnabled(true);
+        if (dijkstraChosen) toComboBox.setEnabled(true);
+        else toComboBox.setEnabled(false);
     }
 
     private class VisualizerThread extends Thread {
@@ -737,7 +811,14 @@ public class GraphWindow {
         @Override
         public void run() {
             while (true) {
-                pathShownList.insert(pathToShowStack.pop());
+                try {
+                    pathShownList.insert(pathToShowStack.pop());
+                }catch (EmptyStackException e) {
+                    JOptionPane.showMessageDialog(mainFrame, "End of Path Already Reached",
+                            "Warning", JOptionPane.WARNING_MESSAGE);
+                    changeMode(paused);
+                    return;
+                }
                 graphCanvas.setPath(pathShownList);
                 updatePathTableValues();
                 try {
@@ -747,6 +828,8 @@ public class GraphWindow {
                 }
                 if (pathToShowStack.isEmpty()) {
                     changeMode(paused);
+                    JOptionPane.showMessageDialog(mainFrame, "End of Path Reached",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
                     break;
                 }
             }
