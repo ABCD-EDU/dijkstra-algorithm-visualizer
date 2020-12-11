@@ -257,6 +257,46 @@ public class Graph {
         return vN;
     }
 
+    /*
+    Dijkstra Implementation
+        Note:
+           u is the parent vertex/node
+           v is the child vertex or target vertex/node. The node to be visited
+           weight as the name implies is the weight of the Edge
+
+    When the Graph was read, the vertices had a data member called minDistance.
+    The data minDistance is the data that represents the distance it would take to travel from a source vertex/node to a destination vertex.
+    All the minDistance of the vertex from the source is set to Infinity since they are not yet visited.
+    Let all d[V] = ∞(infinity) where V ϵ G
+        > v = new Vertex
+        > v.minDistance = infinity
+    The starting vertex or source node will have a minDistance of 0 since the distance it will take to
+        travel from self to itself is 0.
+        > startVertex.minDistance = 0
+    The starting vertex is enqueued on a priority queue (PQ)
+        > PQ.enqueue(startVertex)
+    While PQ is not Empty do
+        Dequeue PQ
+           > u = PQ.dequeue //parent
+        for all edges of u do
+            Remove parent from the parent queue
+            > PQ.remove(u)
+            Relaxation Explained:
+            Given graph G that has set of vertices V = {1,2,3} and set of edges E = {(1,2) , (1,3) , (2,3)}
+            where the weights of each edge are W(1,2) = 1, W(1,3,) = 2, W(2,3) = 3 respectively.
+                > u.minDistance is 0 // u is 1
+                > weight it takes from u to v W(u,v) or in our case W(1,2) is 1 // child vertex is 2
+                > distanceFromParent =  parent.minDistance + weight
+            Check if the minDistance of a child(v) vertex is greater than of the parent's(u) minDistance + weight or W(u,v)
+            child.
+                > child.minDistance > distanceFromParent
+            Infinity is greater than one so we will proceed with relaxation
+                > relax(u, v, distanceFromParent)
+            Enqueue the child(v) vertex to the priority queue
+                > PQ.enqueue(v)
+
+
+     */
     public PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> dijkstra(String start){
         Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
 
@@ -269,11 +309,23 @@ public class Graph {
 
             Vertex parentVertex = priorityQueue.dequeue();
             for (int i=0;i<parentVertex.edges.size();i++){
+                System.out.println("Child : " + parentVertex.edges.getAt(i).key);
+                System.out.println("Weight: " + parentVertex.edges.getAt(i).val);
+                /*This is to replace the current edge into the  of the edge with complete info via getVertex since the inner edges of the current
+                edge is not stored during file reading.
+                  */
                 parentVertex.edges.set(i, new PairList.Node<Vertex, Integer>
                         (getVertex(parentVertex.edges.getAt(i).key.ID), parentVertex.edges.getAt(i).val));
+                /*
+                Assign the edge and weight to a variable
+                 */
                 Vertex childVertex = parentVertex.edges.getAt(i).key;
                 double weight = parentVertex.edges.getAt(i).val;
+                /*
+                Compute the distance it would take from the parent(u) vertex to the child(v) vertex of E(u,v)
+                 */
                 double distanceFromParent = parentVertex.minDistance+weight;
+
                 path.enqueue(new Dictionary.Node<>(getVertex(parentVertex.ID),getVertex(childVertex.ID)));
                 if (childVertex.minDistance>distanceFromParent){
                     priorityQueue.remove(parentVertex);
@@ -286,10 +338,22 @@ public class Graph {
         return getEndWeightPath(this);
     }
 
+    /*
+    Relax sets the distance of the visited vertex/node to the distance of all the combined distance of the
+        traversed path.
+     Example:
 
-
-    public void relax(Vertex u, Vertex v, Double weight){
-        v.minDistance = weight;
+        Before making relaxation, the distance of all the combined edges(path) or Σ W(u,v) is compared to the minDistance
+            of the node to be visited. //Explained in dijkstra method
+        If the child.minDistance greater than the distanceFromParent or infinity then we will relax it so that it will have
+        the value the distance from parent which is the parent.minDistance and the weight W(u,v) of the edge E(u,v)
+        To relax, we just have to set child(v) vertex minDistance to the distanceFromParent.
+        > v.minDistance = distanceFromParent //
+        Since a relaxation happened then child vertex had to remember which vertex it had had relaxation with which is the parent.
+        > v.parent = u
+     */
+    public void relax(Vertex u, Vertex v, Double distanceFromParent){
+        v.minDistance = distanceFromParent;
         v.parent = u;
     }
 
