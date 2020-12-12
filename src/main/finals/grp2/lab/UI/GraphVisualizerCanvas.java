@@ -22,11 +22,11 @@ public class GraphVisualizerCanvas extends Canvas {
     private int rad = 200; // Graph Radius
     private PairList<Integer, Integer> vCoords;
 
-    private final int VRAD = 30; // Vertex Radius
+    private final int VRAD = 35; // Vertex Radius
 
-    private String algoLabel = "Algorithm";
-    private String fromLabel = "From";
-    private String toLabel = "To";
+    private String algoLabel = "";
+    private String fromLabel = "";
+    private String toLabel = "";
 
     public GraphVisualizerCanvas(Graph graph, Color bgColor) {
         this.setBackground(bgColor);
@@ -40,24 +40,34 @@ public class GraphVisualizerCanvas extends Canvas {
         vCoords = calculateVCoords();
         vertexCoordsPairList = initializeVertexCoordsPairList();
         path = new ArrayList<>();
-        System.out.println("Graph initialized - visualizer");
-        System.out.println(graph);
+//        System.out.println("Graph initialized - visualizer");
+//        System.out.println(graph);
         this.repaint();
     }
 
     public void paint(Graphics g) {
         super.paint(g);
-        System.out.println("Canvas Painting!");
-        g.drawString(algoLabel + ": " + fromLabel + " - " + toLabel, 10, 10);
-        g.translate(this.getWidth()/2,this.getHeight()/2); // center
-        g.drawOval(0,0, VRAD, VRAD);
-        g.setColor(Color.BLACK);
-        if (graph.isDirected()) {
-            paintEdgesDirected(g);
-        }else {
+        System.out.println("Canvas Painting");
+        paintHeader(g);
+        g.translate((this.getWidth()/2)-40,(this.getHeight()/2)-40); // center
+//        g.drawOval(0,0, VRAD, VRAD);
+//        g.setColor(Color.BLACK);
+//        if (graph.isDirected()) {
+//            paintEdgesDirected(g);
+//        }else {
             paintEdgesUndirected(g);
-        }
+//        }
         paintVertices(g);
+    }
+
+    private void paintHeader(Graphics g) {
+        g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 25));
+        g.drawString(algoLabel,10,30);
+        if (!fromLabel.equals(""))
+            g.drawString("Start: " + fromLabel, 10, 65);
+        if (!toLabel.equals(""))
+            g.drawString("End: " + toLabel, 10, 100);
+        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
     }
 
     public void paintVertices(Graphics g) {

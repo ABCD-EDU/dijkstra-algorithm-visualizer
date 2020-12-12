@@ -18,6 +18,7 @@ import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.EmptyStackException;
 import java.util.Stack;
+import java.util.concurrent.ExecutionException;
 
 // COMMITS: WINDOW CENTERED, LAYOUT FIXES, PROMPT FILE SELECTION (NO FUNCTIONALITY)
 
@@ -267,7 +268,8 @@ public class GraphWindow {
         controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
         controlPanel.setBorder(new EmptyBorder(35, 35, 60, 35));
-        controlPanel.setPreferredSize(new Dimension(400, 800)); // makes the control panel smaller
+        controlPanel.setMinimumSize(new Dimension(400, 800)); // makes the control panel smaller
+        controlPanel.setMaximumSize(new Dimension(400, 800)); // makes the control panel smaller
 
         controlPanel.add(inputPanel, BorderLayout.NORTH);
         controlPanel.add(tablePanel, BorderLayout.CENTER);
@@ -277,7 +279,8 @@ public class GraphWindow {
     // TODO: INSERT VISUALIZER HERE
     protected void initVisualPanel() {
         visualPanel = new JPanel();
-        visualPanel.setPreferredSize(new Dimension(1100, 550)); // makes the visual panel wider than controls
+        visualPanel.setMinimumSize(new Dimension(1100, 800)); // makes the visual panel wider than controls
+        visualPanel.setMaximumSize(new Dimension(1100, 800)); // makes the visual panel wider than controls
     }
 
     // TODO: FIX FORMATTING
@@ -365,13 +368,16 @@ public class GraphWindow {
         inputTablePanel.add(inputTableScrollPane);
     }
 
+    //TODO: Style dTable related components here
     protected void initDTablePanel() {
         dTableMainPanel = new JPanel(new GridLayout(2,1));
-        dTableMainPanel.setPreferredSize(new Dimension(1100, 250));
+        dTableMainPanel.setPreferredSize(new Dimension(1085, 250));
+        dTableMainPanel.setBackground(Color.YELLOW);
 
         dTablePanel = new JPanel();
-        dTablePanel.setBorder(new EmptyBorder(5,0,10,0));
+        dTablePanel.setBorder(new EmptyBorder(0,0,0,0));
         dTablePanel.setLayout(new GridLayout(1, 1));
+        dTablePanel.setPreferredSize(new Dimension(600,240));
 
         dTableModel = new DefaultTableModel();
         dTable = new JTable(dTableModel);
@@ -384,7 +390,7 @@ public class GraphWindow {
         dTablePanel.add(dTableScrollPane);
 
         dTableLabelPanel = new JPanel(new GridLayout(1, 1));
-        dTableLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
+        dTableLabelPanel.setBorder(new EmptyBorder(0,0,0,0));
         dTableLabel = new JLabel("Pathway to Every Node:");
         dTableLabel.setHorizontalAlignment(SwingConstants.LEFT);
         dTableLabelPanel.add(dTableLabel);
@@ -505,10 +511,9 @@ public class GraphWindow {
     }
 
     private void initializePathQueue() {
-        // TODO: Validate input here
         from = fromField.getText();
         // TODO: edit canvas label output
-        to = "TODO EDIT THIS";
+        to = "";
         graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
         graphCanvas.repaint();
         visualizerThread = new VisualizerThread();
@@ -532,7 +537,7 @@ public class GraphWindow {
         // TODO: input validation
         from = fromField.getText();
         to = toComboBox.getSelectedItem()+"";
-        System.out.println(graph.toString());
+        graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
         PairList<String[], Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>>> pathsList = graph.dijkstra(from);
         PairList.Node<String[], Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>>> selectedPath
                 = pathsList.getAt(verticesIDList.indexOf(to));
@@ -684,6 +689,13 @@ public class GraphWindow {
     }
 
     private void promptFileSelection() {
+        System.out.println("Frame: " + mainFrame.getSize());
+        System.out.println("ControlPanel: " + controlPanel.getSize());
+        System.out.println("VisualPanel: " + visualPanel.getSize());
+        try {
+            System.out.println("dTablePanel: " + dTablePanel.getSize());
+            System.out.println("dTableMainPanel: " + dTableMainPanel.getSize());
+        }catch (Exception e) {}
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setAcceptAllFileFilterUsed(false);
