@@ -13,6 +13,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -27,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Main structure:
- * Frame -> mainPanel -> control and visual panel V
+ * Frame -> mainPanel -> control and visualizer panel V
  *                                                -> control panel
  *                                                      -> inputPanel -> local components
  *                                                      -> tablePanel -> local components
@@ -42,32 +43,33 @@ import java.util.concurrent.ExecutionException;
  * TODO: Disable control panel when file not yet selected
  **/
 public class GraphWindow {
-    private final String INITIAL_THEME = "Bento";
+    protected final String INITIAL_THEME = "Bento";
     protected Color mainColor;
     protected Color secondaryColor;
     protected Color accentColor;
+    protected Color uneditableComponentColor;
     protected Color mainForeground;
     protected Color secondaryForeground;
 
     protected JFrame mainFrame;
 
-    private final JMenuBar menuBar = new JMenuBar();
-    private JMenu aboutSubMenu;
-    private JMenu themesSubMenu;
+    protected final JMenuBar menuBar = new JMenuBar();
+    protected JMenu aboutSubMenu;
+    protected JMenu themesSubMenu;
 
     // main panel for all components
     protected JPanel mainPanel, titleBarPanel;
 
     // sub-panels for controls and visualizer
     protected JPanel controlPanel;
-    protected JPanel visualPanel;
+    protected JPanel visualizerPanel;
     GraphVisualizerCanvas graphCanvas;
 
     // sub panels for controlPanel;
     protected JPanel inputPanel, tablePanel, actionPanel;
 
     // Table-related components:
-    // dTable components are added into visualPanel
+    // dTable components are added into visualizerPanel
     protected JPanel inputTablePanel, pathwayTablePanel, dTablePanel;
     protected JTable inputTable, pathwayTable, dTable;
     protected JPanel inputMainPanel, pathwayMainPanel, dTableMainPanel;
@@ -84,7 +86,6 @@ public class GraphWindow {
     protected JButton skipBackwardButton = new JButton("<<");
     protected JButton incrementButton = new JButton(">");
     protected JButton decrementButton = new JButton("<");
-
     JButton[] actionButtons = {inputFileButton, setButton, playButton, skipForwardButton,
             skipBackwardButton,incrementButton, decrementButton};
 
@@ -100,59 +101,54 @@ public class GraphWindow {
     protected PairList<String, String> edgeWeightPairList;
     protected final String EDGE_W_PAIRLIST_DELIMITER = "=Fr0Mt0=";
 
-    private VisualizerThread visualizerThread;
-    private boolean paused = true;
-    private Graph graph;
-    private List<Graph.Vertex> vertices;
-    private ArrayList<String> verticesIDList;
-    private Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathQueue;
-    private Stack<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathToShowStack;
-    private ArrayList<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathShownList;
-    private String from;
-    private String to;
-    private boolean dijkstraChosen = false;
+    protected VisualizerThread visualizerThread;
+    protected boolean paused = true;
+    protected Graph graph;
+    protected List<Graph.Vertex> vertices;
+    protected ArrayList<String> verticesIDList;
+    protected Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathQueue;
+    protected Stack<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathToShowStack;
+    protected ArrayList<Dictionary.Node<Graph.Vertex, Graph.Vertex>> pathShownList;
+    protected String from;
+    protected String to;
+    protected boolean dijkstraChosen = false;
 
     public GraphWindow() {
-        // init title bar
-//        initTitleBarPanel();
+        //TABLES
+        initializeInputTablePanel();
+        initializePathwayTablePanel();
+        initializeDijsktraTablePanel();
 
-        // init tables
-        initInputTablePanel();
-        initPathwayTablePanel();
-        initDTablePanel();
+        //CONTROL PANEL
+        initializeInputPanel();
+        initializeTablePanel();
+        initializeActionPanel();
 
-        //init control panel
-        initInputPanel();
-        initTablePanel();
-        initActionPanel();
-
-        initControlPanel();
-        initVisualPanel();
+        initializeControlPanel();
+        initializeVisualizerPanel();
 
         // controls
         setActionButtonsActionListeners();
 
         // init main panel after creating all needed components
-        initMainPanel();
-
+        initializeMainPanel();
 
         disableControlPanel();
         inputFileButton.setEnabled(true);
-        playButton.setEnabled(false);
         // only load the mainframe after inserting all components
 
-        initMenuBar();
+        initializeMenuBar();
 
-        initMainFrame();
+        initializeMainFrame();
 
-        initTheme(INITIAL_THEME);
+        initializeTheme(INITIAL_THEME);
     }
 
     /**
      * Do not add any components into the main frame directly.
      * Add the component to its corresponding panel instead.
      */
-    protected void initMainFrame() {
+    protected void initializeMainFrame() {
         mainFrame = new JFrame("Graph Visualizer");
         mainFrame.setIconImage(new ImageIcon("src/main/finals/grp2/lab/asset/Graph.png").getImage());
         mainFrame.setJMenuBar(menuBar);
@@ -160,16 +156,15 @@ public class GraphWindow {
 
         mainFrame.validate();
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        mainFrame.setUndecorated(true);
         mainFrame.pack();
         mainFrame.setResizable(true);
-        mainFrame.setSize(new Dimension(1500, 800));
+        mainFrame.setSize(new Dimension(1500, 900));
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         mainFrame.setLocation((d.width / 2) - mainFrame.getWidth() / 2, (d.height / 2) - mainFrame.getHeight() / 2);
         mainFrame.setVisible(true);
     }
 
-    protected void initMenuBar() {
+    protected void initializeMenuBar() {
         menuBar.setPreferredSize(new Dimension(10, 29));
         menuBar.setBorderPainted(false);
 
@@ -206,56 +201,57 @@ public class GraphWindow {
 
         JMenuItem lightTheme = new JMenuItem("Light");
         lightTheme.setMnemonic(KeyEvent.VK_L);
-        lightTheme.addActionListener(e -> initTheme("Light"));
+        lightTheme.addActionListener(e -> initializeTheme("Light"));
         themesSubMenu.add(lightTheme);
 
         JMenuItem darkTheme = new JMenuItem("Dark");
         darkTheme.setMnemonic(KeyEvent.VK_D);
-        darkTheme.addActionListener(e -> initTheme("Dark"));
+        darkTheme.addActionListener(e -> initializeTheme("Dark"));
         themesSubMenu.add(darkTheme);
 
         JMenuItem sluTheme = new JMenuItem("SLU");
         sluTheme.setMnemonic(KeyEvent.VK_S);
-        sluTheme.addActionListener(e -> initTheme("SLU"));
+        sluTheme.addActionListener(e -> initializeTheme("SLU"));
         themesSubMenu.add(sluTheme);
 
         JMenuItem bentoTheme = new JMenuItem("Bento");
         bentoTheme.setMnemonic(KeyEvent.VK_B);
-        bentoTheme.addActionListener(e -> initTheme("Bento"));
+        bentoTheme.addActionListener(e -> initializeTheme("Bento"));
         themesSubMenu.add(bentoTheme);
 
         JMenuItem draculaTheme = new JMenuItem("Dracula");
         draculaTheme.setMnemonic(KeyEvent.VK_A);
-        draculaTheme.addActionListener(e -> initTheme("Dracula"));
+        draculaTheme.addActionListener(e -> initializeTheme("Dracula"));
         themesSubMenu.add(draculaTheme);
 
         JMenuItem gruvboxTheme = new JMenuItem("Gruvbox");
         gruvboxTheme.setMnemonic(KeyEvent.VK_G);
-        gruvboxTheme.addActionListener(e -> initTheme("Gruvbox"));
+        gruvboxTheme.addActionListener(e -> initializeTheme("Gruvbox"));
         themesSubMenu.add(gruvboxTheme);
 
         JMenuItem godspeedTheme = new JMenuItem("Godspeed");
         godspeedTheme.setMnemonic(KeyEvent.VK_E);
-        godspeedTheme.addActionListener(e -> initTheme("Godspeed"));
+        godspeedTheme.addActionListener(e -> initializeTheme("Godspeed"));
         themesSubMenu.add(godspeedTheme);
 
         JMenuItem Olive = new JMenuItem("Olive");
         Olive.setMnemonic(KeyEvent.VK_V);
-        Olive.addActionListener(e -> initTheme("Olive"));
+        Olive.addActionListener(e -> initializeTheme("Olive"));
         themesSubMenu.add(Olive);
 
         JMenuItem halloweenTheme = new JMenuItem("Halloween");
         halloweenTheme.setMnemonic(KeyEvent.VK_H);
-        halloweenTheme.addActionListener(e -> initTheme("Halloween"));
+        halloweenTheme.addActionListener(e -> initializeTheme("Halloween"));
         themesSubMenu.add(halloweenTheme);
     }
 
-    // TODO: Ad themes
-    protected void initTheme(String theme) {
+    // TODO: Add themes
+    protected void initializeTheme(String theme) {
         if (theme.equalsIgnoreCase("Bento")) setBentoThemeProperties();
 //        if (theme.equalsIgnoreCase("Light")) setWhiteThemeProperties();
 //        else if (theme.equalsIgnoreCase("Dark")) setDarkThemeProperties();
 //        else if (theme.equalsIgnoreCase("SLU")) setSLUThemeProperties();
+//        else if (theme.equalsIgnoreCase("Bento")) setBentoThemeProperties();
 //        else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
 //        else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
 //        else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
@@ -263,9 +259,12 @@ public class GraphWindow {
 //        else if (theme.equalsIgnoreCase("Christmas")) setChristmasThemeProperties();
 
         UIManager.put("Panel.background", secondaryColor);
+        UIManager.put("OptionPane.background", secondaryColor);
+        UIManager.put("OptionPane.messageForeground", mainForeground);
         UIManager.put("Button.background", accentColor);
         UIManager.put("Button.foreground", mainForeground);
-        UIManager.put("Button.select", secondaryColor);
+        UIManager.put("Button.select", mainColor);
+        UIManager.put("Button.focus", accentColor);
         UIManager.put("Button.border", new EmptyBorder(5, 10, 5, 10));
 
         setButtonColors();
@@ -278,33 +277,38 @@ public class GraphWindow {
         menuBar.setBackground(accentColor);
 
         controlPanel.setBackground(mainColor);
-        visualPanel.setBackground(secondaryColor);
+        visualizerPanel.setBackground(secondaryColor);
 
         inputPanel.setBackground(mainColor);
         tablePanel.setBackground(mainColor);
         actionPanel.setBackground(mainColor);
 
         inputMainPanel.setBackground(mainColor);
-        pathwayMainPanel.setBackground(mainColor);
-
-        inputTablePanel.setBackground(mainColor);
-        pathwayTablePanel.setBackground(mainColor);
-
         inputLabelPanel.setBackground(mainColor);
+        inputTablePanel.setBackground(mainColor);
+        inputTable.setBackground(secondaryColor);
+        inputTable.getTableHeader().setBackground(accentColor);
+        inputTableScrollPane.setBackground(accentColor);
+
+        pathwayMainPanel.setBackground(mainColor);
         pathwayLabelPanel.setBackground(mainColor);
+        pathwayTablePanel.setBackground(mainColor);
+        pathwayTable.setBackground(secondaryColor);
+        pathwayTable.getTableHeader().setBackground(accentColor);
+        pathwayTableScrollPane.setBackground(accentColor);
+
+        dTableMainPanel.setBackground(secondaryColor);
+        dTable.setBackground(mainColor);
+        dTable.getTableHeader().setBackground(accentColor);
+        dTableScrollPane.setBackground(accentColor);
 
         fromToPanel.setBackground(mainColor);
         algoLabelPanel.setBackground(mainColor);
         algoSelectionPanel.setBackground(mainColor);
+        algoSelectionBox.setBackground(secondaryColor);
         playPanel.setBackground(mainColor);
         stepPanel.setBackground(mainColor);
 
-        inputTable.setBackground(secondaryColor);
-        inputTable.getTableHeader().setBackground(accentColor);
-        pathwayTable.setBackground(secondaryColor);
-        pathwayTable.getTableHeader().setBackground(accentColor);
-
-        algoSelectionBox.setBackground(secondaryColor);
     }
 
     protected void setForegrounds() {
@@ -314,11 +318,42 @@ public class GraphWindow {
         inputLabel.setForeground(mainForeground);
         pathwayLabel.setForeground(mainForeground);
         algorithmLabel.setForeground(mainForeground);
+        dTableLabel.setForeground(mainForeground);
 
         inputTable.getTableHeader().setForeground(mainForeground);
         pathwayTable.getTableHeader().setForeground(mainForeground);
 
+        dTableMainPanel.setForeground(mainForeground);
+        dTable.getTableHeader().setForeground(mainForeground);
+
         algoSelectionBox.setForeground(mainForeground);
+    }
+
+    protected void setBorders() {
+        controlPanel.setBorder(new EmptyBorder(30, 35, 60, 35));
+        inputPanel.setBorder(new EmptyBorder(0,100,0,0));
+
+        inputLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
+        inputTablePanel.setBorder(new EmptyBorder(5,0,10,0));
+        inputTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        inputTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
+
+        pathwayLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
+        pathwayTablePanel.setBorder(new EmptyBorder(5,0,10,0));
+        pathwayTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        pathwayTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
+
+        dTableMainPanel.setBorder(new EmptyBorder(0, 150, 0, 150));
+        dTableLabelPanel.setBorder(new EmptyBorder(0,0,0,0));
+        dTableLabel.setBorder(new EmptyBorder(10, 0, 5, 0));
+        dTablePanel.setBorder(new EmptyBorder(0,0,0,0));
+        dTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        dTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
+
+        algoLabelPanel.setBorder(new EmptyBorder(20, 35, 5, 35));
+        algoSelectionPanel.setBorder(new EmptyBorder(0,35,5,35));
+        playPanel.setBorder(new EmptyBorder(0,35,5,35));
+        stepPanel.setBorder(new EmptyBorder(0,35,5,35));
     }
 
     protected void setButtonColors() {
@@ -333,63 +368,14 @@ public class GraphWindow {
         inputFileButton.setBorder(new EmptyBorder(6, 0, 6, 0));
     }
 
-    protected void setBorders() {
-        controlPanel.setBorder(new EmptyBorder(35, 35, 60, 35));
-        inputPanel.setBorder(new EmptyBorder(0,100,0,0));
-        inputLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
-        pathwayLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
 
-        inputTablePanel.setBorder(new EmptyBorder(5,0,10,0));
-        inputTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
-        inputTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
-
-        dTablePanel.setBorder(new EmptyBorder(0,0,0,0));
-        dTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
-        dTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
-        dTableLabelPanel.setBorder(new EmptyBorder(0,0,0,0));
-        pathwayTablePanel.setBorder(new EmptyBorder(5,0,10,0));
-        pathwayTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
-        pathwayTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
-
-
-
-        algoLabelPanel.setBorder(new EmptyBorder(10, 30, 0, 30));
-        algoSelectionPanel.setBorder(new EmptyBorder(0,30,5,30));
-        playPanel.setBorder(new EmptyBorder(0,30,5,30));
-        stepPanel.setBorder(new EmptyBorder(0,30,5,30));
-    }
-
-    protected void initMainPanel() {
+    protected void initializeMainPanel() {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
 
 //        mainPanel.add(titleBarPanel);
         mainPanel.add(controlPanel);
-        mainPanel.add(visualPanel);
-    }
-
-    /**
-     * Custom title bar
-     * Change the layout first in the initMainPanel() method before using.
-     */
-    protected void initTitleBarPanel() {
-        titleBarPanel = new JPanel();
-        titleBarPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new GridLayout(1, 3));
-
-        JButton[] titleButtons = new JButton[]{
-                new JButton("X"),
-                new JButton("-"),
-                new JButton("_"),
-        };
-
-        for (JButton button : titleButtons) {
-            buttonsPanel.add(button);
-        }
-
-        titleBarPanel.add(buttonsPanel);
+        mainPanel.add(visualizerPanel);
     }
 
     /**
@@ -397,11 +383,11 @@ public class GraphWindow {
      * <p>
      * if you want to add a new row of components create a panel first then insert it here
      */
-    protected void initControlPanel() {
+    protected void initializeControlPanel() {
         controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
-        controlPanel.setMinimumSize(new Dimension(400, 800)); // makes the control panel smaller
-        controlPanel.setMaximumSize(new Dimension(400, 800)); // makes the control panel smaller
+        controlPanel.setMinimumSize(new Dimension(400, 900)); // makes the control panel smaller
+        controlPanel.setMaximumSize(new Dimension(400, 900)); // makes the control panel smaller
 
         controlPanel.add(inputPanel, BorderLayout.NORTH);
         controlPanel.add(tablePanel, BorderLayout.CENTER);
@@ -409,30 +395,68 @@ public class GraphWindow {
     }
 
     // TODO: INSERT VISUALIZER HERE
-    protected void initVisualPanel() {
-        visualPanel = new JPanel();
-        visualPanel.setMinimumSize(new Dimension(1100, 800)); // makes the visual panel wider than controls
-        visualPanel.setMaximumSize(new Dimension(1100, 800)); // makes the visual panel wider than controls
+    protected void initializeVisualizerPanel() {
+        visualizerPanel = new JPanel();
+        visualizerPanel.setMinimumSize(new Dimension(1100, 900)); // makes the visual panel wider than controls
+        visualizerPanel.setMaximumSize(new Dimension(1100, 900)); // makes the visual panel wider than controls
     }
 
-    // TODO: FIX FORMATTING
-    protected void initInputPanel() {
+
+
+    // TODO: EDIT Tooltip Message
+    protected void initializeInputPanel() {
         inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(1, 2));
 
-        JLabel text = new JLabel();
-        text.setHorizontalAlignment(SwingConstants.LEFT);
+        JLabel textSpacing = new JLabel();
+        textSpacing.setHorizontalAlignment(SwingConstants.LEFT);
 
-        // components in input panel
         inputFileButton.setToolTipText("Lorem Ipsum");
         inputFileButton.addActionListener((e) -> promptFileSelection());
 
-        inputPanel.add(text);
+        inputPanel.add(textSpacing);
         inputPanel.add(inputFileButton);
     }
 
-    // TODO: CLEAN
-    protected void initTablePanel() {
+    protected void promptFileSelection() {
+        System.out.println("Frame: " + mainFrame.getSize());
+        System.out.println("ControlPanel: " + controlPanel.getSize());
+        System.out.println("VisualizerPanel: " + visualizerPanel.getSize());
+        try {
+            System.out.println("dTablePanel: " + dTablePanel.getSize());
+            System.out.println("dTableMainPanel: " + dTableMainPanel.getSize());
+        }catch (Exception e) {}
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
+        int choice = fileChooser.showOpenDialog(mainFrame);
+        if (choice == JFileChooser.APPROVE_OPTION) { // initialize graph
+            textFile = fileChooser.getSelectedFile();
+            // TODO: change path to actual textFile
+            graph = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+            vertices = graph.getVertices();
+            initializeVerticesIDList();
+            initializeEdgeWeightPairList();
+            setVisualizerPanelProperties(dijkstraChosen);
+            updateToComboBox();
+            enableControlPanel();
+            playButton.setEnabled(true);
+            dTableModel.setRowCount(0);
+            inputTableModel.setRowCount(0);
+            pathwayTableModel.setRowCount(0);
+            try {
+                initializeInputTableValues();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("CHOSEN: " + textFile.getName());
+        } else {
+            System.out.println("File Selection Aborted");
+        }
+    }
+
+    protected void initializeTablePanel() {
         tablePanel = new JPanel();
         tablePanel.setLayout(new GridLayout(2,1));
 
@@ -447,15 +471,12 @@ public class GraphWindow {
         pathwayLabelPanel.add(pathwayLabel);
 
         inputMainPanel = new JPanel();
-        pathwayMainPanel = new JPanel();
-
         inputMainPanel.setLayout(new BoxLayout(inputMainPanel, BoxLayout.Y_AXIS));
-        pathwayMainPanel.setLayout(new BoxLayout(pathwayMainPanel, BoxLayout.Y_AXIS));
-
-        // add label panel and table panel
         inputMainPanel.add(inputLabelPanel);
         inputMainPanel.add(inputTablePanel);
 
+        pathwayMainPanel = new JPanel();
+        pathwayMainPanel.setLayout(new BoxLayout(pathwayMainPanel, BoxLayout.Y_AXIS));
         pathwayMainPanel.add(pathwayLabelPanel);
         pathwayMainPanel.add(pathwayTablePanel);
 
@@ -463,24 +484,7 @@ public class GraphWindow {
         tablePanel.add(pathwayMainPanel);
     }
 
-    protected void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames,
-                                 JScrollPane scrollPane) {
-        defaultTableModel.setColumnIdentifiers(columnNames);
-        defaultTableModel.setRowCount(0);
-        table.setEnabled(false);
-        table.setCellSelectionEnabled(false);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.setForeground(Color.WHITE);
-        table.setRowHeight(50);
-        table.setOpaque(true);
-        table.setFillsViewportHeight(true);
-        table.getTableHeader().setReorderingAllowed(false);
-        table.getTableHeader().setResizingAllowed(false);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        scrollPane.setVisible(true);
-    }
-
-    protected void initInputTablePanel() {
+    protected void initializeInputTablePanel() {
         inputTablePanel = new JPanel();
         inputTablePanel.setLayout(new GridLayout(1, 1));
 
@@ -494,35 +498,7 @@ public class GraphWindow {
         inputTablePanel.add(inputTableScrollPane);
     }
 
-    //TODO: Style dTable related components here
-    protected void initDTablePanel() {
-        dTableMainPanel = new JPanel(new GridLayout(2,1));
-        dTableMainPanel.setPreferredSize(new Dimension(1085, 250));
-        dTableMainPanel.setBackground(Color.YELLOW);
-
-        dTablePanel = new JPanel();
-        dTablePanel.setLayout(new GridLayout(1, 1));
-        dTablePanel.setPreferredSize(new Dimension(600,240));
-
-        dTableModel = new DefaultTableModel();
-        dTable = new JTable(dTableModel);
-        dTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
-        dTableScrollPane = new JScrollPane(dTable);
-
-        initializeTable(dTable, dTableModel, new String[]{"End", "Cost", "Path"}, dTableScrollPane);
-        dTablePanel.add(dTableScrollPane);
-
-        dTableLabelPanel = new JPanel(new GridLayout(1, 1));
-        dTableLabel = new JLabel("Pathway to Every Node:");
-        dTableLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        dTableLabelPanel.add(dTableLabel);
-        dTableMainPanel.setLayout(new BoxLayout(dTableMainPanel, BoxLayout.Y_AXIS));
-
-        dTableMainPanel.add(dTableLabelPanel);
-        dTableMainPanel.add(dTablePanel);
-    }
-
-    protected void initPathwayTablePanel() {
+    protected void initializePathwayTablePanel() {
         pathwayTablePanel = new JPanel();
         pathwayTablePanel.setLayout(new GridLayout(1, 1));
 
@@ -536,11 +512,64 @@ public class GraphWindow {
         pathwayTablePanel.add(pathwayTableScrollPane);
     }
 
-    protected void initActionPanel() {
+    protected void initializeTable(JTable table, DefaultTableModel defaultTableModel, String[] columnNames,
+                                   JScrollPane scrollPane) {
+        defaultTableModel.setColumnIdentifiers(columnNames);
+        defaultTableModel.setRowCount(0);
+        table.setEnabled(false);
+        table.setCellSelectionEnabled(false);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setForeground(Color.WHITE);
+        table.setRowHeight(50);
+        table.setOpaque(true);
+        table.setFillsViewportHeight(true);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setResizingAllowed(false);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setHorizontalAlignment(0);
+        for (int i = 0; i < table.getColumnCount(); i++){
+            table.setDefaultRenderer(table.getColumnClass(i),renderer);
+        }
+
+        table.updateUI();
+        scrollPane.setVisible(true);
+    }
+
+    //TODO: Smaller Row Height
+    protected void initializeDijsktraTablePanel() {
+        dTableMainPanel = new JPanel(new GridLayout(2,1));
+
+        dTablePanel = new JPanel();
+        dTablePanel.setLayout(new GridLayout(1, 1));
+        dTablePanel.setPreferredSize(new Dimension(700,245));
+
+        dTableModel = new DefaultTableModel();
+        dTable = new JTable(dTableModel);
+        dTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
+        dTableScrollPane = new JScrollPane(dTable);
+
+        initializeTable(dTable, dTableModel, new String[]{"End", "Cost", "Path"}, dTableScrollPane);
+        dTablePanel.add(dTableScrollPane);
+
+        dTableLabelPanel = new JPanel(new GridLayout(1, 1));
+        dTableLabel = new JLabel("Pathway to Every Node:");
+        dTableLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        dTableLabelPanel.add(dTableLabel);
+        dTableMainPanel.setLayout(new BoxLayout(dTableMainPanel, BoxLayout.Y_AXIS));
+
+        dTableMainPanel.add(dTableLabelPanel);
+        dTableMainPanel.add(dTablePanel);
+
+        dTableLabelPanel.setBackground(secondaryColor);
+    }
+
+    protected void initializeActionPanel() {
         actionPanel = new JPanel();
         actionPanel.setLayout(new GridLayout(5, 1));
 
-        fromToPanel = new JPanel(new GridLayout(1, 3, 5, 5));
+        fromToPanel = new JPanel(new GridLayout(1, 3, 9, 5));
         algoLabelPanel = new JPanel(new GridLayout(1, 1));
         algoSelectionPanel = new JPanel(new GridLayout(1, 1));
         playPanel = new JPanel(new GridLayout(1, 1));
@@ -550,19 +579,13 @@ public class GraphWindow {
         toComboBox = new JComboBox<>();
         toComboBox.setEnabled(false);
 
-        algoLabelPanel.setPreferredSize(new Dimension(100, 0));
-        algoSelectionPanel.setPreferredSize(new Dimension(100, 20   ));
-        playPanel.setPreferredSize(new Dimension(100, 40));
-        stepPanel.setPreferredSize(new Dimension(100, 40));
-
+        algoLabelPanel.setPreferredSize(new Dimension(100, 40));
         algorithmLabel = new JLabel("Algorithm");
         algorithmLabel.setHorizontalAlignment(SwingConstants.CENTER);
         algoLabelPanel.add(algorithmLabel);
 
         initializeAlgoSelectionBox();
         algoSelectionPanel.add(algoSelectionBox);
-
-//        setActionButtons(); // modify this to change button style
 
         fromToPanel.add(fromField);
         fromToPanel.add(toComboBox);
@@ -581,7 +604,7 @@ public class GraphWindow {
         actionPanel.add(stepPanel);
     }
 
-    private void initializeAlgoSelectionBox() {
+    protected void initializeAlgoSelectionBox() {
         algoSelectionBox = new JComboBox<String>(); // Dropdown list
         algoSelectionBox.setFocusable(false);
         algoSelectionBox.addItem("None");
@@ -589,34 +612,28 @@ public class GraphWindow {
         algoSelectionBox.addItem("Breadth First Search");
         algoSelectionBox.addItem("Dijkstra's Shortest Path");
         algoSelectionBox.addItemListener(e -> {
-            visualPanel.remove(graphCanvas);
+            visualizerPanel.remove(graphCanvas);
             String selection = algoSelectionBox.getSelectedItem()+"";
             if (selection.equals("Dijkstra's Shortest Path")) {
                 dijkstraChosen = true;
                 toComboBox.setEnabled(true);
-                setVisualPanelProperties(dijkstraChosen);
-            }else {
+                setVisualizerPanelProperties(dijkstraChosen);
+            } else {
                 toComboBox.setEnabled(false);
                 dijkstraChosen = false;
                 if (dTableMainPanel != null) {
-                    visualPanel.remove(graphCanvas);
-                    visualPanel.remove(dTableMainPanel);
+                    visualizerPanel.remove(graphCanvas);
+                    visualizerPanel.remove(dTableMainPanel);
                 }
-                setVisualPanelProperties(dijkstraChosen);
+                setVisualizerPanelProperties(dijkstraChosen);
             }
-            visualPanel.revalidate();
-            visualPanel.repaint();
+            visualizerPanel.revalidate();
+            visualizerPanel.repaint();
         });
     }
 
 
-    private void initializeVerticesIDList() {
-        verticesIDList = new ArrayList<>();
-        for (int i = 0; i < vertices.getSize(); i++)
-            verticesIDList.insert(vertices.getElement(i).ID);
-    }
-
-    private void updateToComboBox() {
+    protected void updateToComboBox() {
         toComboBox.removeAll();
         for (int i = 0; i < verticesIDList.getSize(); i++) {
             toComboBox.addItem(verticesIDList.getElement(i));
@@ -624,7 +641,7 @@ public class GraphWindow {
         //TODO: Combo box aesthetics
     }
 
-    private void initializePathQueue() {
+    protected void initializePathQueue() {
         from = fromField.getText();
         // TODO: edit canvas label output
         to = "";
@@ -647,7 +664,7 @@ public class GraphWindow {
         }
     }
 
-    private void initializePathQueueDijkstra() {
+    protected void initializePathQueueDijkstra() {
         // TODO: input validation
         from = fromField.getText();
         to = toComboBox.getSelectedItem()+"";
@@ -660,9 +677,8 @@ public class GraphWindow {
         visualizerThread = new VisualizerThread();
     }
 
-    private void updateDTable(
-            PairList<String[], Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>>> pathsList
-            , int chosenIdx) {
+    protected void updateDTable(PairList<String[], Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>>> pathsList, int chosenIdx) {
+        Color color = new Color(0x6A4C61);
         dTableModel.setRowCount(0);
         for (int i = 0; i <pathsList.size(); i++)
             dTableModel.addRow(pathsList.getAt(i).key);
@@ -671,14 +687,14 @@ public class GraphWindow {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                            boolean hasFocus, int row, int column) {
                 final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(row == chosenIdx ? accentColor : secondaryColor);
+                c.setBackground(row == chosenIdx ? color : mainColor);
                 // TODO: change highlight color for higlighted row
                 return c;
             }
         });
     }
 
-    private void initializePathStackToShow() {
+    protected void initializePathStackToShow() {
         Stack<Dictionary.Node<Graph.Vertex, Graph.Vertex>> temp = new Stack<>();
         pathToShowStack = new Stack<>();
         while (!pathQueue.isEmpty()) {
@@ -689,7 +705,7 @@ public class GraphWindow {
         }
     }
 
-    private synchronized void setActionButtonsActionListeners() {
+    protected synchronized void setActionButtonsActionListeners() {
         setButton.addActionListener(e -> { // setFromTo
             if (!readyToSet()) return;
             if (dijkstraChosen)
@@ -766,7 +782,25 @@ public class GraphWindow {
         });
     }
 
-    private boolean readyToVisualize() {
+    protected void updatePathTableValues() {
+        pathwayTableModel.setRowCount(0);
+        for (int i = 0; i < pathShownList.getSize(); i++) {
+            Dictionary.Node<Graph.Vertex, Graph.Vertex> edge = pathShownList.getElement(i);
+            String weight = "N/A";
+            try {
+                weight = edgeWeightPairList.get(edge.key.ID + EDGE_W_PAIRLIST_DELIMITER + edge.val.ID+"");
+            }catch (InvalidParameterException e) {
+//                e.printStackTrace();
+            }
+            pathwayTableModel.addRow(new Object[]{
+                    weight,
+                    edge.key.ID,
+                    edge.val.ID
+            });
+        }
+    }
+
+    protected boolean readyToVisualize() {
         if (pathToShowStack == null) {
             JOptionPane.showMessageDialog(mainFrame, "Please press the set button first.",
                     "Warning", JOptionPane.WARNING_MESSAGE);
@@ -775,7 +809,7 @@ public class GraphWindow {
         return true;
     }
 
-    private boolean readyToSet() {
+    protected boolean readyToSet() {
         if (algoSelectionBox.getSelectedItem().toString().equals("None")) {
             JOptionPane.showMessageDialog(mainFrame, "Please select an algorithm first",
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -796,45 +830,13 @@ public class GraphWindow {
         return false;
     }
 
-    private void promptFileSelection() {
-        System.out.println("Frame: " + mainFrame.getSize());
-        System.out.println("ControlPanel: " + controlPanel.getSize());
-        System.out.println("VisualPanel: " + visualPanel.getSize());
-        try {
-            System.out.println("dTablePanel: " + dTablePanel.getSize());
-            System.out.println("dTableMainPanel: " + dTableMainPanel.getSize());
-        }catch (Exception e) {}
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
-        int choice = fileChooser.showOpenDialog(mainFrame);
-        if (choice == JFileChooser.APPROVE_OPTION) { // initialize graph
-            textFile = fileChooser.getSelectedFile();
-            // TODO: change path to actual textFile
-            graph = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
-            vertices = graph.getVertices();
-            initializeVerticesIDList();
-            initializeEdgeWeightPairList();
-            setVisualPanelProperties(dijkstraChosen);
-            updateToComboBox();
-            enableControlPanel();
-            playButton.setEnabled(true);
-            dTableModel.setRowCount(0);
-            inputTableModel.setRowCount(0);
-            pathwayTableModel.setRowCount(0);
-            try {
-                initializeInputTableValues();
-            }catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("CHOSEN: " + textFile.getName());
-        } else {
-            System.out.println("File Selection Aborted");
-        }
+    protected void initializeVerticesIDList() {
+        verticesIDList = new ArrayList<>();
+        for (int i = 0; i < vertices.getSize(); i++)
+            verticesIDList.insert(vertices.getElement(i).ID);
     }
 
-    private void initializeEdgeWeightPairList() {
+    protected void initializeEdgeWeightPairList() {
         edgeWeightPairList = new PairList<>();
         for (int i = 0; i < vertices.getSize(); i++) {
             Graph.Vertex v = vertices.getElement(i);
@@ -845,7 +847,7 @@ public class GraphWindow {
         }
     }
 
-    private void initializeInputTableValues() throws IOException {
+    protected void initializeInputTableValues() throws IOException {
         inputTableModel.setRowCount(0);
         BufferedReader reader = new BufferedReader(new FileReader("src/main/finals/grp2/lab/data/in.csv"));
         String line = "";
@@ -862,60 +864,29 @@ public class GraphWindow {
         }
     }
 
-    private void updatePathTableValues() {
-        pathwayTableModel.setRowCount(0);
-        for (int i = 0; i < pathShownList.getSize(); i++) {
-            Dictionary.Node<Graph.Vertex, Graph.Vertex> edge = pathShownList.getElement(i);
-            String weight = "N/A";
-            try {
-                weight = edgeWeightPairList.get(edge.key.ID + EDGE_W_PAIRLIST_DELIMITER + edge.val.ID+"");
-            }catch (InvalidParameterException e) {
-//                e.printStackTrace();
-            }
-            pathwayTableModel.addRow(new Object[]{
-                    weight,
-                    edge.key.ID,
-                    edge.val.ID
-            });
-        }
-    }
-
-    private void setVisualPanelProperties(boolean dTablePresent) {
-        visualPanel.removeAll();
+    protected void setVisualizerPanelProperties(boolean dTablePresent) {
+        visualizerPanel.removeAll();
         graphCanvas = new GraphVisualizerCanvas(graph, secondaryColor);
         if (dTablePresent)
-            visualPanel.setPreferredSize(new Dimension(1100,550));
+            visualizerPanel.setPreferredSize(new Dimension(1100,550));
         else
-            visualPanel.setPreferredSize(new Dimension(1100,800));
-        graphCanvas.setPreferredSize(visualPanel.getPreferredSize());
-        visualPanel.add(graphCanvas);
+            visualizerPanel.setPreferredSize(new Dimension(1100,800));
+        graphCanvas.setPreferredSize(visualizerPanel.getPreferredSize());
+        visualizerPanel.add(graphCanvas);
         if (dTablePresent)
-            visualPanel.add(dTableMainPanel);
-        visualPanel.repaint();
-        visualPanel.revalidate();
+            visualizerPanel.add(dTableMainPanel);
+        visualizerPanel.repaint();
+        visualizerPanel.revalidate();
     }
 
-    // TODO: play pause action
-    private void changeMode(boolean mode) {
+    protected void changeMode(boolean mode) {
         playButton.setText(mode ? "Pause" : "Play");
         this.paused = !mode;
-        if (!paused)
-            disableControlPanel();
-        else
-            enableControlPanel();
+        if (!paused) disableControlPanel();
+        else enableControlPanel();
     }
 
-    private void disableControlPanel() {
-        inputFileButton.setEnabled(false);
-        for (int i = 1; i < actionButtons.length; i++) {
-            actionButtons[i].setEnabled(false);
-        }
-        fromField.setEnabled(false);
-        toComboBox.setEnabled(false);
-        algoSelectionBox.setEnabled(false);
-    }
-
-    private void enableControlPanel() {
+    protected void enableControlPanel() {
         inputFileButton.setEnabled(true);
         for (int i = 1; i < actionButtons.length; i++) {
             actionButtons[i].setEnabled(true);
@@ -926,7 +897,17 @@ public class GraphWindow {
         else toComboBox.setEnabled(false);
     }
 
-    private class VisualizerThread extends Thread {
+    protected void disableControlPanel() {
+        inputFileButton.setEnabled(false);
+        for (int i = 1; i < actionButtons.length; i++) {
+            actionButtons[i].setEnabled(false);
+        }
+        fromField.setEnabled(false);
+        toComboBox.setEnabled(false);
+        algoSelectionBox.setEnabled(false);
+    }
+
+    protected class VisualizerThread extends Thread {
 
         @Override
         public void run() {
@@ -957,11 +938,11 @@ public class GraphWindow {
 
     }
 
-    private void setBentoThemeProperties() {
+    protected void setBentoThemeProperties() {
         mainColor = new Color(0x2D394D);
         secondaryColor = new Color(0x4A768D);
         accentColor = new Color(0xF87A90);
-//        uneditableComponentColor = new Color()
+        uneditableComponentColor = new Color(0x6C7482);
 
         mainForeground = Color.WHITE;
         secondaryForeground = Color.BLACK;
@@ -969,7 +950,7 @@ public class GraphWindow {
     // TODO: Add theme methods here
 //    private void setLightThemeProperties() {}
 
-    private void displayGroupMembers() {
+    protected void displayGroupMembers() {
         JOptionPane.showMessageDialog(mainFrame,
                 "       Arevalo, Lance Gabrielle\n" +
                         "       Barana, Lance Matthew\n" +
@@ -979,7 +960,7 @@ public class GraphWindow {
                 "Group 2", JOptionPane.PLAIN_MESSAGE);
     }
 
-    private void displayCourseSpecifications() {
+    protected void displayCourseSpecifications() {
         JOptionPane.showMessageDialog(mainFrame,
                 "   Description:   Data Structures\n" +
                         "   Instructor:   Roderick Makil\n" +
