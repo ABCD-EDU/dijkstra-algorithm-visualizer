@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.EmptyStackException;
@@ -42,8 +43,17 @@ import java.util.concurrent.ExecutionException;
  **/
 public class GraphWindow {
     private final String INITIAL_THEME = "Bento";
+    protected Color mainColor;
+    protected Color secondaryColor;
+    protected Color accentColor;
+    protected Color mainForeground;
+    protected Color secondaryForeground;
 
     protected JFrame mainFrame;
+
+    private final JMenuBar menuBar = new JMenuBar();
+    private JMenu aboutSubMenu;
+    private JMenu themesSubMenu;
 
     // main panel for all components
     protected JPanel mainPanel, titleBarPanel;
@@ -77,21 +87,6 @@ public class GraphWindow {
 
     JButton[] actionButtons = {inputFileButton, setButton, playButton, skipForwardButton,
             skipBackwardButton,incrementButton, decrementButton};
-
-//    protected final JButton[] actionButtons = new JButton[]{
-//            new JButton("Play"),
-//            new JButton("<<"),
-//            new JButton("<"),
-//            new JButton(">"),
-//            new JButton(">>"),
-//            new JButton("Set")
-//    };
-
-    protected Color mainColor;
-    protected Color secondaryColor;
-    protected Color accentColor;
-    protected Color mainForeground;
-    protected Color secondaryForeground;
 
     protected JLabel algorithmLabel;
     protected JPanel fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
@@ -140,13 +135,17 @@ public class GraphWindow {
         // init main panel after creating all needed components
         initMainPanel();
 
-        initTheme(INITIAL_THEME);
 
         disableControlPanel();
         inputFileButton.setEnabled(true);
         playButton.setEnabled(false);
         // only load the mainframe after inserting all components
+
+        initMenuBar();
+
         initMainFrame();
+
+        initTheme(INITIAL_THEME);
     }
 
     /**
@@ -156,6 +155,7 @@ public class GraphWindow {
     protected void initMainFrame() {
         mainFrame = new JFrame("Graph Visualizer");
         mainFrame.setIconImage(new ImageIcon("src/main/finals/grp2/lab/asset/Graph.png").getImage());
+        mainFrame.setJMenuBar(menuBar);
         mainFrame.add(mainPanel);
 
         mainFrame.validate();
@@ -167,6 +167,87 @@ public class GraphWindow {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         mainFrame.setLocation((d.width / 2) - mainFrame.getWidth() / 2, (d.height / 2) - mainFrame.getHeight() / 2);
         mainFrame.setVisible(true);
+    }
+
+    protected void initMenuBar() {
+        menuBar.setPreferredSize(new Dimension(10, 29));
+        menuBar.setBorderPainted(false);
+
+        JMenu menuItemSpacing1 = new JMenu();
+        JMenu menuItemSpacing2 = new JMenu();
+        menuItemSpacing1.setEnabled(false);
+        menuItemSpacing2.setEnabled(false);
+
+        initializeAboutSubMenu();
+        initializeThemesSubMenu();
+
+        menuBar.add(menuItemSpacing1);
+        menuBar.add(aboutSubMenu);
+        menuBar.add(menuItemSpacing2);
+        menuBar.add(themesSubMenu);
+    }
+
+    protected void initializeAboutSubMenu() {
+        aboutSubMenu = new JMenu("About");
+
+        JMenuItem groupMembers = new JMenuItem("Group Members");
+        groupMembers.setMnemonic(KeyEvent.VK_G);
+        groupMembers.addActionListener(e -> displayGroupMembers());
+        aboutSubMenu.add(groupMembers);
+
+        JMenuItem courseSpecification = new JMenuItem("Course Specifications");
+        courseSpecification.setMnemonic(KeyEvent.VK_C);
+        courseSpecification.addActionListener(e -> displayCourseSpecifications());
+        aboutSubMenu.add(courseSpecification);
+    }
+
+    protected void initializeThemesSubMenu() {
+        themesSubMenu = new JMenu("Themes");
+
+        JMenuItem lightTheme = new JMenuItem("Light");
+        lightTheme.setMnemonic(KeyEvent.VK_L);
+        lightTheme.addActionListener(e -> initTheme("Light"));
+        themesSubMenu.add(lightTheme);
+
+        JMenuItem darkTheme = new JMenuItem("Dark");
+        darkTheme.setMnemonic(KeyEvent.VK_D);
+        darkTheme.addActionListener(e -> initTheme("Dark"));
+        themesSubMenu.add(darkTheme);
+
+        JMenuItem sluTheme = new JMenuItem("SLU");
+        sluTheme.setMnemonic(KeyEvent.VK_S);
+        sluTheme.addActionListener(e -> initTheme("SLU"));
+        themesSubMenu.add(sluTheme);
+
+        JMenuItem bentoTheme = new JMenuItem("Bento");
+        bentoTheme.setMnemonic(KeyEvent.VK_B);
+        bentoTheme.addActionListener(e -> initTheme("Bento"));
+        themesSubMenu.add(bentoTheme);
+
+        JMenuItem draculaTheme = new JMenuItem("Dracula");
+        draculaTheme.setMnemonic(KeyEvent.VK_A);
+        draculaTheme.addActionListener(e -> initTheme("Dracula"));
+        themesSubMenu.add(draculaTheme);
+
+        JMenuItem gruvboxTheme = new JMenuItem("Gruvbox");
+        gruvboxTheme.setMnemonic(KeyEvent.VK_G);
+        gruvboxTheme.addActionListener(e -> initTheme("Gruvbox"));
+        themesSubMenu.add(gruvboxTheme);
+
+        JMenuItem godspeedTheme = new JMenuItem("Godspeed");
+        godspeedTheme.setMnemonic(KeyEvent.VK_E);
+        godspeedTheme.addActionListener(e -> initTheme("Godspeed"));
+        themesSubMenu.add(godspeedTheme);
+
+        JMenuItem Olive = new JMenuItem("Olive");
+        Olive.setMnemonic(KeyEvent.VK_V);
+        Olive.addActionListener(e -> initTheme("Olive"));
+        themesSubMenu.add(Olive);
+
+        JMenuItem halloweenTheme = new JMenuItem("Halloween");
+        halloweenTheme.setMnemonic(KeyEvent.VK_H);
+        halloweenTheme.addActionListener(e -> initTheme("Halloween"));
+        themesSubMenu.add(halloweenTheme);
     }
 
     // TODO: Ad themes
@@ -187,13 +268,15 @@ public class GraphWindow {
         UIManager.put("Button.select", secondaryColor);
         UIManager.put("Button.border", new EmptyBorder(5, 10, 5, 10));
 
-        setButtons();
+        setButtonColors();
         setBackgrounds();
         setForegrounds();
         setBorders();
     }
 
     protected void setBackgrounds() {
+        menuBar.setBackground(accentColor);
+
         controlPanel.setBackground(mainColor);
         visualPanel.setBackground(secondaryColor);
 
@@ -225,6 +308,9 @@ public class GraphWindow {
     }
 
     protected void setForegrounds() {
+        aboutSubMenu.setForeground(mainForeground);
+        themesSubMenu.setForeground(mainForeground);
+
         inputLabel.setForeground(mainForeground);
         pathwayLabel.setForeground(mainForeground);
         algorithmLabel.setForeground(mainForeground);
@@ -233,18 +319,17 @@ public class GraphWindow {
         pathwayTable.getTableHeader().setForeground(mainForeground);
 
         algoSelectionBox.setForeground(mainForeground);
-
     }
 
-    protected void setButtons() {
+    protected void setButtonColors() {
         for (JButton button : actionButtons) {
             button.setBackground(secondaryColor);
             button.setForeground(mainForeground);
             button.setFocusPainted(false);
             button.setBorder(new EmptyBorder(0, 0, 0, 0));
         }
-        playButton.setBackground(accentColor);
         inputFileButton.setBackground(accentColor);
+        playButton.setBackground(accentColor);
         inputFileButton.setBorder(new EmptyBorder(6, 0, 6, 0));
     }
 
@@ -339,6 +424,7 @@ public class GraphWindow {
         text.setHorizontalAlignment(SwingConstants.LEFT);
 
         // components in input panel
+        inputFileButton.setToolTipText("Lorem Ipsum");
         inputFileButton.addActionListener((e) -> promptFileSelection());
 
         inputPanel.add(text);
@@ -871,8 +957,6 @@ public class GraphWindow {
 
     }
 
-
-
     private void setBentoThemeProperties() {
         mainColor = new Color(0x2D394D);
         secondaryColor = new Color(0x4A768D);
@@ -881,5 +965,26 @@ public class GraphWindow {
 
         mainForeground = Color.WHITE;
         secondaryForeground = Color.BLACK;
+    }
+    // TODO: Add theme methods here
+//    private void setLightThemeProperties() {}
+
+    private void displayGroupMembers() {
+        JOptionPane.showMessageDialog(mainFrame,
+                "       Arevalo, Lance Gabrielle\n" +
+                        "       Barana, Lance Matthew\n" +
+                        "       Bayquen, Christian\n" +
+                        "       Cayton, Arian Carl\n" +
+                        "       De los Trinos, Jp",
+                "Group 2", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void displayCourseSpecifications() {
+        JOptionPane.showMessageDialog(mainFrame,
+                "   Description:   Data Structures\n" +
+                        "   Instructor:   Roderick Makil\n" +
+                        "   Class Code:   9413\n" +
+                        "   Class #:   CS 211\n",
+                "Course Specifications", JOptionPane.PLAIN_MESSAGE);
     }
 }
