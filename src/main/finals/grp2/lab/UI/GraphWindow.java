@@ -41,6 +41,7 @@ import java.util.concurrent.ExecutionException;
  * TODO: Disable control panel when file not yet selected
  **/
 public class GraphWindow {
+    private final String INITIAL_THEME = "Bento";
 
     protected JFrame mainFrame;
 
@@ -86,7 +87,11 @@ public class GraphWindow {
 //            new JButton("Set")
 //    };
 
-
+    protected Color mainColor;
+    protected Color secondaryColor;
+    protected Color accentColor;
+    protected Color mainForeground;
+    protected Color secondaryForeground;
 
     protected JLabel algorithmLabel;
     protected JPanel fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
@@ -95,14 +100,6 @@ public class GraphWindow {
     protected JComboBox<String> toComboBox;
 
     protected JComboBox<String> algoSelectionBox;
-
-
-    // THEME: Bento
-    protected Color mainColor = new Color(0x2D394D);
-    protected Color secondaryColor = new Color(0x4A768D);
-    protected Color accentColor = new Color(0xF87A90);
-    protected Color mainForeground = Color.WHITE;
-    protected Color secondaryForeground = Color.BLACK;
 
     protected File textFile;
     protected PairList<String, String> edgeWeightPairList;
@@ -143,7 +140,7 @@ public class GraphWindow {
         // init main panel after creating all needed components
         initMainPanel();
 
-        initTheme();
+        initTheme(INITIAL_THEME);
 
         disableControlPanel();
         inputFileButton.setEnabled(true);
@@ -157,8 +154,8 @@ public class GraphWindow {
      * Add the component to its corresponding panel instead.
      */
     protected void initMainFrame() {
-        mainFrame = new JFrame();
-
+        mainFrame = new JFrame("Graph Visualizer");
+        mainFrame.setIconImage(new ImageIcon("src/main/finals/grp2/lab/asset/Graph.png").getImage());
         mainFrame.add(mainPanel);
 
         mainFrame.validate();
@@ -166,15 +163,25 @@ public class GraphWindow {
 //        mainFrame.setUndecorated(true);
         mainFrame.pack();
         mainFrame.setResizable(true);
-        mainFrame.setTitle("Graph Visualizer");
         mainFrame.setSize(new Dimension(1500, 800));
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         mainFrame.setLocation((d.width / 2) - mainFrame.getWidth() / 2, (d.height / 2) - mainFrame.getHeight() / 2);
         mainFrame.setVisible(true);
     }
 
-    protected void initTheme() {
-        UIManager.put("Panel.background", mainColor);
+    // TODO: Ad themes
+    protected void initTheme(String theme) {
+        if (theme.equalsIgnoreCase("Bento")) setBentoThemeProperties();
+//        if (theme.equalsIgnoreCase("Light")) setWhiteThemeProperties();
+//        else if (theme.equalsIgnoreCase("Dark")) setDarkThemeProperties();
+//        else if (theme.equalsIgnoreCase("SLU")) setSLUThemeProperties();
+//        else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
+//        else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
+//        else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
+//        else if (theme.equalsIgnoreCase("Olive")) setOliveThemeProperties();
+//        else if (theme.equalsIgnoreCase("Christmas")) setChristmasThemeProperties();
+
+        UIManager.put("Panel.background", secondaryColor);
         UIManager.put("Button.background", accentColor);
         UIManager.put("Button.foreground", mainForeground);
         UIManager.put("Button.select", secondaryColor);
@@ -862,5 +869,17 @@ public class GraphWindow {
             }
         }
 
+    }
+
+
+
+    private void setBentoThemeProperties() {
+        mainColor = new Color(0x2D394D);
+        secondaryColor = new Color(0x4A768D);
+        accentColor = new Color(0xF87A90);
+//        uneditableComponentColor = new Color()
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.BLACK;
     }
 }
