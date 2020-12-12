@@ -66,15 +66,26 @@ public class GraphWindow {
     protected JLabel inputLabel, pathwayLabel, dTableLabel;
 
     // button controllers
-    protected JButton browseButton;
-    protected final JButton[] actionButtons = new JButton[]{
-            new JButton("Play"),
-            new JButton("<<"),
-            new JButton("<"),
-            new JButton(">"),
-            new JButton(">>"),
-            new JButton("Set")
-    };
+    protected JButton inputFileButton = new JButton("Browse");
+    protected JButton setButton = new JButton("Set");
+    protected JButton playButton = new JButton("Play");
+    protected JButton skipForwardButton = new JButton(">>");
+    protected JButton skipBackwardButton = new JButton("<<");
+    protected JButton incrementButton = new JButton(">");
+    protected JButton decrementButton = new JButton("<");
+
+    JButton[] actionButtons = {inputFileButton, setButton, playButton, skipForwardButton,
+            skipBackwardButton,incrementButton, decrementButton};
+
+//    protected final JButton[] actionButtons = new JButton[]{
+//            new JButton("Play"),
+//            new JButton("<<"),
+//            new JButton("<"),
+//            new JButton(">"),
+//            new JButton(">>"),
+//            new JButton("Set")
+//    };
+
 
 
     protected JLabel algorithmLabel;
@@ -135,8 +146,8 @@ public class GraphWindow {
         initTheme();
 
         disableControlPanel();
-        browseButton.setEnabled(true);
-        actionButtons[0].setEnabled(false);
+        inputFileButton.setEnabled(true);
+        playButton.setEnabled(false);
         // only load the mainframe after inserting all components
         initMainFrame();
     }
@@ -163,9 +174,16 @@ public class GraphWindow {
     }
 
     protected void initTheme() {
+        UIManager.put("Panel.background", mainColor);
+        UIManager.put("Button.background", accentColor);
+        UIManager.put("Button.foreground", mainForeground);
+        UIManager.put("Button.select", secondaryColor);
+        UIManager.put("Button.border", new EmptyBorder(5, 10, 5, 10));
+
+        setButtons();
         setBackgrounds();
         setForegrounds();
-        setButtons();
+        setBorders();
     }
 
     protected void setBackgrounds() {
@@ -212,18 +230,41 @@ public class GraphWindow {
     }
 
     protected void setButtons() {
-        browseButton.setBackground(accentColor);
-        browseButton.setForeground(mainForeground);
-        browseButton.setFocusPainted(false);
-        browseButton.setBorder(new EmptyBorder(5, 0, 5, 0));
-
         for (JButton button : actionButtons) {
             button.setBackground(secondaryColor);
             button.setForeground(mainForeground);
             button.setFocusPainted(false);
             button.setBorder(new EmptyBorder(0, 0, 0, 0));
         }
-        actionButtons[0].setBackground(accentColor);
+        playButton.setBackground(accentColor);
+        inputFileButton.setBackground(accentColor);
+        inputFileButton.setBorder(new EmptyBorder(6, 0, 6, 0));
+    }
+
+    protected void setBorders() {
+        controlPanel.setBorder(new EmptyBorder(35, 35, 60, 35));
+        inputPanel.setBorder(new EmptyBorder(0,100,0,0));
+        inputLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
+        pathwayLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
+
+        inputTablePanel.setBorder(new EmptyBorder(5,0,10,0));
+        inputTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        inputTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
+
+        dTablePanel.setBorder(new EmptyBorder(0,0,0,0));
+        dTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        dTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
+        dTableLabelPanel.setBorder(new EmptyBorder(0,0,0,0));
+        pathwayTablePanel.setBorder(new EmptyBorder(5,0,10,0));
+        pathwayTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        pathwayTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
+
+
+
+        algoLabelPanel.setBorder(new EmptyBorder(10, 30, 0, 30));
+        algoSelectionPanel.setBorder(new EmptyBorder(0,30,5,30));
+        playPanel.setBorder(new EmptyBorder(0,30,5,30));
+        stepPanel.setBorder(new EmptyBorder(0,30,5,30));
     }
 
     protected void initMainPanel() {
@@ -267,7 +308,6 @@ public class GraphWindow {
     protected void initControlPanel() {
         controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
-        controlPanel.setBorder(new EmptyBorder(35, 35, 60, 35));
         controlPanel.setMinimumSize(new Dimension(400, 800)); // makes the control panel smaller
         controlPanel.setMaximumSize(new Dimension(400, 800)); // makes the control panel smaller
 
@@ -286,18 +326,16 @@ public class GraphWindow {
     // TODO: FIX FORMATTING
     protected void initInputPanel() {
         inputPanel = new JPanel();
-        inputPanel.setBorder(new EmptyBorder(0,100,0,0));
         inputPanel.setLayout(new GridLayout(1, 2));
 
         JLabel text = new JLabel();
         text.setHorizontalAlignment(SwingConstants.LEFT);
 
         // components in input panel
-        browseButton = new JButton("Browse");
-        browseButton.addActionListener((e) -> promptFileSelection());
+        inputFileButton.addActionListener((e) -> promptFileSelection());
 
         inputPanel.add(text);
-        inputPanel.add(browseButton);
+        inputPanel.add(inputFileButton);
     }
 
     // TODO: CLEAN
@@ -306,13 +344,11 @@ public class GraphWindow {
         tablePanel.setLayout(new GridLayout(2,1));
 
         inputLabelPanel = new JPanel(new GridLayout(1, 1));
-        inputLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
         inputLabel = new JLabel("Input Table");
         inputLabel.setHorizontalAlignment(SwingConstants.LEFT);
         inputLabelPanel.add(inputLabel);
 
         pathwayLabelPanel = new JPanel(new GridLayout(1, 1));
-        pathwayLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
         pathwayLabel = new JLabel("Pathway Table");
         pathwayLabel.setHorizontalAlignment(SwingConstants.LEFT);
         pathwayLabelPanel.add(pathwayLabel);
@@ -347,21 +383,18 @@ public class GraphWindow {
         table.setFillsViewportHeight(true);
         table.getTableHeader().setReorderingAllowed(false);
         table.getTableHeader().setResizingAllowed(false);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         scrollPane.setVisible(true);
     }
 
     protected void initInputTablePanel() {
         inputTablePanel = new JPanel();
-        inputTablePanel.setBorder(new EmptyBorder(5,0,10,0));
         inputTablePanel.setLayout(new GridLayout(1, 1));
 
         inputTableModel = new DefaultTableModel();
         inputTable = new JTable(inputTableModel);
         inputTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
-        inputTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
         inputTableScrollPane = new JScrollPane(inputTable);
-        inputTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
 
         initializeTable(inputTable, inputTableModel, new String[]{"Weight", "Point A", "Point B"}, inputTableScrollPane);
 
@@ -375,22 +408,18 @@ public class GraphWindow {
         dTableMainPanel.setBackground(Color.YELLOW);
 
         dTablePanel = new JPanel();
-        dTablePanel.setBorder(new EmptyBorder(0,0,0,0));
         dTablePanel.setLayout(new GridLayout(1, 1));
         dTablePanel.setPreferredSize(new Dimension(600,240));
 
         dTableModel = new DefaultTableModel();
         dTable = new JTable(dTableModel);
         dTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
-        dTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
         dTableScrollPane = new JScrollPane(dTable);
-        dTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
 
         initializeTable(dTable, dTableModel, new String[]{"End", "Cost", "Path"}, dTableScrollPane);
         dTablePanel.add(dTableScrollPane);
 
         dTableLabelPanel = new JPanel(new GridLayout(1, 1));
-        dTableLabelPanel.setBorder(new EmptyBorder(0,0,0,0));
         dTableLabel = new JLabel("Pathway to Every Node:");
         dTableLabel.setHorizontalAlignment(SwingConstants.LEFT);
         dTableLabelPanel.add(dTableLabel);
@@ -402,15 +431,12 @@ public class GraphWindow {
 
     protected void initPathwayTablePanel() {
         pathwayTablePanel = new JPanel();
-        pathwayTablePanel.setBorder(new EmptyBorder(5,0,10,0));
         pathwayTablePanel.setLayout(new GridLayout(1, 1));
 
         pathwayTableModel = new DefaultTableModel();
         pathwayTable = new JTable(pathwayTableModel);
         pathwayTable.getTableHeader().setFont(new Font("Default", Font.PLAIN, 11));
-        pathwayTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
         pathwayTableScrollPane = new JScrollPane(pathwayTable);
-        pathwayTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
 
         initializeTable(pathwayTable, pathwayTableModel, new String[]{"Weight", "Point fA", "Point fB"}, pathwayTableScrollPane);
 
@@ -436,11 +462,6 @@ public class GraphWindow {
         playPanel.setPreferredSize(new Dimension(100, 40));
         stepPanel.setPreferredSize(new Dimension(100, 40));
 
-        algoLabelPanel.setBorder(new EmptyBorder(10, 30, 0, 30));
-        algoSelectionPanel.setBorder(new EmptyBorder(0,30,5,30));
-        playPanel.setBorder(new EmptyBorder(0,30,5,30));
-        stepPanel.setBorder(new EmptyBorder(0,30,5,30));
-
         algorithmLabel = new JLabel("Algorithm");
         algorithmLabel.setHorizontalAlignment(SwingConstants.CENTER);
         algoLabelPanel.add(algorithmLabel);
@@ -448,16 +469,16 @@ public class GraphWindow {
         initializeAlgoSelectionBox();
         algoSelectionPanel.add(algoSelectionBox);
 
-        setActionButtons(); // modify this to change button style
+//        setActionButtons(); // modify this to change button style
 
         fromToPanel.add(fromField);
         fromToPanel.add(toComboBox);
-        fromToPanel.add(actionButtons[5]); // set
-        playPanel.add(actionButtons[0]); // Play/Pause button
-        stepPanel.add(actionButtons[1]); // Go to start Button
-        stepPanel.add(actionButtons[2]); // Step backward Button
-        stepPanel.add(actionButtons[3]); // Step forward Button
-        stepPanel.add(actionButtons[4]); // Go to end Button
+        fromToPanel.add(setButton);
+        playPanel.add(playButton);
+        stepPanel.add(skipBackwardButton);
+        stepPanel.add(skipForwardButton);
+        stepPanel.add(decrementButton);
+        stepPanel.add(incrementButton);
 
         // top: dropdown list, middle: wide play/pause button, bottom: steppers
         actionPanel.add(fromToPanel);
@@ -575,14 +596,8 @@ public class GraphWindow {
         }
     }
 
-    protected void setActionButtons() {
-        for (JButton button : actionButtons) {
-//            button.setBackground(Color.RED);
-        }
-    }
-
     private synchronized void setActionButtonsActionListeners() {
-        actionButtons[5].addActionListener(e -> { // setFromTo
+        setButton.addActionListener(e -> { // setFromTo
             if (!readyToSet()) return;
             if (dijkstraChosen)
                 initializePathQueueDijkstra();
@@ -594,7 +609,7 @@ public class GraphWindow {
             updatePathTableValues(); // update path table - empty for now
         });
 
-        actionButtons[0].addActionListener(e -> { // play
+        playButton.addActionListener(e -> {
             if (!readyToVisualize()) return;
             changeMode(paused);
             if (!paused) {
@@ -609,7 +624,7 @@ public class GraphWindow {
             }
         });
 
-        actionButtons[1].addActionListener(e -> { // skip to start
+        skipBackwardButton.addActionListener(e -> {
             if (!readyToVisualize()) return;
             for (int i = pathShownList.getSize()-1; i > -1; i--) {
                 pathToShowStack.push(pathShownList.getElement(i));
@@ -621,7 +636,18 @@ public class GraphWindow {
                     "Successful", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        actionButtons[2].addActionListener(e -> { // backward
+        skipForwardButton.addActionListener(e -> {
+            if (!readyToVisualize()) return;
+            while (!pathToShowStack.isEmpty()) {
+                pathShownList.insert(pathToShowStack.pop());
+            }
+            graphCanvas.setPath(pathShownList);
+            updatePathTableValues();
+            JOptionPane.showMessageDialog(mainFrame, "End of path reached.",
+                    "Successful", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        decrementButton.addActionListener(e -> {
             if (!readyToVisualize()) return;
             try{
                 pathToShowStack.push(pathShownList.getElement(pathShownList.getSize()-1));
@@ -634,7 +660,7 @@ public class GraphWindow {
             updatePathTableValues();
         });
 
-        actionButtons[3].addActionListener(e -> { // forward
+        incrementButton.addActionListener(e -> {
             if (!readyToVisualize()) return;
             try {
                 pathShownList.insert(pathToShowStack.pop());
@@ -644,17 +670,6 @@ public class GraphWindow {
             }
             graphCanvas.setPath(pathShownList);
             updatePathTableValues();
-        });
-
-        actionButtons[4].addActionListener(e -> { // skip to end
-            if (!readyToVisualize()) return;
-            while (!pathToShowStack.isEmpty()) {
-                pathShownList.insert(pathToShowStack.pop());
-            }
-            graphCanvas.setPath(pathShownList);
-            updatePathTableValues();
-            JOptionPane.showMessageDialog(mainFrame, "End of path reached.",
-                    "Successful", JOptionPane.INFORMATION_MESSAGE);
         });
     }
 
@@ -711,7 +726,7 @@ public class GraphWindow {
             setVisualPanelProperties(dijkstraChosen);
             updateToComboBox();
             enableControlPanel();
-            actionButtons[0].setEnabled(true);
+            playButton.setEnabled(true);
             dTableModel.setRowCount(0);
             inputTableModel.setRowCount(0);
             pathwayTableModel.setRowCount(0);
@@ -789,7 +804,7 @@ public class GraphWindow {
 
     // TODO: play pause action
     private void changeMode(boolean mode) {
-        actionButtons[0].setText(mode ? "Pause" : "Play");
+        playButton.setText(mode ? "Pause" : "Play");
         this.paused = !mode;
         if (!paused)
             disableControlPanel();
@@ -798,7 +813,7 @@ public class GraphWindow {
     }
 
     private void disableControlPanel() {
-        browseButton.setEnabled(false);
+        inputFileButton.setEnabled(false);
         for (int i = 1; i < actionButtons.length; i++) {
             actionButtons[i].setEnabled(false);
         }
@@ -808,7 +823,7 @@ public class GraphWindow {
     }
 
     private void enableControlPanel() {
-        browseButton.setEnabled(true);
+        inputFileButton.setEnabled(true);
         for (int i = 1; i < actionButtons.length; i++) {
             actionButtons[i].setEnabled(true);
         }
