@@ -436,13 +436,6 @@ public class GraphWindow {
     }
 
     protected void promptFileSelection() throws IOException {
-        System.out.println("Frame: " + mainFrame.getSize());
-        System.out.println("ControlPanel: " + controlPanel.getSize());
-        System.out.println("VisualizerPanel: " + visualizerPanel.getSize());
-        try {
-            System.out.println("dTablePanel: " + dTablePanel.getSize());
-            System.out.println("dTableMainPanel: " + dTableMainPanel.getSize());
-        }catch (Exception e) {}
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setAcceptAllFileFilterUsed(false);
@@ -656,11 +649,10 @@ public class GraphWindow {
     }
 
     protected void updateToComboBox() {
-        toComboBox.removeAll();
+        toComboBox.removeAllItems();
         for (int i = 0; i < verticesIDList.getSize(); i++) {
             toComboBox.addItem(verticesIDList.getElement(i));
         }
-        //TODO: Combo box aesthetics
     }
 
     protected void initializePathQueue() {
@@ -687,7 +679,6 @@ public class GraphWindow {
     }
 
     protected void initializePathQueueDijkstra() {
-        // TODO: input validation
         from = fromField.getText();
         to = toComboBox.getSelectedItem()+"";
         graphCanvas.setLabels(algoSelectionBox.getSelectedItem()+"", from, to);
@@ -742,12 +733,9 @@ public class GraphWindow {
             if (!readyToVisualize()) return;
             changeMode(paused);
             if (!paused) {
-                if (visualizerThread.getState().toString().equals("TERMINATED")){
+                if (visualizerThread.getState().toString().equals("TERMINATED"))
                     visualizerThread = new VisualizerThread();
-                    visualizerThread.start();
-                }else {
-                    visualizerThread.start();
-                }
+                visualizerThread.start();
             }else {
                 visualizerThread.interrupt();
             }
@@ -931,6 +919,7 @@ public class GraphWindow {
 
         @Override
         public void run() {
+            int speed = 150;
             while (true) {
                 try {
                     pathShownList.insert(pathToShowStack.pop());
@@ -943,7 +932,7 @@ public class GraphWindow {
                 graphCanvas.setPath(pathShownList);
                 updatePathTableValues();
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(speed);
                 } catch (InterruptedException ex) {
                     break;
                 }
@@ -955,7 +944,6 @@ public class GraphWindow {
                 }
             }
         }
-
     }
 
     protected boolean validFile() throws IOException {

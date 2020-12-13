@@ -19,7 +19,7 @@ public class GraphVisualizerCanvas extends Canvas {
     private ArrayList<Dictionary.Node<Graph.Vertex, Graph.Vertex>> path;
 
     private int vSize;
-    private int rad = 200; // Graph Radius
+    private int rad = 235; // Graph Radius
     private PairList<Integer, Integer> vCoords;
 
     private final int VRAD = 35; // Vertex Radius
