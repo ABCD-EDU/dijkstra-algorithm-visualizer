@@ -43,7 +43,8 @@ import java.util.concurrent.ExecutionException;
  * TODO: Disable control panel when file not yet selected
  **/
 public class GraphWindow {
-    protected final String INITIAL_THEME = "SLU";
+    protected final String INITIAL_THEME = "Light";
+    protected String currentTheme = INITIAL_THEME;
     protected Color mainColor;
     protected Color secondaryColor;
     protected Color highlightColor;
@@ -420,13 +421,19 @@ public class GraphWindow {
         textSpacing.setHorizontalAlignment(SwingConstants.LEFT);
         String text = "<html> Accepts .csv & .txt files <br> File format: weight, pointA, pointB <br> First Line should indicate what kind of graph (Directed, Undirected) </html>";
         inputFileButton.setToolTipText(text);
-        inputFileButton.addActionListener((e) -> promptFileSelection());
+        inputFileButton.addActionListener((e) -> {
+            try {
+                promptFileSelection();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        });
 
         inputPanel.add(textSpacing);
         inputPanel.add(inputFileButton);
     }
 
-    protected void promptFileSelection() {
+    protected void promptFileSelection() throws IOException {
         System.out.println("Frame: " + mainFrame.getSize());
         System.out.println("ControlPanel: " + controlPanel.getSize());
         System.out.println("VisualizerPanel: " + visualizerPanel.getSize());
@@ -441,8 +448,11 @@ public class GraphWindow {
         int choice = fileChooser.showOpenDialog(mainFrame);
         if (choice == JFileChooser.APPROVE_OPTION) { // initialize graph
             textFile = fileChooser.getSelectedFile();
-            // TODO: change path to actual textFile
-            graph = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+            if (!validFile()) {
+                displayFileError();
+                return;
+            }
+            graph = new Graph(new File(textFile.getPath()));
             vertices = graph.getVertices();
             initializeVerticesIDList();
             initializeEdgeWeightPairList();
@@ -638,7 +648,6 @@ public class GraphWindow {
             visualizerPanel.repaint();
         });
     }
-
 
     protected void updateToComboBox() {
         toComboBox.removeAll();
@@ -854,7 +863,7 @@ public class GraphWindow {
 
     protected void initializeInputTableValues() throws IOException {
         inputTableModel.setRowCount(0);
-        BufferedReader reader = new BufferedReader(new FileReader("src/main/finals/grp2/lab/data/in.csv"));
+        BufferedReader reader = new BufferedReader(new FileReader(textFile.getPath()));
         String line = "";
         reader.readLine();
         line = reader.readLine();
@@ -943,6 +952,27 @@ public class GraphWindow {
 
     }
 
+    protected boolean validFile() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(textFile.getPath()));
+        String line = "";
+        line = reader.readLine();
+        if (!line.equalsIgnoreCase("DIRECTED") && !line.equalsIgnoreCase("UNDIRECTED")) return false;
+        line = reader.readLine();
+        while (line != null) {
+            String[] data = line.split(",");
+            if (data.length != 3) {
+                return false;
+            }
+            try {
+                Integer.parseInt(data[0]);
+            } catch (NumberFormatException nfe) {
+                return false;
+            }
+            if (data[1].strip().isBlank() || data[2].strip().isBlank()) return false;
+            line = reader.readLine();
+        }
+        return true;
+    }
 
     protected void displayGroupMembers() {
         JOptionPane.showMessageDialog(mainFrame,
@@ -963,6 +993,11 @@ public class GraphWindow {
                 "Course Specifications", JOptionPane.PLAIN_MESSAGE);
     }
 
+    protected void displayFileError() {
+        JOptionPane.showMessageDialog(mainFrame, "- First line must be either Directed or Undirected\n " +
+                "- File Format should follow (Weight(int), From, To)", "File Format Error", JOptionPane.ERROR_MESSAGE);
+    }
+
     protected void setLightThemeProperties() {
         mainColor = new Color(0xD9D9D9);
         secondaryColor = new Color(0xFFFFFF);
@@ -977,6 +1012,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.WHITE;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "Light";
     }
 
     protected void setDarkThemeProperties() {
@@ -993,6 +1030,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.WHITE;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "Dark";
     }
 
     protected void setSLUThemeProperties() {
@@ -1009,6 +1048,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.WHITE;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "SLU";
     }
 
     protected void setBentoThemeProperties() {
@@ -1025,6 +1066,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.WHITE;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "Bento";
     }
 
     protected void setDraculaThemeProperties() {
@@ -1041,6 +1084,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.BLACK;
         vertexForeground = Color.BLACK;
+
+        currentTheme = "Dracula";
     }
 
     protected void setGruvboxThemeProperties() {
@@ -1057,6 +1102,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.BLACK;
         vertexForeground = Color.BLACK;
+
+        currentTheme = "Gruvbox";
     }
 
     protected void setGodspeedThemeProperties() {
@@ -1073,6 +1120,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.BLACK;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "Godspeed";
     }
 
     protected void setOliveThemeProperties() {
@@ -1089,6 +1138,8 @@ public class GraphWindow {
         headerForeground = Color.WHITE;
         mainButtonForeground = Color.WHITE;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "Olive";
     }
 
     protected void setChristmasThemeProperties() {
@@ -1105,5 +1156,7 @@ public class GraphWindow {
         headerForeground = Color.BLACK;
         mainButtonForeground = Color.BLACK;
         vertexForeground = Color.WHITE;
+
+        currentTheme = "Christmas";
     }
 }
