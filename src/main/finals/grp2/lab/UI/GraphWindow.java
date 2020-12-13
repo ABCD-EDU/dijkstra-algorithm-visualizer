@@ -98,7 +98,7 @@ public class GraphWindow {
             skipBackwardButton,incrementButton, decrementButton};
 
     protected JLabel algorithmLabel;
-    protected JPanel fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
+    protected JPanel fromToLabel, fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
 
     protected JTextField fromField;
     protected JComboBox<String> toComboBox;
@@ -311,6 +311,7 @@ public class GraphWindow {
         dTable.getTableHeader().setBackground(headerColor);
         dTableScrollPane.setBackground(headerColor);
 
+        fromToLabel.setBackground(mainColor);
         fromToPanel.setBackground(mainColor);
         algoLabelPanel.setBackground(mainColor);
         algoSelectionPanel.setBackground(mainColor);
@@ -336,6 +337,7 @@ public class GraphWindow {
         dTable.setForeground(mainForeground);
         dTable.getTableHeader().setForeground(headerForeground);
 
+        fromToLabel.setForeground(mainForeground);
         algoSelectionBox.setForeground(mainForeground);
     }
 
@@ -584,8 +586,9 @@ public class GraphWindow {
 
     protected void initializeActionPanel() {
         actionPanel = new JPanel();
-        actionPanel.setLayout(new GridLayout(5, 1));
+        actionPanel.setLayout(new GridLayout(6, 1));
 
+        fromToLabel = new JPanel(new GridLayout(1, 3, 9, 5));
         fromToPanel = new JPanel(new GridLayout(1, 3, 9, 5));
         algoLabelPanel = new JPanel(new GridLayout(1, 1));
         algoSelectionPanel = new JPanel(new GridLayout(1, 1));
@@ -604,6 +607,7 @@ public class GraphWindow {
         initializeAlgoSelectionBox();
         algoSelectionPanel.add(algoSelectionBox);
 
+        fromToLabel.add(new JLabel("         From                     To"));
         fromToPanel.add(fromField);
         fromToPanel.add(toComboBox);
         fromToPanel.add(setButton);
@@ -614,6 +618,7 @@ public class GraphWindow {
         stepPanel.add(incrementButton);
 
         // top: dropdown list, middle: wide play/pause button, bottom: steppers
+        actionPanel.add(fromToLabel);
         actionPanel.add(fromToPanel);
         actionPanel.add(algoLabelPanel);
         actionPanel.add(algoSelectionPanel);

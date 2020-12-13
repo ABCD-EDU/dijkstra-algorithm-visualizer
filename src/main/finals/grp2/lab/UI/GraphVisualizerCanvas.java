@@ -91,7 +91,7 @@ public class GraphVisualizerCanvas extends Canvas {
         if (path.getSize() != 0) {
             g.translate(-VRAD/2, -VRAD/2);
             PairList.Node<Integer, Integer> head = vertexCoordsPairList.get(path.getElement(path.getSize()-1).val);
-            g.setColor(Color.GREEN);
+            g.setColor(Color.RED);
             g.drawOval(head.key, head.val, VRAD, VRAD);
             g.translate(VRAD/2,VRAD/2);
 
@@ -119,7 +119,7 @@ public class GraphVisualizerCanvas extends Canvas {
             PairList.Node<Integer, Integer> p2 = vertexCoordsPairList.get(path.getElement(i).val);
             g.setColor(Color.GREEN);
             if (i == path.getSize()-1)
-                g.setColor(Color.WHITE);
+                g.setColor(Color.RED);
             if (p1.equals(p2)) {
                 g.drawOval(p1.key, p1.val, VRAD, VRAD);
                 continue;
@@ -128,7 +128,6 @@ public class GraphVisualizerCanvas extends Canvas {
         }
 
     }
-
 
     private PairList<Integer, Integer> calculateVCoords() {
         PairList<Integer, Integer> coords = new PairList<>();
