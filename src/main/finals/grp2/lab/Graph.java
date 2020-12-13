@@ -294,8 +294,6 @@ public class Graph {
                 > relax(u, v, distanceFromParent)
             Enqueue the child(v) vertex to the priority queue
                 > PQ.enqueue(v)
-
-
      */
     public PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> dijkstra(String start){
         Queue<Dictionary.Node<Vertex,Vertex>> path = new DoublyLinkedList<>();
@@ -309,8 +307,6 @@ public class Graph {
 
             Vertex parentVertex = priorityQueue.dequeue();
             for (int i=0;i<parentVertex.edges.size();i++){
-                System.out.println("Child : " + parentVertex.edges.getAt(i).key);
-                System.out.println("Weight: " + parentVertex.edges.getAt(i).val);
                 /*This is to replace the current edge into the  of the edge with complete info via getVertex since the inner edges of the current
                 edge is not stored during file reading.
                   */
@@ -342,7 +338,6 @@ public class Graph {
     Relax sets the distance of the visited vertex/node to the distance of all the combined distance of the
         traversed path.
      Example:
-
         Before making relaxation, the distance of all the combined edges(path) or Σ W(u,v) is compared to the minDistance
             of the node to be visited. //Explained in dijkstra method
         If the child.minDistance greater than the distanceFromParent or infinity then we will relax it so that it will have

@@ -559,6 +559,7 @@ public class GraphWindow {
 
         initializeTable(dTable, dTableModel, new String[]{"End", "Cost", "Path"}, dTableScrollPane);
         dTablePanel.add(dTableScrollPane);
+        dTable.getColumnModel().getColumn(2).setPreferredWidth(400);
 
         dTableLabelPanel = new JPanel(new GridLayout(1, 1));
         dTableLabel = new JLabel("(Dijsktra) Pathway to Every Node:");
