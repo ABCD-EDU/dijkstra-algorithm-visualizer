@@ -43,13 +43,20 @@ import java.util.concurrent.ExecutionException;
  * TODO: Disable control panel when file not yet selected
  **/
 public class GraphWindow {
-    protected final String INITIAL_THEME = "Bento";
+    protected final String INITIAL_THEME = "SLU";
     protected Color mainColor;
     protected Color secondaryColor;
+    protected Color highlightColor;
+    protected Color headerColor;
     protected Color accentColor;
-    protected Color uneditableComponentColor;
+    protected Color vertexColor;
+    protected Color edgesColor;
+
     protected Color mainForeground;
     protected Color secondaryForeground;
+    protected Color mainButtonForeground;
+    protected Color headerForeground;
+    protected Color vertexForeground;
 
     protected JFrame mainFrame;
 
@@ -86,7 +93,7 @@ public class GraphWindow {
     protected JButton skipBackwardButton = new JButton("<<");
     protected JButton incrementButton = new JButton(">");
     protected JButton decrementButton = new JButton("<");
-    JButton[] actionButtons = {inputFileButton, setButton, playButton, skipForwardButton,
+    JButton[] actionButtonsArray = {playButton, setButton, inputFileButton, skipForwardButton,
             skipBackwardButton,incrementButton, decrementButton};
 
     protected JLabel algorithmLabel;
@@ -135,6 +142,7 @@ public class GraphWindow {
 
         disableControlPanel();
         inputFileButton.setEnabled(true);
+        playButton.setEnabled(false);
         // only load the mainframe after inserting all components
 
         initializeMenuBar();
@@ -234,47 +242,47 @@ public class GraphWindow {
         godspeedTheme.addActionListener(e -> initializeTheme("Godspeed"));
         themesSubMenu.add(godspeedTheme);
 
-        JMenuItem Olive = new JMenuItem("Olive");
-        Olive.setMnemonic(KeyEvent.VK_V);
-        Olive.addActionListener(e -> initializeTheme("Olive"));
-        themesSubMenu.add(Olive);
+        JMenuItem olive = new JMenuItem("Olive");
+        olive.setMnemonic(KeyEvent.VK_V);
+        olive.addActionListener(e -> initializeTheme("Olive"));
+        themesSubMenu.add(olive);
 
-        JMenuItem halloweenTheme = new JMenuItem("Halloween");
-        halloweenTheme.setMnemonic(KeyEvent.VK_H);
-        halloweenTheme.addActionListener(e -> initializeTheme("Halloween"));
-        themesSubMenu.add(halloweenTheme);
+        JMenuItem christmas = new JMenuItem("Christmas");
+        christmas.setMnemonic(KeyEvent.VK_H);
+        christmas.addActionListener(e -> initializeTheme("Christmas"));
+        themesSubMenu.add(christmas);
     }
 
-    // TODO: Add themes
     protected void initializeTheme(String theme) {
-        if (theme.equalsIgnoreCase("Bento")) setBentoThemeProperties();
-//        if (theme.equalsIgnoreCase("Light")) setWhiteThemeProperties();
-//        else if (theme.equalsIgnoreCase("Dark")) setDarkThemeProperties();
-//        else if (theme.equalsIgnoreCase("SLU")) setSLUThemeProperties();
-//        else if (theme.equalsIgnoreCase("Bento")) setBentoThemeProperties();
-//        else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
-//        else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
-//        else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
-//        else if (theme.equalsIgnoreCase("Olive")) setOliveThemeProperties();
-//        else if (theme.equalsIgnoreCase("Christmas")) setChristmasThemeProperties();
+        if (theme.equalsIgnoreCase("Light")) setLightThemeProperties();
+        else if (theme.equalsIgnoreCase("Dark")) setDarkThemeProperties();
+        else if (theme.equalsIgnoreCase("SLU")) setSLUThemeProperties();
+        else if (theme.equalsIgnoreCase("Bento")) setBentoThemeProperties();
+        else if (theme.equalsIgnoreCase("Dracula")) setDraculaThemeProperties();
+        else if (theme.equalsIgnoreCase("Godspeed")) setGodspeedThemeProperties();
+        else if (theme.equalsIgnoreCase("Gruvbox")) setGruvboxThemeProperties();
+        else if (theme.equalsIgnoreCase("Olive")) setOliveThemeProperties();
+        else if (theme.equalsIgnoreCase("Christmas")) setChristmasThemeProperties();
 
-        UIManager.put("Panel.background", secondaryColor);
-        UIManager.put("OptionPane.background", secondaryColor);
+        UIManager.put("Panel.background", mainColor);
+        UIManager.put("OptionPane.background", mainColor);
         UIManager.put("OptionPane.messageForeground", mainForeground);
-        UIManager.put("Button.background", accentColor);
-        UIManager.put("Button.foreground", mainForeground);
+        UIManager.put("Button.background", headerColor);
+        UIManager.put("Button.foreground", headerForeground);
         UIManager.put("Button.select", mainColor);
-        UIManager.put("Button.focus", accentColor);
+        UIManager.put("Button.focus", headerColor);
         UIManager.put("Button.border", new EmptyBorder(5, 10, 5, 10));
 
         setButtonColors();
         setBackgrounds();
         setForegrounds();
         setBorders();
+
+        setVisualizerPanelProperties(dijkstraChosen);
     }
 
     protected void setBackgrounds() {
-        menuBar.setBackground(accentColor);
+        menuBar.setBackground(headerColor);
 
         controlPanel.setBackground(mainColor);
         visualizerPanel.setBackground(secondaryColor);
@@ -287,20 +295,20 @@ public class GraphWindow {
         inputLabelPanel.setBackground(mainColor);
         inputTablePanel.setBackground(mainColor);
         inputTable.setBackground(secondaryColor);
-        inputTable.getTableHeader().setBackground(accentColor);
-        inputTableScrollPane.setBackground(accentColor);
+        inputTable.getTableHeader().setBackground(headerColor);
+        inputTableScrollPane.setBackground(headerColor);
 
         pathwayMainPanel.setBackground(mainColor);
         pathwayLabelPanel.setBackground(mainColor);
         pathwayTablePanel.setBackground(mainColor);
         pathwayTable.setBackground(secondaryColor);
-        pathwayTable.getTableHeader().setBackground(accentColor);
-        pathwayTableScrollPane.setBackground(accentColor);
+        pathwayTable.getTableHeader().setBackground(headerColor);
+        pathwayTableScrollPane.setBackground(headerColor);
 
         dTableMainPanel.setBackground(secondaryColor);
         dTable.setBackground(mainColor);
-        dTable.getTableHeader().setBackground(accentColor);
-        dTableScrollPane.setBackground(accentColor);
+        dTable.getTableHeader().setBackground(headerColor);
+        dTableScrollPane.setBackground(headerColor);
 
         fromToPanel.setBackground(mainColor);
         algoLabelPanel.setBackground(mainColor);
@@ -312,42 +320,43 @@ public class GraphWindow {
     }
 
     protected void setForegrounds() {
-        aboutSubMenu.setForeground(mainForeground);
-        themesSubMenu.setForeground(mainForeground);
+        aboutSubMenu.setForeground(headerForeground);
+        themesSubMenu.setForeground(headerForeground);
 
         inputLabel.setForeground(mainForeground);
         pathwayLabel.setForeground(mainForeground);
         algorithmLabel.setForeground(mainForeground);
-        dTableLabel.setForeground(mainForeground);
+        dTableLabel.setForeground(secondaryForeground);
 
-        inputTable.getTableHeader().setForeground(mainForeground);
-        pathwayTable.getTableHeader().setForeground(mainForeground);
-
-        dTableMainPanel.setForeground(mainForeground);
-        dTable.getTableHeader().setForeground(mainForeground);
+        inputTable.setForeground(secondaryForeground);
+        inputTable.getTableHeader().setForeground(headerForeground);
+        pathwayTable.setForeground(secondaryForeground);
+        pathwayTable.getTableHeader().setForeground(headerForeground);
+        dTable.setForeground(mainForeground);
+        dTable.getTableHeader().setForeground(headerForeground);
 
         algoSelectionBox.setForeground(mainForeground);
     }
 
     protected void setBorders() {
-        controlPanel.setBorder(new EmptyBorder(30, 35, 60, 35));
+        controlPanel.setBorder(new EmptyBorder(25, 35, 60, 35));
         inputPanel.setBorder(new EmptyBorder(0,100,0,0));
 
         inputLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
         inputTablePanel.setBorder(new EmptyBorder(5,0,10,0));
-        inputTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        inputTable.getTableHeader().setBorder(new LineBorder(headerColor, 1));
         inputTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
 
         pathwayLabelPanel.setBorder(new EmptyBorder(0,10,0,0));
         pathwayTablePanel.setBorder(new EmptyBorder(5,0,10,0));
-        pathwayTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        pathwayTable.getTableHeader().setBorder(new LineBorder(headerColor, 1));
         pathwayTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
 
         dTableMainPanel.setBorder(new EmptyBorder(0, 150, 0, 150));
         dTableLabelPanel.setBorder(new EmptyBorder(0,0,0,0));
         dTableLabel.setBorder(new EmptyBorder(10, 0, 5, 0));
         dTablePanel.setBorder(new EmptyBorder(0,0,0,0));
-        dTable.getTableHeader().setBorder(new LineBorder(accentColor, 1));
+        dTable.getTableHeader().setBorder(new LineBorder(headerColor, 1));
         dTableScrollPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
 
         algoLabelPanel.setBorder(new EmptyBorder(20, 35, 5, 35));
@@ -357,14 +366,17 @@ public class GraphWindow {
     }
 
     protected void setButtonColors() {
-        for (JButton button : actionButtons) {
-            button.setBackground(secondaryColor);
-            button.setForeground(mainForeground);
+        for (JButton button : actionButtonsArray) {
+            if (button == inputFileButton || button == playButton) {
+                button.setBackground(accentColor);
+                button.setForeground(mainButtonForeground);
+            } else {
+                button.setBackground(secondaryColor);
+                button.setForeground(secondaryForeground);
+            }
             button.setFocusPainted(false);
             button.setBorder(new EmptyBorder(0, 0, 0, 0));
         }
-        inputFileButton.setBackground(accentColor);
-        playButton.setBackground(accentColor);
         inputFileButton.setBorder(new EmptyBorder(6, 0, 6, 0));
     }
 
@@ -394,24 +406,20 @@ public class GraphWindow {
         controlPanel.add(actionPanel, BorderLayout.SOUTH);
     }
 
-    // TODO: INSERT VISUALIZER HERE
     protected void initializeVisualizerPanel() {
         visualizerPanel = new JPanel();
         visualizerPanel.setMinimumSize(new Dimension(1100, 900)); // makes the visual panel wider than controls
         visualizerPanel.setMaximumSize(new Dimension(1100, 900)); // makes the visual panel wider than controls
     }
 
-
-
-    // TODO: EDIT Tooltip Message
     protected void initializeInputPanel() {
         inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(1, 2));
 
         JLabel textSpacing = new JLabel();
         textSpacing.setHorizontalAlignment(SwingConstants.LEFT);
-
-        inputFileButton.setToolTipText("Lorem Ipsum");
+        String text = "<html> Accepts .csv & .txt files <br> File format: weight, pointA, pointB <br> First Line should indicate what kind of graph (Directed, Undirected) </html>";
+        inputFileButton.setToolTipText(text);
         inputFileButton.addActionListener((e) -> promptFileSelection());
 
         inputPanel.add(textSpacing);
@@ -520,7 +528,7 @@ public class GraphWindow {
         table.setCellSelectionEnabled(false);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setForeground(Color.WHITE);
-        table.setRowHeight(50);
+        table.setRowHeight(30);
         table.setOpaque(true);
         table.setFillsViewportHeight(true);
         table.getTableHeader().setReorderingAllowed(false);
@@ -537,7 +545,6 @@ public class GraphWindow {
         scrollPane.setVisible(true);
     }
 
-    //TODO: Smaller Row Height
     protected void initializeDijsktraTablePanel() {
         dTableMainPanel = new JPanel(new GridLayout(2,1));
 
@@ -554,7 +561,7 @@ public class GraphWindow {
         dTablePanel.add(dTableScrollPane);
 
         dTableLabelPanel = new JPanel(new GridLayout(1, 1));
-        dTableLabel = new JLabel("Pathway to Every Node:");
+        dTableLabel = new JLabel("(Dijsktra) Pathway to Every Node:");
         dTableLabel.setHorizontalAlignment(SwingConstants.CENTER);
         dTableLabelPanel.add(dTableLabel);
         dTableMainPanel.setLayout(new BoxLayout(dTableMainPanel, BoxLayout.Y_AXIS));
@@ -678,7 +685,6 @@ public class GraphWindow {
     }
 
     protected void updateDTable(PairList<String[], Queue<Dictionary.Node<Graph.Vertex, Graph.Vertex>>> pathsList, int chosenIdx) {
-        Color color = new Color(0x6A4C61);
         dTableModel.setRowCount(0);
         for (int i = 0; i <pathsList.size(); i++)
             dTableModel.addRow(pathsList.getAt(i).key);
@@ -687,8 +693,7 @@ public class GraphWindow {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                            boolean hasFocus, int row, int column) {
                 final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(row == chosenIdx ? color : mainColor);
-                // TODO: change highlight color for higlighted row
+                c.setBackground(row == chosenIdx ? highlightColor : mainColor);
                 return c;
             }
         });
@@ -866,7 +871,7 @@ public class GraphWindow {
 
     protected void setVisualizerPanelProperties(boolean dTablePresent) {
         visualizerPanel.removeAll();
-        graphCanvas = new GraphVisualizerCanvas(graph, secondaryColor);
+        graphCanvas = new GraphVisualizerCanvas(graph, secondaryColor, secondaryForeground, vertexForeground, vertexColor, edgesColor);
         if (dTablePresent)
             visualizerPanel.setPreferredSize(new Dimension(1100,550));
         else
@@ -888,8 +893,8 @@ public class GraphWindow {
 
     protected void enableControlPanel() {
         inputFileButton.setEnabled(true);
-        for (int i = 1; i < actionButtons.length; i++) {
-            actionButtons[i].setEnabled(true);
+        for (int i = 1; i < actionButtonsArray.length; i++) {
+            actionButtonsArray[i].setEnabled(true);
         }
         algoSelectionBox.setEnabled(true);
         fromField.setEnabled(true);
@@ -899,8 +904,8 @@ public class GraphWindow {
 
     protected void disableControlPanel() {
         inputFileButton.setEnabled(false);
-        for (int i = 1; i < actionButtons.length; i++) {
-            actionButtons[i].setEnabled(false);
+        for (int i = 1; i < actionButtonsArray.length; i++) {
+            actionButtonsArray[i].setEnabled(false);
         }
         fromField.setEnabled(false);
         toComboBox.setEnabled(false);
@@ -938,17 +943,6 @@ public class GraphWindow {
 
     }
 
-    protected void setBentoThemeProperties() {
-        mainColor = new Color(0x2D394D);
-        secondaryColor = new Color(0x4A768D);
-        accentColor = new Color(0xF87A90);
-        uneditableComponentColor = new Color(0x6C7482);
-
-        mainForeground = Color.WHITE;
-        secondaryForeground = Color.BLACK;
-    }
-    // TODO: Add theme methods here
-//    private void setLightThemeProperties() {}
 
     protected void displayGroupMembers() {
         JOptionPane.showMessageDialog(mainFrame,
@@ -967,5 +961,149 @@ public class GraphWindow {
                         "   Class Code:   9413\n" +
                         "   Class #:   CS 211\n",
                 "Course Specifications", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    protected void setLightThemeProperties() {
+        mainColor = new Color(0xD9D9D9);
+        secondaryColor = new Color(0xFFFFFF);
+        headerColor = new Color(0x222222);
+        accentColor = new Color(0x222222);
+        vertexColor = Color.BLACK;
+        edgesColor = Color.BLACK;
+        highlightColor = new Color(0xECECEC);
+
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.WHITE;
+        vertexForeground = Color.WHITE;
+    }
+
+    protected void setDarkThemeProperties() {
+        mainColor = new Color(0x333333);
+        secondaryColor = new Color(0x666666);
+        headerColor = new Color(0x000000);
+        accentColor = new Color(0x000000);
+        vertexColor = Color.BLACK;
+        edgesColor = Color.WHITE;
+        highlightColor = new Color(0x999999);
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.WHITE;
+        vertexForeground = Color.WHITE;
+    }
+
+    protected void setSLUThemeProperties() {
+        mainColor = new Color(0xF4D35E);
+        secondaryColor = new Color(0xFFFFFF);
+        headerColor = new Color(0x0D3B66);
+        accentColor = headerColor;
+        vertexColor = headerColor;
+        edgesColor = new Color(0x0D3B66);
+        highlightColor = new Color(0xF9E9AE);
+
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.WHITE;
+        vertexForeground = Color.WHITE;
+    }
+
+    protected void setBentoThemeProperties() {
+        mainColor = new Color(0x2D394D);
+        secondaryColor = new Color(0x4A768D);
+        headerColor = new Color(0xF87A90);
+        accentColor = headerColor;
+        vertexColor = headerColor;
+        edgesColor = Color.WHITE;
+        highlightColor = new Color(0x969CA6);
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.WHITE;
+        vertexForeground = Color.WHITE;
+    }
+
+    protected void setDraculaThemeProperties() {
+        mainColor = new Color(0x282A36);
+        secondaryColor = new Color(0x44475A);
+        headerColor = new Color(0x6272A4);
+        accentColor = new Color(0xBD93F9);
+        vertexColor = accentColor;
+        edgesColor = Color.WHITE;
+        highlightColor = new Color(0x93949A);
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.BLACK;
+        vertexForeground = Color.BLACK;
+    }
+
+    protected void setGruvboxThemeProperties() {
+        mainColor = new Color(0x282828);
+        secondaryColor = new Color(0x1D2021);
+        headerColor = new Color(0x689D6A);
+        accentColor = new Color(0xDED1AD);
+        vertexColor = accentColor;
+        edgesColor = Color.WHITE;
+        highlightColor = new Color(0x939393);
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.BLACK;
+        vertexForeground = Color.BLACK;
+    }
+
+    protected void setGodspeedThemeProperties() {
+        mainColor = new Color(0x6A97B5);
+        secondaryColor = new Color(0xEAE3D5);
+        headerColor = new Color(0x5A5E61);
+        accentColor = new Color(0xFAEE69);
+        vertexColor = mainColor;
+        edgesColor = Color.BLACK;
+        highlightColor = new Color(0xB4CBDA);
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.BLACK;
+        vertexForeground = Color.WHITE;
+    }
+
+    protected void setOliveThemeProperties() {
+        mainColor = new Color(0xB6B09A);
+        secondaryColor = new Color(0xD9D2C8);
+        headerColor = new Color(0x2E2F33);
+        accentColor = new Color(0x6F8C70);
+        vertexColor = accentColor;
+        edgesColor = Color.BLACK;
+        highlightColor = new Color(0xDAD7CC);
+
+        mainForeground = Color.BLACK;
+        secondaryForeground = Color.BLACK;
+        headerForeground = Color.WHITE;
+        mainButtonForeground = Color.WHITE;
+        vertexForeground = Color.WHITE;
+    }
+
+    protected void setChristmasThemeProperties() {
+        mainColor = new Color(0xCD1624);
+        secondaryColor = new Color(0x23856D);
+        headerColor = new Color(0xFAF8F8);
+        accentColor = new Color(0xF8F272);
+        vertexColor = mainColor;
+        edgesColor = Color.WHITE;
+        highlightColor = new Color(0xE68A91);
+
+        mainForeground = Color.WHITE;
+        secondaryForeground = Color.WHITE;
+        headerForeground = Color.BLACK;
+        mainButtonForeground = Color.BLACK;
+        vertexForeground = Color.WHITE;
     }
 }

@@ -28,8 +28,14 @@ public class GraphVisualizerCanvas extends Canvas {
     private String fromLabel = "";
     private String toLabel = "";
 
-    public GraphVisualizerCanvas(Graph graph, Color bgColor) {
+    Color mainFg, vertexFg, vertexColor, edgeColor;
+
+    public GraphVisualizerCanvas(Graph graph, Color bgColor, Color mainFg, Color vertexFg, Color vertexColor, Color edgeColor) {
         this.setBackground(bgColor);
+        this.mainFg = mainFg;
+        this.vertexFg = vertexFg;
+        this.vertexColor = vertexColor;
+        this.edgeColor = edgeColor;
         setGraph(graph);
     }
 
@@ -61,7 +67,8 @@ public class GraphVisualizerCanvas extends Canvas {
     }
 
     private void paintHeader(Graphics g) {
-        g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 25));
+        g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 22));
+        g.setColor(mainFg); // VISUALIZER PANEL FOREGROUND
         g.drawString(algoLabel,10,30);
         if (!fromLabel.equals(""))
             g.drawString("Start: " + fromLabel, 10, 65);
@@ -74,17 +81,17 @@ public class GraphVisualizerCanvas extends Canvas {
 //        g.translate(-VRAD/2, -VRAD/2);
         for (int i = 0; i < vSize; i++) {
             PairList.Node<Integer, Integer> coord = vCoords.getAt(i);
-            g.setColor(Color.BLACK);
+            g.setColor(vertexColor);    // VERTEX COLOR
             g.translate(-VRAD/2, -VRAD/2);
             g.fillOval(coord.key, coord.val, VRAD, VRAD);
-            g.setColor(Color.PINK);
+            g.setColor(vertexFg);    // VERTEX FOREGROUND COLOR
             g.translate(VRAD/2,VRAD/2);
             g.drawString(Integer.toString(i), coord.key, coord.val);
         }
         if (path.getSize() != 0) {
             g.translate(-VRAD/2, -VRAD/2);
             PairList.Node<Integer, Integer> head = vertexCoordsPairList.get(path.getElement(path.getSize()-1).val);
-            g.setColor(Color.WHITE);
+            g.setColor(Color.GREEN);
             g.drawOval(head.key, head.val, VRAD, VRAD);
             g.translate(VRAD/2,VRAD/2);
 
@@ -102,7 +109,7 @@ public class GraphVisualizerCanvas extends Canvas {
                     continue;
                 }
                 int cost = vertices.getElement(i).edges.getAt(j).val;
-                g.setColor(Color.BLACK);
+                g.setColor(edgeColor); //EDGE COLOR
                 g.drawLine(p1.key, p1.val, p2.key, p2.val);
             }
         }
@@ -120,11 +127,6 @@ public class GraphVisualizerCanvas extends Canvas {
             g.drawLine(p1.key, p1.val, p2.key, p2.val);
         }
 
-    }
-
-    public void paintEdgesDirected(Graphics g) {
-        //TODO: implement paintEdgesDirected()
-        System.out.println("DIRECTED");
     }
 
 
@@ -171,6 +173,4 @@ public class GraphVisualizerCanvas extends Canvas {
         this.path = path;
         this.repaint();
     }
-
-
 }
