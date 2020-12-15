@@ -84,7 +84,7 @@ public class GraphWindow {
     protected DefaultTableModel inputTableModel, pathwayTableModel, dTableModel;
     protected JScrollPane inputTableScrollPane, pathwayTableScrollPane, dTableScrollPane;
     protected JPanel inputLabelPanel, pathwayLabelPanel, dTableLabelPanel;
-    protected JLabel inputLabel, pathwayLabel, dTableLabel;
+    protected JLabel inputLabel, pathwayLabel, dTableLabel, fromToLabel;
 
     // button controllers
     protected JButton inputFileButton = new JButton("Browse");
@@ -98,7 +98,7 @@ public class GraphWindow {
             skipBackwardButton,incrementButton, decrementButton};
 
     protected JLabel algorithmLabel;
-    protected JPanel fromToLabel, fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
+    protected JPanel fromToLabelPanel, fromToPanel, algoLabelPanel, algoSelectionPanel, playPanel, stepPanel;
 
     protected JTextField fromField;
     protected JComboBox<String> toComboBox;
@@ -311,7 +311,7 @@ public class GraphWindow {
         dTable.getTableHeader().setBackground(headerColor);
         dTableScrollPane.setBackground(headerColor);
 
-        fromToLabel.setBackground(mainColor);
+        fromToLabelPanel.setBackground(mainColor);
         fromToPanel.setBackground(mainColor);
         algoLabelPanel.setBackground(mainColor);
         algoSelectionPanel.setBackground(mainColor);
@@ -582,7 +582,7 @@ public class GraphWindow {
         actionPanel = new JPanel();
         actionPanel.setLayout(new GridLayout(6, 1));
 
-        fromToLabel = new JPanel(new GridLayout(1, 3, 9, 5));
+        fromToLabelPanel = new JPanel(new GridLayout(1, 3, 9, 5));
         fromToPanel = new JPanel(new GridLayout(1, 3, 9, 5));
         algoLabelPanel = new JPanel(new GridLayout(1, 1));
         algoSelectionPanel = new JPanel(new GridLayout(1, 1));
@@ -601,7 +601,8 @@ public class GraphWindow {
         initializeAlgoSelectionBox();
         algoSelectionPanel.add(algoSelectionBox);
 
-        fromToLabel.add(new JLabel("         From                     To"));
+        fromToLabel = new JLabel("         From                     To");
+        fromToLabelPanel.add(fromToLabel);
         fromToPanel.add(fromField);
         fromToPanel.add(toComboBox);
         fromToPanel.add(setButton);
@@ -612,7 +613,7 @@ public class GraphWindow {
         stepPanel.add(incrementButton);
 
         // top: dropdown list, middle: wide play/pause button, bottom: steppers
-        actionPanel.add(fromToLabel);
+        actionPanel.add(fromToLabelPanel);
         actionPanel.add(fromToPanel);
         actionPanel.add(algoLabelPanel);
         actionPanel.add(algoSelectionPanel);
