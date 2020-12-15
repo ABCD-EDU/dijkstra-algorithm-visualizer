@@ -2,13 +2,7 @@ package main.finals.grp2.lab;
 
 import main.finals.grp2.util.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.NoSuchElementException;
+import java.io.*;
 
 public class Graph {
 
@@ -97,6 +91,8 @@ public class Graph {
 
     private void insertDirected(int weight, String from, String to) {
         Vertex v = getVertex(from);
+        if (getVertex(to) == null)
+            vertices.insert(new Vertex(to));
         if (v != null) { // if node exists just insert the destination
             v.edges.put(new Vertex(to), weight);
         } else { // if not then create a node then insert to graph
@@ -408,13 +404,20 @@ public class Graph {
        return path;
    }
 
-    public static void main(String[] args) {
-        Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
+    public static void main(String[] args) throws IOException {
+//        Graph g = new Graph(new File("src/main/finals/grp2/lab/data/in.csv"));
 
-        for (int i = 0; i < 2; i++) {
-            PairList<String[], Queue<Dictionary.Node<Vertex, Vertex>>> data = g.dijkstra(String.valueOf(i));
-            System.out.println(i);
-        }
+//        FileWriter writer = new FileWriter("src/main/finals/grp2/lab/data/in.csv");
+//
+//        writer.write("DIRECTED\n");
+//        int edges = 30;
+//        for (int i = 0; i < edges; i++) {
+//            for (int j = 0; j < edges; j++) {
+//                if (i == j) continue;
+//                writer.write("1," + i + "," + j + "\n");
+//            }
+//        }
+//        writer.close();
 
     }
 

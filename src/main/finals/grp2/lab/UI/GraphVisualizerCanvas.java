@@ -6,7 +6,6 @@ import main.finals.grp2.util.ArrayList;
 import main.finals.grp2.util.Dictionary;
 import main.finals.grp2.util.List;
 
-import javax.swing.*;
 import java.awt.*;
 
 // TODO: INTEGRATE NEW GRAPH
@@ -56,13 +55,7 @@ public class GraphVisualizerCanvas extends Canvas {
         System.out.println("Canvas Painting");
         paintHeader(g);
         g.translate((this.getWidth()/2)-40,(this.getHeight()/2)-40); // center
-//        g.drawOval(0,0, VRAD, VRAD);
-//        g.setColor(Color.BLACK);
-//        if (graph.isDirected()) {
-//            paintEdgesDirected(g);
-//        }else {
-            paintEdgesUndirected(g);
-//        }
+        paintEdgesUndirected(g);
         paintVertices(g);
     }
 
